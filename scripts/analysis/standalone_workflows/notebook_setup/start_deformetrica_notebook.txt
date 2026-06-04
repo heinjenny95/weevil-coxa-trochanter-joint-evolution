@@ -1,0 +1,3 @@
+<LOCAL_USER>@<LOCAL_HOST>:~$ source ~/deformetrica/bin/activate
+(deformetrica) <LOCAL_USER>@<LOCAL_HOST>:~$ cd <KERNEL_WIDTH_PROJECT_ROOT>
+(deformetrica) <LOCAL_USER>@<LOCAL_HOST>:<KERNEL_WIDTH_PROJECT_ROOT>$ jupyter notebook

@@ -1,0 +1,37 @@
+# Operating-system noise
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# R session/cache files
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# Python cache/build files
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+env/
+
+# Temporary and backup files
+*.tmp
+*.temp
+*.bak
+*.backup
+~$*
+backup_before*/
+Backup/
+
+# Local editor metadata
+.vscode/
+.idea/
+
+# Large/generated local archives
+*.zip
+*.tar
+*.tar.gz
+

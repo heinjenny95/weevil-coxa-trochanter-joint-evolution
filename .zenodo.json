@@ -1,0 +1,26 @@
+{
+  "title": "Code for evolutionary diversification of the coxa-trochanteral joint morphology in weevils",
+  "upload_type": "software",
+  "description": "Analysis code associated with a study of coxa-trochanteral joint morphology in Curculionoidea.",
+  "creators": [
+    {
+      "name": "The authors of the associated manuscript"
+    }
+  ],
+  "license": "MIT",
+  "keywords": [
+    "Curculionoidea",
+    "weevils",
+    "geometric morphometrics",
+    "coxa-trochanteral joint",
+    "screw joint",
+    "phylogenetic comparative methods"
+  ],
+  "related_identifiers": [
+    {
+      "relation": "isSupplementTo",
+      "identifier": "DOI_TO_BE_ADDED",
+      "scheme": "doi"
+    }
+  ]
+}

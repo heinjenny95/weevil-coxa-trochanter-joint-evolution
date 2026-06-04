@@ -1,0 +1,10 @@
+*.R text eol=lf
+*.py text eol=lf
+*.ps1 text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+*.csv text eol=lf
+*.tre text eol=lf
+*.tree text eol=lf
+*.nex text eol=lf
+
