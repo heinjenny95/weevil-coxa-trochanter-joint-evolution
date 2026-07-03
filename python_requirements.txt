@@ -1,3 +1,6 @@
+deformetrica==4.3.0
+jupyterlab
+matplotlib
 numpy
 pandas
 scipy

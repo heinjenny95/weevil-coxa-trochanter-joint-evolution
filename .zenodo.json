@@ -1,7 +1,7 @@
 {
   "title": "Analysis code for evolutionary diversification of the biological screw joint in weevils",
   "upload_type": "software",
-  "description": "Analysis code accompanying a comparative study of coxa-trochanteral joint morphology, screw geometry and evolutionary diversification in Curculionoidea.",
+  "description": "Reproducible preprocessing, Deformetrica atlas, morphometric, biomechanical and phylogenetic analysis code accompanying a comparative study of coxa-trochanteral joint evolution in Curculionoidea.",
   "version": "1.0.0",
   "creators": [
     {"name": "Hein, Jenny", "orcid": "0009-0007-4150-4538"},
@@ -26,6 +26,8 @@
   "keywords": [
     "Curculionoidea",
     "weevils",
+    "Deformetrica",
+    "landmark-free morphometrics",
     "geometric morphometrics",
     "coxa-trochanteral joint",
     "screw joint",

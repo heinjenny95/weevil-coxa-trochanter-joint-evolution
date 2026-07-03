@@ -10,13 +10,31 @@
 
 rm(list = ls())
 
-# ------------------- PATHS -------------------
-momenta_file <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/Atlas_Momentas.txt"
-xml_file     <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/data_set.xml"
+# ------------------- INPUTS AND OUTPUTS -------------------
+# Command-line use:
+# Rscript extract_pca_scores_with_specimen_ids.R \
+#   Atlas_Momentas.txt data_set.xml output_directory
+args <- commandArgs(trailingOnly = TRUE)
 
-out_csv      <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/PCA_scores_with_specimen_id.csv"
-out_var_csv  <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/PCA_variance.csv"
-out_pdf      <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/PCA_simple_plots.pdf"
+if (length(args) == 3) {
+  momenta_file <- args[1]
+  xml_file <- args[2]
+  out_dir <- args[3]
+} else if (length(args) == 0) {
+  momenta_file <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/Atlas_Momentas.txt"
+  xml_file <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing/data_set.xml"
+  out_dir <- "<KERNEL_WIDTH_PROJECT_ROOT>/data/atlasing"
+} else {
+  stop(
+    "Expected either no arguments or: Atlas_Momentas.txt data_set.xml output_directory",
+    call. = FALSE
+  )
+}
+
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
+out_csv <- file.path(out_dir, "PCA_scores_with_specimen_id.csv")
+out_var_csv <- file.path(out_dir, "PCA_variance.csv")
+out_pdf <- file.path(out_dir, "PCA_simple_plots.pdf")
 
 # ------------------- PACKAGES -------------------
 if (!requireNamespace("xml2", quietly = TRUE)) {

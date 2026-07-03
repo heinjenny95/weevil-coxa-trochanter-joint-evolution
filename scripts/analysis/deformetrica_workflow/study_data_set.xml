@@ -1,0 +1,343 @@
+<?xml version="1.0"?>
+<data_set>
+        <subject id="15_mononychus_punctumalbum_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">15_mononychus_punctumalbum_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="240_anthribus_nebulosus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">240_anthribus_nebulosus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="291_basilogeus_dacrycarpi_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">291_basilogeus_dacrycarpi_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="300_phaenomerus_foveipennis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">300_phaenomerus_foveipennis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="301_scobinoides_dentatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">301_scobinoides_dentatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="302_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">302_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="303_perapion_curtirostre_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">303_perapion_curtirostre_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="304_merynchites_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">304_merynchites_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="305_euplatypus_paralellus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">305_euplatypus_paralellus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="306_proterhinus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">306_proterhinus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="307_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">307_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="308_lisshorhoptrus_oryzophilus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">308_lisshorhoptrus_oryzophilus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="309_listronotus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">309_listronotus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="310_ormiscus_saltator_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">310_ormiscus_saltator_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="311_neochetina_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">311_neochetina_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="312_metapocyrtus_adspersus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">312_metapocyrtus_adspersus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="313_sitona_hispidulus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">313_sitona_hispidulus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="314_euparius_paganus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">314_euparius_paganus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="315_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">315_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="316_hypera_postica_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">316_hypera_postica_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="317_brentus_trochanter_mirrored_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">317_brentus_trochanter_mirrored_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="318_car_pini_trochanter_mirrored_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">318_car_pini_trochanter_mirrored_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="a_fallax_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">a_fallax_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="a_frumentarium_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">a_frumentarium_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="a_haematodes_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">a_haematodes_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="a_validum_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">a_validum_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="adexius_scrobipennis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">adexius_scrobipennis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="archarius_pyrrhoceras_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">archarius_pyrrhoceras_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="b_porcatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">b_porcatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="barypeithes_araneiformis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">barypeithes_araneiformis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="brachysomus_hirtus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">brachysomus_hirtus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="c_attelaboides_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">c_attelaboides_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="c_cinctus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">c_cinctus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="c_glandium_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">c_glandium_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="c_tuberculosus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">c_tuberculosus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="cleopus_solani_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">cleopus_solani_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="coenorhinus_pauxillus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">coenorhinus_pauxillus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="dorytomus_taeniatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">dorytomus_taeniatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="dryophthorus_corticalis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">dryophthorus_corticalis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="e_hypocrita_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">e_hypocrita_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="e_micros_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">e_micros_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="hylesinus_crenatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">hylesinus_crenatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="hylurgops_palliatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">hylurgops_palliatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="larinus_turbinatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">larinus_turbinatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="leiosoma_deflexum_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">leiosoma_deflexum_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="leperisinus_fraxini_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">leperisinus_fraxini_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="limnobaris_t_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">limnobaris_t_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="n_marmoratus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">n_marmoratus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="n_quadrimaculatus_trochanter_mirrored_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">n_quadrimaculatus_trochanter_mirrored_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="orchestes_testaceus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">orchestes_testaceus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="otiorynchus_singularis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">otiorynchus_singularis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="oxystoma_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">oxystoma_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="p_pollinarius_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">p_pollinarius_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="phyllobius_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">phyllobius_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="polydrusus_marginatus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">polydrusus_marginatus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="protapion_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">protapion_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="rhinusa_tetra_trochanter_mirrored_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">rhinusa_tetra_trochanter_mirrored_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="rynchites_cupreus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">rynchites_cupreus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="s_capitatum_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">s_capitatum_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="s_melanogtammum_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">s_melanogtammum_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="scolytus_carpini_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">scolytus_carpini_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="sibinia_pellucens_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">sibinia_pellucens_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="sitona_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">sitona_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="t_plicicollis_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">t_plicicollis_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="t_pseudonastus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">t_pseudonastus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="u_rufipes_trochanter_mirrored_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">u_rufipes_trochanter_mirrored_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="xylocleptes_bispinus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">xylocleptes_bispinus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+        <subject id="xylosandrus_germanus_trochanter_aligned.vtk">
+                <visit id="experiment">
+                        <filename object_id="joint">xylosandrus_germanus_trochanter_aligned.vtk</filename>
+                </visit>
+        </subject>
+</data_set>
