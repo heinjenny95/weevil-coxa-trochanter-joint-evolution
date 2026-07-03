@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "Please cite the associated manuscript and archived repository release."
+message: "Please cite the associated manuscript and this code repository."
 title: "Analysis code for evolutionary diversification of the biological screw joint in weevils"
 type: software
 authors:

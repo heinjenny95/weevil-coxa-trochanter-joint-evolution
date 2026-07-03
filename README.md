@@ -76,10 +76,9 @@ the original analyses.
 
 ## Citation
 
-Please cite the associated manuscript and the archived release of this
-repository. Citation metadata are provided in `CITATION.cff`. A manuscript DOI
-and archival DOI can be added after publication and Zenodo deposition without
-changing the analysis history.
+Please cite the associated manuscript and this repository. Citation metadata
+are provided in `CITATION.cff`; the manuscript DOI can be added after
+publication without changing the analysis history.
 
 ## License
 
