@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Joint type Ã— screw geometry (NON-phylogenetic) â€” UPDATED VERSION
 #
 # Compatible with new geometry file containing:

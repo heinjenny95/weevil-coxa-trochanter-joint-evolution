@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Cluster analysis on morphospace PCA scores (PC-space)
 # - k-means (k selection: silhouette + gap statistic)
 # - hierarchical clustering (Ward.D2; k selection: silhouette)

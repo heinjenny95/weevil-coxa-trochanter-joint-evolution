@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Extract 1 extreme specimen per PC in BOTH directions:
 #   - single minimum AND single maximum per PC (PC1-PC5)
 # Output:

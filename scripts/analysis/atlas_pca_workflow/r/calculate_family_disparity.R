@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Disparity (within-family) - BARPLOT with bootstrap CI
 # - Uses PCA scores (PC1..PCk)
 # - Joins Family from specimen_key
@@ -19,7 +19,7 @@ suppressPackageStartupMessages({
 pca_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
 key_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key_with_centroid_size.csv"
 
-k_pcs    <- 6
+k_pcs    <- 5
 B        <- 5000
 ci_level <- 0.95
 min_n    <- 3   # n > 2

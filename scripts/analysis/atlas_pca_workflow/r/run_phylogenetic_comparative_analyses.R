@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Phylogenetic comparative analysis workflow
 # Project: Curculionoidea coxa-trochanter joint paper
 # Purpose:

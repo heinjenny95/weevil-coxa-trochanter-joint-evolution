@@ -1,11 +1,26 @@
 {
-  "title": "Code for evolutionary diversification of the coxa-trochanteral joint morphology in weevils",
+  "title": "Analysis code for evolutionary diversification of the biological screw joint in weevils",
   "upload_type": "software",
-  "description": "Analysis code associated with a study of coxa-trochanteral joint morphology in Curculionoidea.",
+  "description": "Analysis code accompanying a comparative study of coxa-trochanteral joint morphology, screw geometry and evolutionary diversification in Curculionoidea.",
+  "version": "1.0.0",
   "creators": [
-    {
-      "name": "The authors of the associated manuscript"
-    }
+    {"name": "Hein, Jenny", "orcid": "0009-0007-4150-4538"},
+    {"name": "Katzke, Julian", "orcid": "0000-0002-1447-9660"},
+    {"name": "Riedel, Alexander", "orcid": "0000-0002-8291-4425"},
+    {"name": "Bell, Otto", "orcid": "0009-0007-4666-2324"},
+    {"name": "Cecilia, Angelica", "orcid": "0000-0003-0807-4621"},
+    {"name": "Chamorro, M. Lourdes", "orcid": "0000-0002-3536-9372"},
+    {"name": "Ershov, Alexey", "orcid": "0000-0002-5774-5068"},
+    {"name": "Faragó, Tomáš", "orcid": "0009-0006-9824-2797"},
+    {"name": "Hamann, Elias", "orcid": "0000-0002-0623-9069"},
+    {"name": "Sarkar, Chandan", "orcid": "0009-0001-4374-0231"},
+    {"name": "Syrota, Sofiia", "orcid": "0009-0005-7235-3221"},
+    {"name": "Tavakoli, Clément", "orcid": "0000-0002-9994-5818"},
+    {"name": "Zagainov, Nikolay", "orcid": "0000-0003-2901-4759"},
+    {"name": "Zuber, Marcus", "orcid": "0000-0002-2429-6171"},
+    {"name": "Baumbach, Tilo", "orcid": "0000-0003-1034-6876"},
+    {"name": "Heethoff, Michael", "orcid": "0000-0003-3453-4871"},
+    {"name": "van de Kamp, Thomas", "orcid": "0000-0001-7390-1318"}
   ],
   "license": "MIT",
   "keywords": [
@@ -15,12 +30,5 @@
     "coxa-trochanteral joint",
     "screw joint",
     "phylogenetic comparative methods"
-  ],
-  "related_identifiers": [
-    {
-      "relation": "isSupplementTo",
-      "identifier": "DOI_TO_BE_ADDED",
-      "scheme": "doi"
-    }
   ]
 }

@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # EXTENDED ALLOMETRY PIPELINE
 # FINAL DEBUG VERSION WITH HEADER-RECOVERY FOR GEOMETRY
 # ============================================================
@@ -270,7 +270,8 @@ read_cs_from_txt <- function(path) {
   }
   
   xyz_chr <- do.call(rbind, strsplit(trimws(xyz_lines), "\\s+"))
-  xyz <- matrix(as.numeric(xyz_chr), ncol = 3, byrow = TRUE)
+  xyz <- xyz_chr
+  storage.mode(xyz) <- "numeric"
   
   centroid <- colMeans(xyz)
   sqrt(sum(rowSums((xyz - matrix(centroid, nrow(xyz), 3, byrow = TRUE))^2)))

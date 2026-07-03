@@ -1,4 +1,4 @@
-﻿root <- "<MANUSCRIPT_PROJECT_ROOT>"
+root <- "<MANUSCRIPT_PROJECT_ROOT>"
 
 candidate_files <- c(
   "03_Data_and_Inputs/Analysis_Input/specimen_key.csv",

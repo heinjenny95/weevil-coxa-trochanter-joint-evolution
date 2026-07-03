@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Curculionoidea joint-trait combinations audit
 # - Reads Excel
 # - Enumerates all theoretical combos (24)

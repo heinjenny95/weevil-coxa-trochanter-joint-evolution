@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Coxa thickness (median) - exploratory plots (no hole variable)
 # Combined 2x2 figure + CSV export of model statistics
 # ============================================================

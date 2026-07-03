@@ -1,13 +1,64 @@
 cff-version: 1.2.0
-message: "If you use this code, please cite the associated manuscript and archived repository release."
-title: "Code for evolutionary diversification of the coxa-trochanteral joint morphology in weevils"
+message: "Please cite the associated manuscript and archived repository release."
+title: "Analysis code for evolutionary diversification of the biological screw joint in weevils"
 type: software
 authors:
-  - name: "The authors of the associated manuscript"
-version: "0.1.0"
-date-released: "2026-06-04"
+  - given-names: Jenny
+    family-names: Hein
+    orcid: "https://orcid.org/0009-0007-4150-4538"
+  - given-names: Julian
+    family-names: Katzke
+    orcid: "https://orcid.org/0000-0002-1447-9660"
+  - given-names: Alexander
+    family-names: Riedel
+    orcid: "https://orcid.org/0000-0002-8291-4425"
+  - given-names: Otto
+    family-names: Bell
+    orcid: "https://orcid.org/0009-0007-4666-2324"
+  - given-names: Angelica
+    family-names: Cecilia
+    orcid: "https://orcid.org/0000-0003-0807-4621"
+  - given-names: M. Lourdes
+    family-names: Chamorro
+    orcid: "https://orcid.org/0000-0002-3536-9372"
+  - given-names: Alexey
+    family-names: Ershov
+    orcid: "https://orcid.org/0000-0002-5774-5068"
+  - given-names: "Tomáš"
+    family-names: "Faragó"
+    orcid: "https://orcid.org/0009-0006-9824-2797"
+  - given-names: Elias
+    family-names: Hamann
+    orcid: "https://orcid.org/0000-0002-0623-9069"
+  - given-names: Chandan
+    family-names: Sarkar
+    orcid: "https://orcid.org/0009-0001-4374-0231"
+  - given-names: Sofiia
+    family-names: Syrota
+    orcid: "https://orcid.org/0009-0005-7235-3221"
+  - given-names: "Clément"
+    family-names: Tavakoli
+    orcid: "https://orcid.org/0000-0002-9994-5818"
+  - given-names: Nikolay
+    family-names: Zagainov
+    orcid: "https://orcid.org/0000-0003-2901-4759"
+  - given-names: Marcus
+    family-names: Zuber
+    orcid: "https://orcid.org/0000-0002-2429-6171"
+  - given-names: Tilo
+    family-names: Baumbach
+    orcid: "https://orcid.org/0000-0003-1034-6876"
+  - given-names: Michael
+    family-names: Heethoff
+    orcid: "https://orcid.org/0000-0003-3453-4871"
+  - given-names: Thomas
+    family-names: van de Kamp
+    orcid: "https://orcid.org/0000-0001-7390-1318"
+version: "1.0.0"
+date-released: "2026-07-03"
 repository-code: "https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution"
-license: "MIT"
+url: "https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution"
+license: MIT
 keywords:
   - Curculionoidea
   - weevils

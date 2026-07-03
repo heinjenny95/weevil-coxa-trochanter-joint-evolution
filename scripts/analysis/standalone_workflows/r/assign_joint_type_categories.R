@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Assign joint_type + screw_state per specimen_id (DE-CSV export)
 # - Reads: joint_trait_table.xlsx
 # - Normalizes traits (Schraube: TRUE/FALSE/X; others TRUE/FALSE)

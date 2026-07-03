@@ -1,4 +1,4 @@
-﻿# ============================================================
+# ============================================================
 # Joint-combo audit (Curculionoidea screw-joint traits)
 # Works with older dplyr versions (no count(name=...), no count(sort=...))
 #
