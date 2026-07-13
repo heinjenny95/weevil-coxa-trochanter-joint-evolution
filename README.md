@@ -12,7 +12,8 @@ colour-adjustment and panel-assembly scripts are intentionally excluded.
 ## Repository contents
 
 - `scripts/analysis/atlas_pca_workflow`: PCA extraction, morphospace
-  clustering, family disparity and allometry.
+  clustering, family disparity, allometry and the main phylogenetic
+  comparative workflow.
 - `scripts/analysis/deformetrica_workflow`: exact deterministic-atlas
   configuration, ordered 68-subject dataset XML, portable runner and an
   output-free Jupyter workflow.
@@ -24,8 +25,8 @@ colour-adjustment and panel-assembly scripts are intentionally excluded.
   tests.
 - `scripts/analysis/phylogeny_workflow`: alignment subsetting and preparation
   of the study phylogeny.
-- `scripts/analysis/phylogenetic_comparative_analysis`: targeted
-  phylogenetically informed tests.
+- `scripts/analysis/phylogenetic_comparative_analysis`: targeted add-on
+  phylogenetically informed tests not covered by the main workflow.
 - `scripts/analysis/standalone_workflows`: joint typology, screw geometry and
   combined analysis workflows.
 - `scripts/code_manifest.csv`: file sizes and SHA-256 checksums for the
