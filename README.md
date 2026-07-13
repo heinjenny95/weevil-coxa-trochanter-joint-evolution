@@ -75,7 +75,7 @@ and processed research data are not duplicated in this code repository.
 
 The repository provides the analysis scripts and configuration files needed to
 rerun the documented workflows with the study data described in the manuscript.
-The code was developed in R 4.x and Python 3.x; atlas construction used
+The code was developed for R version 4 and Python version 3; atlas construction used
 Deformetrica 4.3.0. Scripts were checked for portable paths and release-ready
 repository structure for the v1.0.0 release. Exact numerical reproduction
 additionally depends on the deposited study data, external software described
