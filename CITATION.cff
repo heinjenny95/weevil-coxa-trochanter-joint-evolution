@@ -55,9 +55,7 @@ authors:
     family-names: van de Kamp
     orcid: "https://orcid.org/0000-0001-7390-1318"
 version: "1.0.0"
-date-released: "2026-07-03"
-repository-code: "https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution"
-url: "https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution"
+date-released: "2026-07-13"
 license: MIT
 keywords:
   - Curculionoidea
