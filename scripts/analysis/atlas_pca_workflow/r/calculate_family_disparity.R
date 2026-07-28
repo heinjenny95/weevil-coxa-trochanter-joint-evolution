@@ -4,9 +4,11 @@
 # - Joins Family from specimen_key
 # - Keeps only families with n > 2
 # - Disparity = mean squared Euclidean distance to family centroid
+# - Also tests whether family-level dispersion differs globally with a
+#   permutation ANOVA on squared distances to family centroids.
 # - Outputs:
-#     1) disparity_by_family_k{k}.csv
-#     2) disparity_by_family_k{k}.pdf (barplot)
+#     1) disparity_by_family_k{k}_nGT2.csv
+#     2) disparity_by_family_barplot_k{k}_nGT2.pdf
 # ============================================================
 
 rm(list = ls())
@@ -23,6 +25,7 @@ k_pcs    <- 5
 B        <- 5000
 ci_level <- 0.95
 min_n    <- 3   # n > 2
+n_perm   <- 9999
 
 # Output
 out_dir <- dirname(pca_path)
@@ -56,6 +59,44 @@ boot_ci <- function(X, B = 2000, ci_level = 0.95) {
   alpha <- (1 - ci_level) / 2
   qs <- quantile(stats, probs = c(alpha, 1 - alpha), names = FALSE)
   setNames(qs, c("ci_low", "ci_high"))
+}
+
+dispersion_anova <- function(data, pc_columns, group_column = "Family") {
+  X <- as.matrix(data[, pc_columns, drop = FALSE])
+  grp <- as.factor(data[[group_column]])
+
+  centroids <- rowsum(X, grp) / as.vector(table(grp))
+  d2 <- rowSums((X - centroids[grp, , drop = FALSE])^2)
+
+  lm_fit <- lm(d2 ~ grp)
+  an <- anova(lm_fit)
+  unname(an[["F value"]][1])
+}
+
+permutation_dispersion_test <- function(data, pc_columns, group_column = "Family",
+                                        n_perm = 9999, seed = 1) {
+  set.seed(seed)
+  observed_F <- dispersion_anova(data, pc_columns, group_column)
+
+  perm_F <- numeric(n_perm)
+  perm_data <- data
+  for (i in seq_len(n_perm)) {
+    perm_data[[group_column]] <- sample(data[[group_column]])
+    perm_F[i] <- dispersion_anova(perm_data, pc_columns, group_column)
+  }
+
+  # +1 correction keeps the permutation P value conservative and non-zero.
+  p_perm <- (sum(perm_F >= observed_F, na.rm = TRUE) + 1) / (n_perm + 1)
+
+  tibble(
+    global_dispersion_test = "permutation ANOVA on squared distances to family centroids",
+    global_dispersion_test_F = observed_F,
+    global_dispersion_test_p = p_perm,
+    global_dispersion_test_permutations = n_perm,
+    global_dispersion_test_note = paste0(
+      "Families with n >= ", min_n, "; PC1-PC", length(pc_columns)
+    )
+  )
 }
 
 # ------------------- READ + JOIN -------------------
@@ -101,6 +142,23 @@ df2 <- df %>% filter(Family %in% keep_fams)
 cat("Families retained (n >=", min_n, "):\n")
 print(fam_counts %>% filter(Family %in% keep_fams) %>% arrange(desc(n)))
 
+# ------------------- GLOBAL DISPERSION TEST -------------------
+global_test <- permutation_dispersion_test(
+  df2,
+  pcs_use,
+  group_column = "Family",
+  n_perm = n_perm,
+  seed = 1
+)
+
+cat(
+  "Global family-dispersion permutation test:",
+  "F =", round(global_test$global_dispersion_test_F, 6),
+  "P =", global_test$global_dispersion_test_p,
+  "permutations =", n_perm,
+  "\n"
+)
+
 # ------------------- DISPARITY + BOOTSTRAP (efficient) -------------------
 set.seed(1)
 
@@ -119,7 +177,8 @@ disp_out <- df2 %>%
   }) %>%
   ungroup() %>%
   arrange(desc(disparity)) %>%
-  mutate(Family = factor(Family, levels = Family))
+  mutate(Family = factor(Family, levels = Family)) %>%
+  bind_cols(global_test[rep(1, n()), ])
 
 # ------------------- WRITE CSV -------------------
 out_csv <- file.path(out_dir, paste0("disparity_by_family_k", k_pcs, "_nGT2.csv"))
