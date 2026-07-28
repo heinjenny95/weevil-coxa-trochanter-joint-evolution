@@ -1,9 +1,8 @@
-# Phylogenetically informed allometry of the multivariate PC1-PC5 score.
+# Phylogenetically informed allometry of the full atlas-shape score.
 #
-# The score projects PC1-PC5 onto the normalized specimen-level regression
-# vector for log centroid size. It is used to visualize the multivariate
-# allometric effect alongside the RRPP analysis and is not a replacement for
-# the specimen-level multivariate significance test.
+# The score projects all non-zero atlas PC axes onto the normalized
+# specimen-level regression vector for log centroid size. The specimen-level
+# RRPP analysis remains the primary full-shape significance test.
 
 suppressPackageStartupMessages({
   library(ape)
@@ -59,13 +58,6 @@ normalize_tree_label <- function(x) {
 }
 
 prepare_table <- function(data, require_label = FALSE) {
-  pc_names <- paste0("PC", 1:5)
-  missing_pc <- setdiff(pc_names, names(data))
-  if (length(missing_pc) > 0) {
-    stop("Missing PC columns: ", paste(missing_pc, collapse = ", "), call. = FALSE)
-  }
-  for (name in pc_names) data[[name]] <- as_numeric(data[[name]])
-
   if (!"logCS" %in% names(data)) {
     if (!"centroid_size" %in% names(data)) {
       stop("Input requires logCS or centroid_size.", call. = FALSE)
@@ -85,16 +77,30 @@ prepare_table <- function(data, require_label = FALSE) {
   data
 }
 
-specimen <- prepare_table(read_table_auto(specimen_path))
+specimen <- prepare_table(read_table_auto(specimen_path), require_label = TRUE)
 tip_data <- prepare_table(read_table_auto(tip_path), require_label = TRUE)
 tree <- ape::read.tree(tree_path)
 tree$node.label <- NULL
 tree$tip.label <- normalize_tree_label(tree$tip.label)
 tip_data$tree_label <- normalize_tree_label(tip_data$tree_label)
 
-pc_names <- paste0("PC", 1:5)
-specimen <- specimen[stats::complete.cases(specimen[, c(pc_names, "logCS")]), ]
-tip_data <- tip_data[stats::complete.cases(tip_data[, c(pc_names, "logCS", "tree_label")]), ]
+pc_names <- grep("^PC[0-9]+$", names(specimen), value = TRUE)
+pc_names <- pc_names[order(as.integer(sub("^PC", "", pc_names)))]
+if (length(pc_names) < 5) {
+  stop("Fewer than five PC columns were detected.", call. = FALSE)
+}
+for (name in pc_names) specimen[[name]] <- as_numeric(specimen[[name]])
+pc_variance <- vapply(specimen[pc_names], stats::var, numeric(1), na.rm = TRUE)
+pc_names <- pc_names[
+  is.finite(pc_variance) & pc_variance > sqrt(.Machine$double.eps)
+]
+
+specimen <- specimen[
+  stats::complete.cases(specimen[, c(pc_names, "logCS", "tree_label")]),
+]
+tip_data <- tip_data[
+  stats::complete.cases(tip_data[, c("logCS", "tree_label")]),
+]
 
 pc_matrix <- as.matrix(specimen[, pc_names])
 pc_fit <- stats::lm(pc_matrix ~ specimen$logCS)
@@ -112,7 +118,18 @@ project_score <- function(data) {
 }
 
 specimen$multivariate_score <- project_score(specimen)
-tip_data$multivariate_score <- project_score(tip_data)
+tip_scores <- stats::aggregate(
+  specimen[, c("logCS", "multivariate_score")],
+  by = list(tree_label = specimen$tree_label),
+  FUN = mean,
+  na.rm = TRUE
+)
+tip_data <- merge(
+  tip_data[, c("tree_label", "logCS"), drop = FALSE],
+  tip_scores[, c("tree_label", "multivariate_score"), drop = FALSE],
+  by = "tree_label",
+  all = FALSE
+)
 
 common_tips <- intersect(tree$tip.label, tip_data$tree_label)
 if (length(common_tips) < 4) {
@@ -134,7 +151,9 @@ fit_summary <- summary(fit)
 coefficient <- as.data.frame(fit_summary$coefficients)["logCS", , drop = FALSE]
 
 results <- data.frame(
-  response = "PC1_PC5_regression_score",
+  response = "full_atlas_shape_regression_score",
+  analysis_scope = "all_nonzero_atlas_PCs",
+  n_pc_axes = length(pc_names),
   n = stats::nobs(fit),
   estimate = coefficient$Estimate,
   std_error = coefficient$`Std. Error`,

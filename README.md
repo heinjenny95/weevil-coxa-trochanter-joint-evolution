@@ -64,6 +64,16 @@ The intended generic project layout is:
 Some scripts create diagnostic graphics as analysis byproducts. These are not
 the final publication layouts.
 
+### Allometry analysis scope
+
+The primary multivariate allometry test uses all non-zero atlas PC axes and
+therefore represents the complete atlas-derived shape space. Because atlas
+shapes were normalized for scale before PCA, the isometric null is a zero
+multivariate shape slope with log centroid size. Analyses restricted to
+PC1-PC5 are retained only as anatomical sensitivity analyses; these five axes
+are used elsewhere in the manuscript for interpretable visualization of the
+dominant deformations.
+
 ## Data availability
 
 Tomographic data, processed meshes, morphometric scores, geometry

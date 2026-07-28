@@ -52,6 +52,7 @@ out_key_csv            <- file.path(out_dir, "specimen_key_with_centroid_size.cs
 out_pca_csv            <- file.path(out_dir, "PCA_scores_with_specimen_id_with_centroid_size.csv")
 out_univar_csv         <- file.path(out_dir, "allometry_univariate_PC1_to_PC5_results.csv")
 out_rrpp_csv           <- file.path(out_dir, "allometry_rrpp_multivariate_results.csv")
+out_rrpp_pc5_csv       <- file.path(out_dir, "allometry_rrpp_PC1_to_PC5_sensitivity_results.csv")
 out_procD_csv          <- file.path(out_dir, "allometry_procD_lm_results.csv")
 
 out_plot_uni_png       <- file.path(out_dir, "allometry_univariate_PC1_to_PC5.png")
@@ -263,6 +264,7 @@ if (any(df$centroid_size <= 0)) {
 }
 
 pc_cols <- grep("^PC[0-9]+$", names(df), value = TRUE)
+pc_cols <- pc_cols[order(as.integer(sub("^PC", "", pc_cols)))]
 if (length(pc_cols) < 5) {
   stop_with_hint(paste0("Found fewer than 5 PC columns. Detected: ", paste(pc_cols, collapse = ", ")))
 }
@@ -272,14 +274,19 @@ if (length(missing_required_pcs) > 0) {
   stop_with_hint(paste0("Missing required PCs: ", paste(missing_required_pcs, collapse = ", ")))
 }
 
-for (cc in pcs_use) {
+for (cc in pc_cols) {
   df[[cc]] <- suppressWarnings(as.numeric(df[[cc]]))
 }
+
+pc_variance <- vapply(df[pc_cols], stats::var, numeric(1), na.rm = TRUE)
+pcs_full_shape <- pc_cols[
+  is.finite(pc_variance) & pc_variance > sqrt(.Machine$double.eps)
+]
 
 df0 <- df %>%
   dplyr::mutate(logCS = log(centroid_size)) %>%
   dplyr::filter(!is.na(logCS)) %>%
-  dplyr::filter(dplyr::if_all(dplyr::all_of(pcs_use), ~ !is.na(.x)))
+  dplyr::filter(dplyr::if_all(dplyr::all_of(pcs_full_shape), ~ !is.na(.x)))
 
 if (nrow(df0) < 10) {
   stop_with_hint(paste0("Too few rows after filtering NA. Remaining: ", nrow(df0)))
@@ -288,6 +295,7 @@ if (nrow(df0) < 10) {
 cat("\n=== Allometry data ===\n")
 cat("Rows:", nrow(df0), "\n")
 cat("Using PCs:", paste(pcs_use, collapse = ", "), "\n")
+cat("Primary full-shape PCs:", paste(pcs_full_shape, collapse = ", "), "\n")
 cat("Permutations:", n_permutations, "\n")
 cat("P-value adjustment for univariate tests:", p_adjust_method, "\n\n")
 
@@ -404,11 +412,14 @@ ggsave(
 )
 
 # ============================================================
-# 5.2 MULTIVARIATE (RRPP): (PC1..PC5) ~ logCS
+# 5.2 MULTIVARIATE (RRPP): full atlas shape ~ logCS
 # ============================================================
 
-cat("=== Multivariat (RRPP): (PC1..PC5) ~ logCS ===\n")
-Y <- as.matrix(df0[, pcs_use, drop = FALSE])
+cat("=== Multivariate (RRPP): full atlas shape ~ logCS ===\n")
+Y <- as.matrix(df0[, pcs_full_shape, drop = FALSE])
+pc_variance_complete <- vapply(df0[pcs_full_shape], stats::var, numeric(1), na.rm = TRUE)
+total_shape_variance <- sum(pc_variance_complete)
+pc5_variance_percent <- 100 * sum(pc_variance_complete[pcs_use]) / total_shape_variance
 
 fit_rrpp <- RRPP::lm.rrpp(
   Y ~ logCS,
@@ -447,6 +458,12 @@ rrpp_tab <- as.data.frame(rrpp_tab)
 rrpp_tab$Term <- rownames(rrpp_tab)
 rownames(rrpp_tab) <- NULL
 rrpp_tab <- rrpp_tab[, c("Term", setdiff(names(rrpp_tab), "Term")), drop = FALSE]
+rrpp_tab$analysis_scope <- "full_atlas_shape"
+rrpp_tab$n_pc_axes <- length(pcs_full_shape)
+rrpp_tab$pc_axes <- paste(pcs_full_shape, collapse = ",")
+rrpp_tab$variance_represented_percent <- 100
+rrpp_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+rrpp_tab$n_permutations <- n_permutations
 
 write.table(
   rrpp_tab,
@@ -460,6 +477,36 @@ write.table(
 )
 
 cat("\n Wrote RRPP multivariate table:\n", out_rrpp_csv, "\n")
+
+Y_pc5 <- as.matrix(df0[, pcs_use, drop = FALSE])
+fit_rrpp_pc5 <- RRPP::lm.rrpp(
+  Y_pc5 ~ logCS,
+  data = df0,
+  iter = n_permutations,
+  print.progress = FALSE
+)
+rrpp_pc5_anova <- anova(fit_rrpp_pc5)
+rrpp_pc5_tab <- if (!is.null(rrpp_pc5_anova$table)) rrpp_pc5_anova$table else as.data.frame(rrpp_pc5_anova)
+rrpp_pc5_tab <- as.data.frame(rrpp_pc5_tab)
+rrpp_pc5_tab$Term <- rownames(rrpp_pc5_tab)
+rownames(rrpp_pc5_tab) <- NULL
+rrpp_pc5_tab <- rrpp_pc5_tab[, c("Term", setdiff(names(rrpp_pc5_tab), "Term")), drop = FALSE]
+rrpp_pc5_tab$analysis_scope <- "PC1-PC5_sensitivity"
+rrpp_pc5_tab$n_pc_axes <- length(pcs_use)
+rrpp_pc5_tab$pc_axes <- paste(pcs_use, collapse = ",")
+rrpp_pc5_tab$variance_represented_percent <- pc5_variance_percent
+rrpp_pc5_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+rrpp_pc5_tab$n_permutations <- n_permutations
+write.table(
+  rrpp_pc5_tab,
+  file = out_rrpp_pc5_csv,
+  sep = ";",
+  dec = ",",
+  row.names = FALSE,
+  col.names = TRUE,
+  quote = FALSE,
+  fileEncoding = "UTF-8"
+)
 # ============================================================
 # 5.2b MORPHOSPACE PLOT: PC1-PC2 colored by logCS
 # ============================================================
@@ -524,7 +571,7 @@ ggsave(
 # 5.3 geomorph procD.lm
 # ============================================================
 
-cat("\n=== geomorph: procD.lm on PC1-PC5 ===\n")
+cat("\n=== geomorph: procD.lm on full atlas shape ===\n")
 fit_allo <- geomorph::procD.lm(
   Y ~ logCS,
   data = df0,
@@ -552,6 +599,12 @@ rownames(procD_tab) <- NULL
 wanted <- c("Term", "Df", "SS", "MS", "Rsq", "F", "Z", "Pr(>F)")
 have <- intersect(wanted, names(procD_tab))
 procD_tab <- procD_tab[, c(have, setdiff(names(procD_tab), have)), drop = FALSE]
+procD_tab$analysis_scope <- "full_atlas_shape"
+procD_tab$n_pc_axes <- length(pcs_full_shape)
+procD_tab$pc_axes <- paste(pcs_full_shape, collapse = ",")
+procD_tab$variance_represented_percent <- 100
+procD_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+procD_tab$n_permutations <- n_permutations
 
 write.table(
   procD_tab,

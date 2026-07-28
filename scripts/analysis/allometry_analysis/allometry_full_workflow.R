@@ -31,8 +31,13 @@ out_pca_csv                 <- file.path(out_dir, "PCA_scores_with_specimen_id_w
 out_merged_csv              <- file.path(out_dir, "allometry_merged_table.csv")
 
 out_univar_pc_csv           <- file.path(out_dir, "allometry_univariate_PC1_to_PC5_results.csv")
+out_univar_all_pc_csv       <- file.path(out_dir, "allometry_univariate_all_PC_results.csv")
 out_rrpp_csv                <- file.path(out_dir, "allometry_rrpp_multivariate_results.csv")
+out_rrpp_pc5_csv            <- file.path(out_dir, "allometry_rrpp_PC1_to_PC5_sensitivity_results.csv")
 out_procD_csv               <- file.path(out_dir, "allometry_procD_lm_results.csv")
+out_pc_contributions_csv    <- file.path(out_dir, "allometry_PC_allometric_contributions.csv")
+out_shape_scores_csv        <- file.path(out_dir, "allometry_full_shape_regression_scores.csv")
+out_analysis_scope_csv      <- file.path(out_dir, "allometry_analysis_scope.csv")
 out_cont_csv                <- file.path(out_dir, "allometry_continuous_traits_results.csv")
 out_group_csv               <- file.path(out_dir, "allometry_group_size_tests_results.csv")
 out_binom_csv               <- file.path(out_dir, "allometry_binary_trait_glm_results.csv")
@@ -668,10 +673,20 @@ df$centroid_size <- safe_numeric(df$centroid_size)
 if (any(is.na(df$centroid_size))) stop_with_hint("centroid_size contains NA after numeric conversion.")
 if (any(df$centroid_size <= 0)) stop_with_hint("centroid_size must be > 0 for log().")
 
-missing_required_pcs <- setdiff(pcs_use, names(df))
+all_pc_cols <- grep("^PC[0-9]+$", names(df), value = TRUE)
+all_pc_cols <- all_pc_cols[order(as.integer(sub("^PC", "", all_pc_cols)))]
+missing_required_pcs <- setdiff(pcs_use, all_pc_cols)
 if (length(missing_required_pcs) > 0) stop_with_hint(paste0("Missing required PCs: ", paste(missing_required_pcs, collapse = ", ")))
 
-for (cc in pcs_use) df[[cc]] <- safe_numeric(df[[cc]])
+for (cc in all_pc_cols) df[[cc]] <- safe_numeric(df[[cc]])
+
+pc_variance <- vapply(df[all_pc_cols], stats::var, numeric(1), na.rm = TRUE)
+pcs_full_shape <- all_pc_cols[
+  is.finite(pc_variance) & pc_variance > sqrt(.Machine$double.eps)
+]
+if (length(pcs_full_shape) == 0) {
+  stop_with_hint("No non-zero PC axes were detected for the full-shape analysis.")
+}
 
 geom_aliases <- list(
   abs_winding_angle_deg    = c("abs_winding_angle_deg"),
@@ -712,7 +727,7 @@ df <- df %>%
 
 df_shape <- df %>%
   dplyr::filter(!is.na(logCS)) %>%
-  dplyr::filter(dplyr::if_all(dplyr::all_of(pcs_use), ~ !is.na(.x)))
+  dplyr::filter(dplyr::if_all(dplyr::all_of(pcs_full_shape), ~ !is.na(.x)))
 
 if (nrow(df_shape) < 10) stop_with_hint(paste0("Too few rows after filtering NA for shape analyses. Remaining: ", nrow(df_shape)))
 
@@ -729,7 +744,8 @@ manifest_lines <- c(
   if (length(detected_trait_cols) > 0) paste(names(detected_trait_cols), "->", unname(detected_trait_cols)) else "none",
   "",
   "=== USED PCs ===",
-  paste(pcs_use, collapse = ", ")
+  paste0("Anatomical interpretation and univariate summaries: ", paste(pcs_use, collapse = ", ")),
+  paste0("Primary full-shape allometry: ", paste(pcs_full_shape, collapse = ", "))
 )
 writeLines(manifest_lines, out_manifest_txt)
 
@@ -756,10 +772,38 @@ write.table(
   fileEncoding = "UTF-8"
 )
 
+univar_all_pc_results <- lapply(pcs_full_shape, function(pc) {
+  run_lm_table(df_shape, response = pc, predictor = "logCS", log_response = FALSE)
+}) %>%
+  dplyr::bind_rows() %>%
+  dplyr::mutate(
+    p_value_adjusted = stats::p.adjust(p_value, method = p_adjust_method),
+    significance_raw = sig_label(p_value),
+    significance_adjusted = sig_label(p_value_adjusted),
+    p_adjust_method = p_adjust_method,
+    trait_group = "full_atlas_shape_PC"
+  )
+
+write.table(
+  univar_all_pc_results,
+  file = out_univar_all_pc_csv,
+  sep = ";", dec = ",",
+  row.names = FALSE, col.names = TRUE, quote = FALSE,
+  fileEncoding = "UTF-8"
+)
+
 # ============================================================
-# 12) MULTIVARIATE SHAPE ALLOMETRY
+# 12) MULTIVARIATE FULL-SHAPE ALLOMETRY
 # ============================================================
-Y <- as.matrix(df_shape[, pcs_use, drop = FALSE])
+Y <- as.matrix(df_shape[, pcs_full_shape, drop = FALSE])
+pc_variance_complete <- vapply(
+  df_shape[pcs_full_shape],
+  stats::var,
+  numeric(1),
+  na.rm = TRUE
+)
+total_shape_variance <- sum(pc_variance_complete)
+pc5_variance_percent <- 100 * sum(pc_variance_complete[pcs_use]) / total_shape_variance
 
 fit_rrpp <- RRPP::lm.rrpp(Y ~ logCS, data = df_shape, iter = n_permutations, print.progress = FALSE)
 rrpp_anova <- anova(fit_rrpp)
@@ -768,10 +812,44 @@ rrpp_tab <- as.data.frame(rrpp_tab)
 rrpp_tab$Term <- rownames(rrpp_tab)
 rownames(rrpp_tab) <- NULL
 rrpp_tab <- rrpp_tab[, c("Term", setdiff(names(rrpp_tab), "Term")), drop = FALSE]
+rrpp_tab$analysis_scope <- "full_atlas_shape"
+rrpp_tab$n_pc_axes <- length(pcs_full_shape)
+rrpp_tab$pc_axes <- paste(pcs_full_shape, collapse = ",")
+rrpp_tab$variance_represented_percent <- 100
+rrpp_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+rrpp_tab$n_permutations <- n_permutations
 
 write.table(
   rrpp_tab,
   file = out_rrpp_csv,
+  sep = ";", dec = ",",
+  row.names = FALSE, col.names = TRUE, quote = FALSE,
+  fileEncoding = "UTF-8"
+)
+
+Y_pc5 <- as.matrix(df_shape[, pcs_use, drop = FALSE])
+fit_rrpp_pc5 <- RRPP::lm.rrpp(
+  Y_pc5 ~ logCS,
+  data = df_shape,
+  iter = n_permutations,
+  print.progress = FALSE
+)
+rrpp_pc5_anova <- anova(fit_rrpp_pc5)
+rrpp_pc5_tab <- if (!is.null(rrpp_pc5_anova$table)) rrpp_pc5_anova$table else as.data.frame(rrpp_pc5_anova)
+rrpp_pc5_tab <- as.data.frame(rrpp_pc5_tab)
+rrpp_pc5_tab$Term <- rownames(rrpp_pc5_tab)
+rownames(rrpp_pc5_tab) <- NULL
+rrpp_pc5_tab <- rrpp_pc5_tab[, c("Term", setdiff(names(rrpp_pc5_tab), "Term")), drop = FALSE]
+rrpp_pc5_tab$analysis_scope <- "PC1-PC5_sensitivity"
+rrpp_pc5_tab$n_pc_axes <- length(pcs_use)
+rrpp_pc5_tab$pc_axes <- paste(pcs_use, collapse = ",")
+rrpp_pc5_tab$variance_represented_percent <- pc5_variance_percent
+rrpp_pc5_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+rrpp_pc5_tab$n_permutations <- n_permutations
+
+write.table(
+  rrpp_pc5_tab,
+  file = out_rrpp_pc5_csv,
   sep = ";", dec = ",",
   row.names = FALSE, col.names = TRUE, quote = FALSE,
   fileEncoding = "UTF-8"
@@ -791,6 +869,12 @@ rownames(procD_tab) <- NULL
 wanted <- c("Term", "Df", "SS", "MS", "Rsq", "F", "Z", "Pr(>F)")
 have <- intersect(wanted, names(procD_tab))
 procD_tab <- procD_tab[, c(have, setdiff(names(procD_tab), have)), drop = FALSE]
+procD_tab$analysis_scope <- "full_atlas_shape"
+procD_tab$n_pc_axes <- length(pcs_full_shape)
+procD_tab$pc_axes <- paste(pcs_full_shape, collapse = ",")
+procD_tab$variance_represented_percent <- 100
+procD_tab$null_hypothesis <- "zero multivariate shape slope under isometry"
+procD_tab$n_permutations <- n_permutations
 
 write.table(
   procD_tab,
@@ -799,6 +883,60 @@ write.table(
   row.names = FALSE, col.names = TRUE, quote = FALSE,
   fileEncoding = "UTF-8"
 )
+
+regression_fit <- stats::lm(Y ~ df_shape$logCS)
+regression_vector_raw <- stats::coef(regression_fit)[2, ]
+regression_norm <- sqrt(sum(regression_vector_raw^2))
+regression_vector <- regression_vector_raw / regression_norm
+shape_center <- colMeans(Y)
+centered_shape <- sweep(Y, 2, shape_center, "-")
+full_shape_score <- as.vector(centered_shape %*% regression_vector)
+
+fitted_ss_by_pc <- regression_vector_raw^2
+fitted_ss_total <- sum(fitted_ss_by_pc)
+pc_contributions <- data.frame(
+  principal_component = pcs_full_shape,
+  regression_coefficient = as.numeric(regression_vector_raw),
+  normalized_regression_loading = as.numeric(regression_vector),
+  fitted_effect_percent = 100 * fitted_ss_by_pc / fitted_ss_total,
+  total_shape_variance_percent = 100 * pc_variance_complete[pcs_full_shape] / total_shape_variance,
+  stringsAsFactors = FALSE
+)
+pc_contributions <- pc_contributions[
+  order(pc_contributions$fitted_effect_percent, decreasing = TRUE),
+  ,
+  drop = FALSE
+]
+
+shape_score_table <- data.frame(
+  specimen_id = df_shape$specimen_id,
+  logCS = df_shape$logCS,
+  full_shape_regression_score = full_shape_score,
+  stringsAsFactors = FALSE
+)
+family_col <- find_first_col(df_shape, c("Family", "family"))
+if (!is.na(family_col)) shape_score_table$Family <- df_shape[[family_col]]
+
+analysis_scope <- data.frame(
+  primary_analysis = "RRPP regression of all non-zero atlas PCs on log centroid size",
+  isometric_null = "zero multivariate shape slope because atlas shape is scale-normalized",
+  n_specimens = nrow(df_shape),
+  n_pc_axes_primary = length(pcs_full_shape),
+  primary_variance_percent = 100,
+  sensitivity_analysis = "RRPP regression of PC1-PC5 on log centroid size",
+  sensitivity_variance_percent = pc5_variance_percent,
+  pc1_pc5_fitted_effect_percent = sum(
+    pc_contributions$fitted_effect_percent[
+      pc_contributions$principal_component %in% pcs_use
+    ]
+  ),
+  n_permutations = n_permutations,
+  stringsAsFactors = FALSE
+)
+
+write.csv2(pc_contributions, out_pc_contributions_csv, row.names = FALSE)
+write.csv2(shape_score_table, out_shape_scores_csv, row.names = FALSE)
+write.csv2(analysis_scope, out_analysis_scope_csv, row.names = FALSE)
 
 # ============================================================
 # 13) CONTINUOUS GEOMETRY TRAITS ~ logCS
