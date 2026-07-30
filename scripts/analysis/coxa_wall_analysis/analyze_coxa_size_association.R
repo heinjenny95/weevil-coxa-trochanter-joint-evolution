@@ -39,6 +39,7 @@ dat$hole <- as_bool(dat$hole)
 dat$hole_factor <- factor(dat$hole, levels = c(FALSE, TRUE), labels = c("Absent", "Present"))
 dat$log_size <- log10(dat$bbox_diag_um)
 dat$log_thickness <- log10(dat$median_thickness_um)
+dat$central_section_median_cuticle_thickness_proxy_um <- dat$median_thickness_um
 
 if (file.exists(key_file)) {
   key <- read_csv2_safe(key_file)
@@ -60,7 +61,7 @@ desc <- do.call(rbind, lapply(split(hole_complete, hole_complete$hole_factor), f
     coxa_size_median_um = median(x$bbox_diag_um),
     coxa_size_min_um = min(x$bbox_diag_um),
     coxa_size_max_um = max(x$bbox_diag_um),
-    wall_thickness_median_um = median(x$median_thickness_um),
+    central_section_cuticle_thickness_proxy_median_um = median(x$median_thickness_um),
     stringsAsFactors = FALSE
   )
 }))
@@ -120,12 +121,12 @@ lm_coef <- as.data.frame(coef(lm_sum))
 lm_coef$term <- rownames(lm_coef)
 rownames(lm_coef) <- NULL
 names(lm_coef)[1:4] <- c("estimate", "std_error", "t_value", "p_value")
-lm_coef$model <- "wall_thickness_vs_coxa_size"
+lm_coef$model <- "central_section_cuticle_thickness_proxy_vs_coxa_size"
 lm_coef <- lm_coef[, c("model", "term", "estimate", "std_error", "t_value", "p_value")]
 
 lm_model <- data.frame(
-  model = "wall_thickness_vs_coxa_size",
-  response = "log10(median_thickness_um)",
+  model = "central_section_cuticle_thickness_proxy_vs_coxa_size",
+  response = "log10(central_section_median_cuticle_thickness_proxy_um)",
   predictor = "log10(bbox_diag_um)",
   n = nrow(size_complete),
   r_squared = lm_sum$r.squared,
@@ -143,7 +144,7 @@ spearman <- suppressWarnings(cor.test(size_complete$bbox_diag_um, size_complete$
 cor_tab <- data.frame(
   test = c("Pearson", "Spearman"),
   x = "bbox_diag_um",
-  y = "median_thickness_um",
+  y = "central_section_median_cuticle_thickness_proxy_um",
   n = nrow(size_complete),
   estimate = c(unname(pearson$estimate), unname(spearman$estimate)),
   statistic = c(unname(pearson$statistic), unname(spearman$statistic)),
@@ -176,9 +177,9 @@ supp_table <- rbind(
     stringsAsFactors = FALSE
   ),
   data.frame(
-    analysis = "Coxal wall thickness vs coxa size",
+    analysis = "Central-section cuticle-thickness proxy vs coxa size",
     test = "linear model",
-    response = "log10(median_thickness_um)",
+    response = "log10(central_section_median_cuticle_thickness_proxy_um)",
     predictor = "log10(bbox_diag_um)",
     n = lm_model$n,
     estimate = lm_coef$estimate[lm_coef$term == "log_size"],
@@ -232,7 +233,7 @@ if (requireNamespace("ggplot2", quietly = TRUE)) {
     scale_x_log10() +
     scale_y_log10() +
     labs(x = "Coxa size (bounding-box diagonal, um)",
-         y = "Median coxal wall thickness (um)") +
+         y = "Central-section median cuticle-thickness proxy (um)") +
     annotate("text", x = min(size_complete$bbox_diag_um), y = max(size_complete$median_thickness_um),
              hjust = 0, vjust = 1,
              label = paste0("LM R2 = ", signif(lm_model$r_squared, 3),
@@ -255,6 +256,6 @@ cat("Input rows:", nrow(dat), "\n")
 cat("Hole model rows:", nrow(hole_complete), "\n")
 cat("Hole present/absent:", sum(hole_complete$hole), "/", sum(!hole_complete$hole), "\n")
 cat("GLM LR p:", model_tab$lr_p_value, "\n")
-cat("Thickness-size LM R2:", lm_model$r_squared, "\n")
-cat("Thickness-size LM p:", lm_model$model_p_value, "\n")
+cat("Central-section thickness-proxy-size LM R2:", lm_model$r_squared, "\n")
+cat("Central-section thickness-proxy-size LM p:", lm_model$model_p_value, "\n")
 cat("Outputs:", out_dir, "\n")

@@ -1,7 +1,9 @@
 # ============================================================
 # Coxa metrics (combined):
 # 1) Coxa size from OBJ (bounding-box diagonal)
-# 2) Cuticle thickness from binary TIF label stacks:
+# 2) Exploratory central-section cuticle-thickness proxy from binary TIF
+#    label stacks. This is not a local 3D-thickness measurement from a
+#    homologous anatomical wall region:
 #    - find FIRST and LAST slice that contain cuticle
 #    - take mid-slice between them
 #    - compute thickness on that 2D slice via EDT:
@@ -77,9 +79,13 @@ def bbox_diag_from_obj(obj_path: str) -> float:
 
 def thickness_stats_from_tif(tif_path: str):
     """
-    Loads 3D label stack (Z,Y,X), finds mid-slice of structure,
-    computes thickness per cuticle pixel via EDT on cropped slice,
-    returns median/p10/p90 in voxels and slice indices.
+    Loads a 3D label stack (Z,Y,X), finds the midpoint between the first
+    and last valid slices, and calculates an exploratory cuticle-thickness
+    proxy on that single 2D section. Per-pixel values are twice the 2D EDT
+    radius. The result is orientation-dependent and does not represent a
+    homologous local wall region or a true 3D local-thickness estimate.
+
+    Returns median/p10/p90 proxy values in voxels and slice indices.
     """
     stack = imread(tif_path)
     if stack.ndim != 3:
@@ -179,11 +185,38 @@ def main():
                 "p10_thickness_um": safe_round(p10_um, ROUND_UM),
                 "p90_thickness_um": safe_round(p90_um, ROUND_UM),
 
+                # Explicit public names; legacy names above remain compatible.
+                "central_section_median_cuticle_thickness_proxy_vox": safe_round(
+                    thick["median_thickness_vox"], ROUND_VOX
+                ),
+                "central_section_p10_cuticle_thickness_proxy_vox": safe_round(
+                    thick["p10_thickness_vox"], ROUND_VOX
+                ),
+                "central_section_p90_cuticle_thickness_proxy_vox": safe_round(
+                    thick["p90_thickness_vox"], ROUND_VOX
+                ),
+                "central_section_median_cuticle_thickness_proxy_um": safe_round(
+                    med_um, ROUND_UM
+                ),
+                "central_section_p10_cuticle_thickness_proxy_um": safe_round(
+                    p10_um, ROUND_UM
+                ),
+                "central_section_p90_cuticle_thickness_proxy_um": safe_round(
+                    p90_um, ROUND_UM
+                ),
+
                 # slice info
                 "first_slice": thick["first_slice"],
                 "last_slice": thick["last_slice"],
                 "mid_slice": thick["mid_slice"],
                 "n_pixels_mid_slice": thick["n_pixels_mid_slice"],
+                "thickness_proxy_method": (
+                    "median of twice the 2D EDT radius on the midpoint slice"
+                ),
+                "thickness_proxy_scope": (
+                    "exploratory central-section proxy; not a homologous local "
+                    "wall region or 3D local-thickness measurement"
+                ),
 
                 # file paths (optional but helpful)
                 "obj_file": os.path.basename(obj_path),

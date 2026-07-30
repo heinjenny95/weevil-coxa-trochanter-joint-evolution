@@ -19,8 +19,8 @@ colour-adjustment and panel-assembly scripts are intentionally excluded.
   output-free Jupyter workflow.
 - `scripts/analysis/mesh_preprocessing`: three-landmark GPA alignment used to
   prepare trochanter meshes for atlas construction.
-- `scripts/analysis/coxa_wall_analysis`: coxal size, wall-thickness and opening
-  analyses.
+- `scripts/analysis/coxa_wall_analysis`: coxal size, central-section
+  cuticle-thickness proxy and wall-opening analyses.
 - `scripts/analysis/ecology_analysis`: exploratory ecological association
   tests.
 - `scripts/analysis/phylogeny_workflow`: alignment subsetting and preparation
@@ -74,6 +74,11 @@ PC1-PC5 are retained only as anatomical sensitivity analyses; these five axes
 are used elsewhere in the manuscript for interpretable visualization of the
 dominant deformations.
 
+The phylogenetically informed multivariate allometry analysis likewise uses
+all non-zero atlas PC axes directly in an RRPP model with the phylogenetic
+covariance matrix. Its one-dimensional fitted projection is produced only for
+visualization and is not used as the response variable for inference.
+
 ## Data availability
 
 Tomographic data, processed meshes, morphometric scores, geometry
@@ -85,11 +90,14 @@ and processed research data are not duplicated in this code repository.
 
 The repository provides the analysis scripts and configuration files needed to
 rerun the documented workflows with the study data described in the manuscript.
-The code was developed for R version 4 and Python version 3; atlas construction used
-Deformetrica 4.3.0. Scripts were checked for portable paths and release-ready
-repository structure for the v1.0.0 release. Exact numerical reproduction
-additionally depends on the deposited study data, external software described
-in the Methods and the package versions used for the original analyses.
+Release checks were performed with R 4.5.2 and Python 3.12.8; the original
+central-section coxa-thickness extraction was run with Python 3.13.1 as
+reported in the Methods, and atlas construction used Deformetrica 4.3.0 in its
+compatible Python environment. Scripts were checked for portable paths and
+release-ready repository structure for the v1.0.0 release. Exact numerical
+reproduction additionally depends on the deposited study data, external
+software described in the Methods and the package versions used for the
+original analyses.
 
 ## Citation
 

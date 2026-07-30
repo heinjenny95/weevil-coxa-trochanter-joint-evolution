@@ -6,9 +6,11 @@ size.
 
 - `allometry_full_workflow.R`
   merges specimen metadata, PCA scores, centroid size and screw-geometry
-  measurements; runs univariate and multivariate allometry tests; and exports
-  diagnostic tables and plots.
+  measurements; runs univariate analyses and the primary multivariate RRPP
+  test across all non-zero atlas PC axes; and exports diagnostic tables and
+  plots. The PC1-PC5 model is retained as an anatomical sensitivity analysis,
+  not as the full-shape test.
 
-Phylogenetically informed allometry follow-up tests are stored with the other
-phylogenetic comparative analyses in
+The direct phylogenetically informed multivariate RRPP analysis across all
+non-zero PC axes is stored with the other phylogenetic comparative analyses in
 `../phylogenetic_comparative_analysis/`.

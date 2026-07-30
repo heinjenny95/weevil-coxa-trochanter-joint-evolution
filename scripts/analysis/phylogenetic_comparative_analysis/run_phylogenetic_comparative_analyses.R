@@ -65,13 +65,26 @@ theme_set(ggplot2::theme_bw(base_size = 12))
 # SECTION 1: USER SETTINGS
 # ============================================================
 
-tree_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_withCaridae_calibrated_Grafen.tre"
-tree_variant_dir <- "<MANUSCRIPT_PROJECT_ROOT>/Phylogeny/Dataset_S4_Supermatrices_partitions/Supermatrix for Fig. 1/AA"
-pc_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
-specimen_key_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv"
-geometry_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv"
-centroid_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id_with_centroid_size.csv"
-output_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/PCM"
+input_dir <- Sys.getenv(
+  "WEV_ANALYSIS_INPUT_DIR",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input"
+)
+tree_file <- Sys.getenv(
+  "WEV_TREE_FILE",
+  unset = file.path(input_dir, "curc_fig1_withCaridae_calibrated_Grafen.tre")
+)
+tree_variant_dir <- Sys.getenv(
+  "WEV_TREE_VARIANT_DIR",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/Phylogeny/Dataset_S4_Supermatrices_partitions/Supermatrix for Fig. 1/AA"
+)
+pc_file <- file.path(input_dir, "PCA_scores_with_specimen_id.csv")
+specimen_key_file <- file.path(input_dir, "specimen_key.csv")
+geometry_file <- file.path(input_dir, "winding_metrics_excel.csv")
+centroid_file <- file.path(input_dir, "PCA_scores_with_specimen_id_with_centroid_size.csv")
+output_dir <- Sys.getenv(
+  "WEV_PCM_OUTPUT_DIR",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/PCM"
+)
 
 tree_variant_files <- c(
   ml_unrooted = "curc_fig1.treefile",
@@ -308,6 +321,7 @@ safe_fit_continuous_models <- function(tree, trait_vec, trait_name) {
     dplyr::group_by(trait) %>%
     dplyr::mutate(
       delta_AICc = AICc - min(AICc, na.rm = TRUE),
+      akaike_weight = exp(-0.5 * delta_AICc) / sum(exp(-0.5 * delta_AICc), na.rm = TRUE),
       best_model = model[which.min(AICc)]
     ) %>%
     dplyr::ungroup()
@@ -348,26 +362,54 @@ safe_pgls <- function(tree, df, response, predictor, predictor_is_factor = FALSE
 
   form <- stats::as.formula(paste0("`", response, "` ~ `", predictor, "`"))
 
-  cor_struct <- tryCatch(
-    ape::corPagel(value = 0.5, phy = tr, fixed = FALSE, form = ~tree_label),
-    error = function(e) NULL
-  )
-  if (is.null(cor_struct)) {
-    return(list(result = NULL, reason = "Failed to build corPagel structure."))
+  # Optimize Pagel's lambda explicitly within its biological parameter range.
+  # nlme can otherwise move the unconstrained corPagel coefficient above one,
+  # producing nearly singular covariance matrices and spurious exact fits.
+  fit_at_lambda <- function(lambda) {
+    cor_struct <- tryCatch(
+      ape::corPagel(value = lambda, phy = tr, fixed = TRUE, form = ~tree_label),
+      error = function(e) NULL
+    )
+    if (is.null(cor_struct)) return(NULL)
+
+    tryCatch(
+      suppressWarnings(
+        nlme::gls(
+          model = form,
+          data = dat,
+          correlation = cor_struct,
+          method = "ML",
+          na.action = na.omit
+        )
+      ),
+      error = function(e) NULL
+    )
   }
 
-  fit <- tryCatch(
-    suppressWarnings(
-      nlme::gls(
-        model = form,
-        data = dat,
-        correlation = cor_struct,
-        method = "ML",
-        na.action = na.omit
-      )
-    ),
+  neg_log_lik <- function(lambda) {
+    fit_i <- fit_at_lambda(lambda)
+    if (is.null(fit_i)) return(Inf)
+    ll <- tryCatch(as.numeric(stats::logLik(fit_i)), error = function(e) NA_real_)
+    if (!is.finite(ll)) Inf else -ll
+  }
+
+  opt <- tryCatch(
+    stats::optimize(neg_log_lik, interval = c(0, 1), tol = 1e-7),
     error = function(e) NULL
   )
+
+  lambda_candidates <- c(0, 1)
+  if (!is.null(opt) && is.finite(opt$minimum)) {
+    lambda_candidates <- c(lambda_candidates, opt$minimum)
+  }
+  candidate_nll <- vapply(lambda_candidates, neg_log_lik, numeric(1))
+
+  if (all(!is.finite(candidate_nll))) {
+    return(list(result = NULL, reason = "No valid PGLS fit for lambda in [0, 1]."))
+  }
+
+  lambda_est <- lambda_candidates[which.min(candidate_nll)]
+  fit <- fit_at_lambda(lambda_est)
 
   if (is.null(fit)) {
     return(list(result = NULL, reason = "gls PGLS fit failed."))
@@ -381,14 +423,6 @@ safe_pgls <- function(tree, df, response, predictor, predictor_is_factor = FALSE
   coef_tab <- as.data.frame(sm$tTable) %>%
     tibble::rownames_to_column("term") %>%
     tibble::as_tibble()
-
-  lambda_est <- tryCatch(
-    {
-      coef_val <- stats::coef(fit$modelStruct$corStruct, unconstrained = FALSE)
-      as.numeric(coef_val[[1]])
-    },
-    error = function(e) NA_real_
-  )
 
   anova_tab <- tryCatch(
     as.data.frame(stats::anova(fit)) %>%
@@ -1279,6 +1313,11 @@ for (set_name in names(mv_pc_sets)) {
     dplyr::group_by(pc_set) %>%
     dplyr::mutate(
       delta_AIC = AIC - min(AIC, na.rm = TRUE),
+      akaike_weight = dplyr::if_else(
+        is.na(AIC),
+        NA_real_,
+        exp(-0.5 * delta_AIC) / sum(exp(-0.5 * delta_AIC), na.rm = TRUE)
+      ),
       best_model = model[which.min(AIC)]
     ) %>%
     dplyr::ungroup()

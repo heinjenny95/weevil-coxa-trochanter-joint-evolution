@@ -1,230 +1,263 @@
-# ============================================================
-# Disparity (within-family) - BARPLOT with bootstrap CI
-# - Uses PCA scores (PC1..PCk)
-# - Joins Family from specimen_key
-# - Keeps only families with n > 2
-# - Disparity = mean squared Euclidean distance to family centroid
-# - Also tests whether family-level dispersion differs globally with a
-#   permutation ANOVA on squared distances to family centroids.
-# - Outputs:
-#     1) disparity_by_family_k{k}_nGT2.csv
-#     2) disparity_by_family_barplot_k{k}_nGT2.pdf
-# ============================================================
+#!/usr/bin/env Rscript
 
-rm(list = ls())
+# Family-level disparity in PC1-PC5.
+#
+# Outputs observed mean squared distances to family centroids, bootstrap
+# confidence intervals, a global PERMDISP test, FDR-adjusted pairwise PERMDISP
+# tests, and a rarefaction sensitivity analysis at the smallest retained family
+# sample size. Families represented by fewer than three specimens are excluded.
+
+options(stringsAsFactors = FALSE)
 
 suppressPackageStartupMessages({
-  library(tidyverse)
+  library(dplyr)
+  library(readr)
+  library(tidyr)
+  library(vegan)
 })
 
-# ------------------- SETTINGS -------------------
-pca_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
-key_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key_with_centroid_size.csv"
-
-k_pcs    <- 5
-B        <- 5000
-ci_level <- 0.95
-min_n    <- 3   # n > 2
-n_perm   <- 9999
-
-# Output
-out_dir <- dirname(pca_path)
-
-# Optional: family colors (set to NULL to use ggplot default palette)
-# If you want exact matching colors, fill this named vector with your real hex codes.
-fam_cols <- c(
-  "Anthribidae"    = "#F8766D",
-  "Attelabidae"    = "#C49A00",
-  "Belidae"        = "#7CAE00",
-  "Brentidae"      = "#00BA38",
-  "Caridae"        = "#00BFC4",
-  "Curculionidae"  = "#C77CFF",
-  "Nemonychidae"   = "#F564E3"
-)
-
-# ------------------- HELPERS -------------------
-disparity_msd <- function(X) {
-  cen <- colMeans(X)
-  d2  <- rowSums((X - matrix(cen, nrow(X), ncol(X), byrow = TRUE))^2)
-  mean(d2)
-}
-
-boot_ci <- function(X, B = 2000, ci_level = 0.95) {
-  n <- nrow(X)
-  stats <- numeric(B)
-  for (b in seq_len(B)) {
-    idx <- sample.int(n, size = n, replace = TRUE)
-    stats[b] <- disparity_msd(X[idx, , drop = FALSE])
-  }
-  alpha <- (1 - ci_level) / 2
-  qs <- quantile(stats, probs = c(alpha, 1 - alpha), names = FALSE)
-  setNames(qs, c("ci_low", "ci_high"))
-}
-
-dispersion_anova <- function(data, pc_columns, group_column = "Family") {
-  X <- as.matrix(data[, pc_columns, drop = FALSE])
-  grp <- as.factor(data[[group_column]])
-
-  centroids <- rowsum(X, grp) / as.vector(table(grp))
-  d2 <- rowSums((X - centroids[grp, , drop = FALSE])^2)
-
-  lm_fit <- lm(d2 ~ grp)
-  an <- anova(lm_fit)
-  unname(an[["F value"]][1])
-}
-
-permutation_dispersion_test <- function(data, pc_columns, group_column = "Family",
-                                        n_perm = 9999, seed = 1) {
-  set.seed(seed)
-  observed_F <- dispersion_anova(data, pc_columns, group_column)
-
-  perm_F <- numeric(n_perm)
-  perm_data <- data
-  for (i in seq_len(n_perm)) {
-    perm_data[[group_column]] <- sample(data[[group_column]])
-    perm_F[i] <- dispersion_anova(perm_data, pc_columns, group_column)
-  }
-
-  # +1 correction keeps the permutation P value conservative and non-zero.
-  p_perm <- (sum(perm_F >= observed_F, na.rm = TRUE) + 1) / (n_perm + 1)
-
-  tibble(
-    global_dispersion_test = "permutation ANOVA on squared distances to family centroids",
-    global_dispersion_test_F = observed_F,
-    global_dispersion_test_p = p_perm,
-    global_dispersion_test_permutations = n_perm,
-    global_dispersion_test_note = paste0(
-      "Families with n >= ", min_n, "; PC1-PC", length(pc_columns)
+args <- commandArgs(trailingOnly = TRUE)
+if (length(args) < 3) {
+  stop(
+    paste(
+      "Usage: Rscript calculate_family_disparity.R",
+      "<pca_scores.csv> <specimen_key.csv> <output_dir>"
     )
   )
 }
 
-# ------------------- READ + JOIN -------------------
-pca <- read.csv2(pca_path, stringsAsFactors = FALSE, check.names = FALSE)
-key <- read.csv2(key_path, stringsAsFactors = FALSE, check.names = FALSE)
+pca_path <- normalizePath(args[[1]], mustWork = TRUE)
+key_path <- normalizePath(args[[2]], mustWork = TRUE)
+out_dir <- args[[3]]
+dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-stopifnot("specimen_id" %in% names(pca))
-stopifnot("specimen_id" %in% names(key))
-stopifnot("Family" %in% names(key))
+k_pcs <- 5L
+min_n <- 3L
+n_boot <- 5000L
+n_perm <- 9999L
+n_rarefy <- 5000L
+seed <- 20260729L
 
-df <- pca %>%
-  left_join(key %>% select(specimen_id, Family), by = "specimen_id")
+read_any <- function(path) {
+  first <- readLines(path, n = 1, warn = FALSE, encoding = "UTF-8")
+  delim <- if (grepl(";", first, fixed = TRUE)) ";" else ","
+  decimal <- if (delim == ";") "," else "."
+  read_delim(
+    path,
+    delim = delim,
+    locale = locale(decimal_mark = decimal, grouping_mark = ""),
+    show_col_types = FALSE,
+    trim_ws = TRUE
+  )
+}
 
-# detect PC columns
-pc_cols <- grep("^PC[0-9]+$", names(df), value = TRUE)
-if (length(pc_cols) < 2) stop("Found fewer than 2 PC columns in PCA table.")
+write_table <- function(x, filename) {
+  write_csv(x, file.path(out_dir, filename), na = "")
+}
 
-# sort PCs numerically (PC1, PC2, PC10 safe)
-pc_num <- as.integer(sub("^PC", "", pc_cols))
-pc_cols <- pc_cols[order(pc_num)]
+disparity_msd <- function(x) {
+  centre <- colMeans(x)
+  mean(rowSums(sweep(x, 2, centre, "-")^2))
+}
 
-pcs_use <- pc_cols[seq_len(min(k_pcs, length(pc_cols)))]
+bootstrap_disparity <- function(x, n_boot) {
+  n <- nrow(x)
+  replicate(
+    n_boot,
+    disparity_msd(x[sample.int(n, n, replace = TRUE), , drop = FALSE])
+  )
+}
 
-# coerce PCs numeric
-for (cc in pcs_use) df[[cc]] <- suppressWarnings(as.numeric(df[[cc]]))
-
-# drop incomplete rows
-df <- df %>%
-  filter(!is.na(Family)) %>%
-  filter(if_all(all_of(pcs_use), ~ !is.na(.x))) %>%
-  mutate(Family = as.character(Family))
-
-# keep only families with n > 2
-fam_counts <- df %>%
-  group_by(Family) %>%
-  summarise(n = n(), .groups = "drop") %>%
-  arrange(desc(n))
-
-keep_fams  <- fam_counts %>% filter(n >= min_n) %>% pull(Family)
-
-df2 <- df %>% filter(Family %in% keep_fams)
-
-cat("Families retained (n >=", min_n, "):\n")
-print(fam_counts %>% filter(Family %in% keep_fams) %>% arrange(desc(n)))
-
-# ------------------- GLOBAL DISPERSION TEST -------------------
-global_test <- permutation_dispersion_test(
-  df2,
-  pcs_use,
-  group_column = "Family",
-  n_perm = n_perm,
-  seed = 1
-)
-
-cat(
-  "Global family-dispersion permutation test:",
-  "F =", round(global_test$global_dispersion_test_F, 6),
-  "P =", global_test$global_dispersion_test_p,
-  "permutations =", n_perm,
-  "\n"
-)
-
-# ------------------- DISPARITY + BOOTSTRAP (efficient) -------------------
-set.seed(1)
-
-disp_out <- df2 %>%
-  group_by(Family) %>%
-  group_modify(~{
-    X <- as.matrix(.x[, pcs_use, drop = FALSE])
-    disp <- disparity_msd(X)
-    ci <- boot_ci(X, B = B, ci_level = ci_level)
-    tibble(
-      n = nrow(X),
-      disparity = disp,
-      ci_low = unname(ci["ci_low"]),
-      ci_high = unname(ci["ci_high"])
-    )
-  }) %>%
-  ungroup() %>%
-  arrange(desc(disparity)) %>%
-  mutate(Family = factor(Family, levels = Family)) %>%
-  bind_cols(global_test[rep(1, n()), ])
-
-# ------------------- WRITE CSV -------------------
-out_csv <- file.path(out_dir, paste0("disparity_by_family_k", k_pcs, "_nGT2.csv"))
-write.csv2(disp_out, out_csv, row.names = FALSE)
-cat("Wrote:", out_csv, "\n")
-
-# ------------------- BARPLOT -------------------
-# Warn if color map incomplete (only relevant if fam_cols is not NULL)
-if (!is.null(fam_cols)) {
-  missing_cols <- setdiff(levels(disp_out$Family), names(fam_cols))
-  if (length(missing_cols) > 0) {
-    message(" Missing colors for families: ", paste(missing_cols, collapse = ", "))
-    message("Add them to fam_cols if you want exact matching colors.")
+rarefied_disparity <- function(x, target_n, n_iter) {
+  if (nrow(x) == target_n) {
+    return(rep(disparity_msd(x), n_iter))
   }
+  replicate(
+    n_iter,
+    disparity_msd(x[sample.int(nrow(x), target_n, replace = FALSE), , drop = FALSE])
+  )
 }
 
-p <- ggplot(disp_out, aes(x = Family, y = disparity, fill = Family)) +
-  geom_col(width = 0.75, alpha = 0.95) +
-  geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width = 0.2, linewidth = 0.5) +
-  geom_text(aes(label = paste0("n=", n)), vjust = -0.6, size = 3) +
-  theme_classic() +
-  theme(
-    legend.position = "none",
-    axis.text.x = element_text(angle = 35, hjust = 1)
-  ) +
-  labs(
-    title = paste0("Within-family disparity (PC1..PC", k_pcs, "), families with n > 2"),
-    x = "Family",
-    y = "Disparity (mean squared distance to family centroid)"
-  ) +
-  expand_limits(y = max(disp_out$ci_high, na.rm = TRUE) * 1.12)
-
-if (!is.null(fam_cols)) {
-  p <- p + scale_fill_manual(values = fam_cols, drop = FALSE)
+extract_permdisp <- function(x, group, permutations) {
+  fit <- betadisper(
+    dist(x),
+    group = droplevels(factor(group)),
+    type = "centroid",
+    bias.adjust = TRUE
+  )
+  test <- permutest(fit, permutations = permutations)
+  tab <- as.data.frame(test$tab)
+  tibble(
+    F = unname(tab[1, "F"]),
+    p_value = unname(tab[1, "Pr(>F)"]),
+    permutations = permutations
+  )
 }
 
-# Save as PDF (publication-friendly)
-out_pdf <- file.path(out_dir, paste0("disparity_by_family_barplot_k", k_pcs, "_nGT2.pdf"))
-pdf(out_pdf, width = 10, height = 6)
-print(p)
-dev.off()
-cat("Wrote:", out_pdf, "\n")
+pca <- read_any(pca_path)
+key <- read_any(key_path)
 
-# Optional: also save as PNG
-out_png <- file.path(out_dir, paste0("disparity_by_family_barplot_k", k_pcs, "_nGT2.png"))
-ggsave(out_png, plot = p, width = 10, height = 6, dpi = 300)
-cat("Wrote:", out_png, "\n")
+if (!"specimen_id" %in% names(pca)) stop("PCA table lacks specimen_id.")
+if (!"specimen_id" %in% names(key)) stop("Specimen key lacks specimen_id.")
 
-cat("DONE.\n")
+family_column <- intersect(c("Family", "family"), names(key))
+if (!"Family" %in% names(pca)) {
+  if (!length(family_column)) stop("No family column found in PCA table or key.")
+  pca <- pca |>
+    left_join(
+      key |> transmute(specimen_id, Family = .data[[family_column[[1]]]]),
+      by = "specimen_id"
+    )
+}
+
+pc_columns <- grep("^PC[0-9]+$", names(pca), value = TRUE)
+pc_columns <- pc_columns[order(as.integer(sub("^PC", "", pc_columns)))]
+if (length(pc_columns) < k_pcs) stop("Fewer than five PC columns found.")
+pc_columns <- pc_columns[seq_len(k_pcs)]
+
+data <- pca |>
+  mutate(
+    Family = trimws(as.character(Family)),
+    across(all_of(pc_columns), as.numeric)
+  ) |>
+  filter(
+    !is.na(Family),
+    Family != "",
+    if_all(all_of(pc_columns), is.finite)
+  )
+
+family_counts <- data |>
+  count(Family, name = "n") |>
+  arrange(desc(n), Family)
+
+retained_families <- family_counts |>
+  filter(n >= min_n) |>
+  pull(Family)
+
+analysis_data <- data |>
+  filter(Family %in% retained_families) |>
+  mutate(Family = droplevels(factor(Family)))
+
+if (nlevels(analysis_data$Family) < 2) {
+  stop("Fewer than two families meet the minimum sample-size criterion.")
+}
+
+x <- as.matrix(analysis_data[, pc_columns])
+
+set.seed(seed)
+summary_table <- analysis_data |>
+  group_by(Family) |>
+  group_modify(\(group_data, family_key) {
+    family_x <- as.matrix(group_data[, pc_columns])
+    boot <- bootstrap_disparity(family_x, n_boot)
+    tibble(
+      n = nrow(family_x),
+      disparity = disparity_msd(family_x),
+      ci_low = unname(quantile(boot, 0.025)),
+      ci_high = unname(quantile(boot, 0.975)),
+      bootstrap_replicates = n_boot
+    )
+  }) |>
+  ungroup() |>
+  arrange(desc(disparity))
+
+set.seed(seed)
+global_test <- extract_permdisp(
+  x,
+  analysis_data$Family,
+  permutations = n_perm
+) |>
+  mutate(
+    test = "PERMDISP on Euclidean distances to family centroids",
+    dimensions = paste0("PC1-PC", k_pcs),
+    families = nlevels(analysis_data$Family),
+    specimens = nrow(analysis_data),
+    minimum_family_n = min_n,
+    .before = 1
+  )
+
+family_pairs <- combn(levels(analysis_data$Family), 2, simplify = FALSE)
+set.seed(seed)
+pairwise_tests <- bind_rows(lapply(family_pairs, function(pair) {
+  subset_data <- analysis_data |>
+    filter(Family %in% pair) |>
+    mutate(Family = droplevels(Family))
+  pair_result <- extract_permdisp(
+    as.matrix(subset_data[, pc_columns]),
+    subset_data$Family,
+    permutations = n_perm
+  )
+  pair_result |>
+    mutate(
+      family_1 = pair[[1]],
+      family_2 = pair[[2]],
+      n_1 = sum(subset_data$Family == pair[[1]]),
+      n_2 = sum(subset_data$Family == pair[[2]]),
+      .before = 1
+    )
+})) |>
+  mutate(
+    p_adjusted_fdr = p.adjust(p_value, method = "BH"),
+    significant_fdr_0_05 = p_adjusted_fdr < 0.05
+  ) |>
+  arrange(p_adjusted_fdr, p_value)
+
+target_n <- min(summary_table$n)
+set.seed(seed)
+rarefied_table <- analysis_data |>
+  group_by(Family) |>
+  group_modify(\(group_data, family_key) {
+    family_x <- as.matrix(group_data[, pc_columns])
+    draws <- rarefied_disparity(family_x, target_n, n_rarefy)
+    tibble(
+      original_n = nrow(family_x),
+      rarefied_n = target_n,
+      rarefied_disparity_mean = mean(draws),
+      rarefied_disparity_median = median(draws),
+      rarefied_ci_low = unname(quantile(draws, 0.025)),
+      rarefied_ci_high = unname(quantile(draws, 0.975)),
+      rarefaction_replicates = n_rarefy
+    )
+  }) |>
+  ungroup() |>
+  arrange(desc(rarefied_disparity_mean))
+
+scope <- tibble(
+  analysis = "Family-level disparity",
+  response = "PC1-PC5",
+  disparity_metric = "Mean squared Euclidean distance to the family centroid",
+  global_test = "PERMDISP with centroid distances and bias adjustment",
+  pairwise_test = "Pairwise PERMDISP with Benjamini-Hochberg FDR correction",
+  sensitivity_analysis = paste0(
+    "Rarefaction to ", target_n,
+    " specimens per family without replacement"
+  ),
+  minimum_family_n = min_n,
+  bootstrap_replicates = n_boot,
+  permutation_replicates = n_perm,
+  rarefaction_replicates = n_rarefy,
+  random_seed = seed
+)
+
+write_table(family_counts, "family_disparity_sample_counts.csv")
+write_table(summary_table, "family_disparity_summary_pc1_pc5.csv")
+write_table(global_test, "family_disparity_global_test_pc1_pc5.csv")
+write_table(pairwise_tests, "family_disparity_pairwise_tests_pc1_pc5.csv")
+write_table(rarefied_table, "family_disparity_rarefied_n4_pc1_pc5.csv")
+write_table(scope, "family_disparity_analysis_scope.csv")
+
+# Compatibility filename used by the publication figure generator.
+write_csv(
+  summary_table,
+  file.path(out_dir, "disparity_by_family_k5_nGT2.csv"),
+  na = ""
+)
+
+cat("Retained families:\n")
+print(summary_table)
+cat("\nGlobal PERMDISP:\n")
+print(global_test)
+cat("\nPairwise PERMDISP:\n")
+print(pairwise_tests)
+cat("\nRarefied disparity:\n")
+print(rarefied_table)

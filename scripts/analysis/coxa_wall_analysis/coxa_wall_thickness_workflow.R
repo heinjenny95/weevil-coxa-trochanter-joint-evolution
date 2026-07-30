@@ -1,5 +1,7 @@
 # ============================================================
-# Coxa thickness (median) - exploratory plots (no hole variable)
+# Central-section cuticle-thickness proxy - exploratory plots
+# The proxy is the median of twice the 2D EDT radius on a single midpoint
+# section. It is not a homologous local region or a true 3D thickness measure.
 # Combined 2x2 figure + CSV export of model statistics
 # ============================================================
 
@@ -60,9 +62,9 @@ p1 <- ggplot(df, aes(x = bbox_diag_um, y = median_thickness_um)) +
   scale_y_log10() +
   geom_smooth(method = "lm", se = TRUE) +
   labs(
-    title = "Median cuticle thickness vs Coxa size",
-    x = "Coxa size (bbox diagonal, m) [log10]",
-    y = "Median cuticle thickness (m) [log10]"
+    title = "Central-section cuticle-thickness proxy vs coxa size",
+    x = "Coxa size (bbox diagonal, um) [log10]",
+    y = "Central-section median thickness proxy (um) [log10]"
   ) +
   theme_classic()
 
@@ -70,8 +72,8 @@ p1 <- ggplot(df, aes(x = bbox_diag_um, y = median_thickness_um)) +
 p2 <- ggplot(df, aes(x = median_thickness_um)) +
   geom_histogram(bins = 25) +
   labs(
-    title = "Distribution of median cuticle thickness",
-    x = "Median cuticle thickness (m)",
+    title = "Distribution of the central-section thickness proxy",
+    x = "Central-section median thickness proxy (um)",
     y = "Count"
   ) +
   theme_classic()
@@ -90,9 +92,9 @@ p3 <- ggplot(df, aes(x = bbox_diag_um, y = median_thickness_um)) +
   scale_y_log10() +
   geom_smooth(method = "lm", se = FALSE) +
   labs(
-    title = "Thickness vs size (labels = extreme thickness values)",
-    x = "Coxa size (bbox diagonal, m) [log10]",
-    y = "Median cuticle thickness (m) [log10]"
+    title = "Thickness proxy vs size (labels = extreme values)",
+    x = "Coxa size (bbox diagonal, um) [log10]",
+    y = "Central-section median thickness proxy (um) [log10]"
   ) +
   theme_classic()
 

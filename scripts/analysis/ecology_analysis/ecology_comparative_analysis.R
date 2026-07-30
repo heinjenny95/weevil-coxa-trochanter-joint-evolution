@@ -13,11 +13,23 @@ suppressPackageStartupMessages({
 })
 
 # ------------------- PATHS -------------------
-project_root <- "<MANUSCRIPT_PROJECT_ROOT>"
-ecology_path <- file.path(project_root, "analysis_data", "Input", "ecology_tree_tip_matrix.csv")
-pcm_tip_path <- file.path(project_root, "analysis_data", "Results", "PCM", "tip_level_dataset_used_for_PCM.csv")
-tree_path <- file.path(project_root, "analysis_data", "Input", "curculionoidea_primary_tree.tre")
-out_dir <- file.path(project_root, "analysis_data", "Results", "Ecology")
+project_root <- Sys.getenv("WEV_PROJECT_ROOT", unset = "<MANUSCRIPT_PROJECT_ROOT>")
+ecology_path <- Sys.getenv(
+  "WEV_ECOLOGY_INPUT",
+  unset = file.path(project_root, "analysis_data", "Input", "ecology_tree_tip_matrix_draft.csv")
+)
+pcm_tip_path <- Sys.getenv(
+  "WEV_PCM_TIP_DATA",
+  unset = file.path(project_root, "analysis_data", "Results", "PCM", "tip_level_dataset_used_for_PCM.csv")
+)
+tree_path <- Sys.getenv(
+  "WEV_TREE_FILE",
+  unset = file.path(project_root, "analysis_data", "Input", "curc_fig1_withCaridae_calibrated_Grafen.tre")
+)
+out_dir <- Sys.getenv(
+  "WEV_ECOLOGY_OUTPUT_DIR",
+  unset = file.path(project_root, "analysis_data", "Results", "Ecology")
+)
 plot_dir <- file.path(out_dir, "plots")
 
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
@@ -59,13 +71,14 @@ write_output <- function(x, path) {
   write.csv(x, sub("\\.csv$", "_gsheets.csv", path), row.names = FALSE)
 }
 
-fit_pgls_with_fallback <- function(formula_obj, comp_obj, lambda_bounds = c(1e-06, 1.5)) {
+fit_pgls_with_fallback <- function(formula_obj, comp_obj, lambda_bounds = c(0, 1)) {
   attempts <- list(
     list(label = "lambda_ML", lambda = "ML", bounds = list(lambda = lambda_bounds)),
-    list(label = "lambda_fixed_1", lambda = 1, bounds = NULL),
-    list(label = "lambda_fixed_0", lambda = 0, bounds = NULL)
+    list(label = "lambda_fixed_0", lambda = 0, bounds = NULL),
+    list(label = "lambda_fixed_1", lambda = 1, bounds = NULL)
   )
   last_error <- NULL
+  valid_fits <- list()
   for (att in attempts) {
     fit_try <- tryCatch(
       {
@@ -81,8 +94,13 @@ fit_pgls_with_fallback <- function(formula_obj, comp_obj, lambda_bounds = c(1e-0
       }
     )
     if (!is.null(fit_try)) {
-      return(list(model = fit_try, method = att$label, error = NA_character_))
+      valid_fits[[att$label]] <- fit_try
     }
+  }
+  if (length(valid_fits) > 0) {
+    fit_loglik <- vapply(valid_fits, function(x) as.numeric(logLik(x)), numeric(1))
+    best_label <- names(which.max(fit_loglik))
+    return(list(model = valid_fits[[best_label]], method = best_label, error = NA_character_))
   }
   list(model = NULL, method = NA_character_, error = last_error)
 }
