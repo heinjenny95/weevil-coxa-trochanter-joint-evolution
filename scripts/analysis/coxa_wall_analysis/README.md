@@ -1,12 +1,17 @@
 # Coxa-wall analyses
 
-This folder contains the scripts used to derive and analyse a central-section
-cuticle-thickness proxy and the coxal wall opening character. The proxy is the
-median two-dimensional distance-transform thickness in one standardized
-central slice. It is orientation-dependent and must not be interpreted as
-homologous local or three-dimensional coxal wall thickness. The files are not
-alternative versions of the same analysis; they represent different steps of
-the coxa-wall workflow.
+This folder contains the reproducible workflow used to quantify coxal wall
+thickness across the complete three-dimensional coxa masks and to analyse its
+association with coxa size and the coxal wall opening. The primary thickness
+measure is the median local thickness across all foreground voxels in the
+largest connected component of each mask. Local thickness is defined as the
+diameter of the largest sphere that contains a foreground voxel and remains
+inside the coxa mask.
+
+For computational efficiency, the complete foreground-cropped mask is analysed
+at an isotropic scale of 0.75. Comparison with full-resolution estimates for a
+validation subset changed the median thickness by no more than 0.5%. Distances
+are converted back to original-voxel units and then to micrometres.
 
 Recommended order:
 
@@ -16,12 +21,18 @@ Recommended order:
 2. `update_coxa_wall_character_coding.R`
    Updates the broader coxa-wall character table used for joint-character
    summaries.
-3. `coxa_wall_thickness_workflow.R`
-   Extracts exploratory central-section thickness-proxy summaries and
-   diagnostics from the coxa measurement table.
-4. `analyze_coxa_size_association.R`
-   Tests whether coxal wall opening is associated with coxa size or the
-   central-section thickness proxy.
+3. `extract_3d_coxa_wall_thickness.py`
+   Extracts whole-volume local-thickness summaries, coxa size and mask-quality
+   diagnostics from paired binary TIFF masks and OBJ meshes.
+4. `analyse_3d_coxa_wall_thickness.R`
+   Tests allometric scaling of whole-volume wall thickness and whether coxal
+   wall opening is associated with size-corrected thickness. It also runs
+   boundary-exclusion and lower-tail-thickness sensitivity analyses and creates
+   the supplementary figure and result tables.
+
+The older central-section scripts are retained only to document the exploratory
+analysis that preceded the whole-volume workflow. They are not used for the
+reported results.
 
 The scripts assume the input tables distributed with the study and use
 placeholder project roots rather than workstation-specific paths.
