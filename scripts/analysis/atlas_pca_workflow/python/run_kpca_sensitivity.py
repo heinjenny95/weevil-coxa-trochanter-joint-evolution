@@ -508,31 +508,49 @@ def make_figures(
 ) -> None:
     configure_plotting()
 
-    fig, axes = plt.subplots(2, 3, figsize=(7.0866, 4.35), constrained_layout=True)
+    fig, axes = plt.subplots(3, 2, figsize=(7.0866, 7.10))
+    fig.subplots_adjust(
+        left=0.095,
+        right=0.985,
+        top=0.985,
+        bottom=0.085,
+        wspace=0.24,
+        hspace=0.34,
+    )
     datasets = [
         (linear, "Linear PCA", linear_fraction, "PC"),
         (legacy_aligned, "RBF-kPCA, legacy gamma = 0.25", legacy_fraction, "matched kPC"),
         (adaptive_aligned, "RBF-kPCA, median-distance gamma", adaptive_fraction, "matched kPC"),
     ]
     panel_letters = iter("abcdef")
-    for column, (values, title, fractions, label_prefix) in enumerate(datasets):
+    for row, (values, title, fractions, label_prefix) in enumerate(datasets):
         x1 = f"{label_prefix}1 ({100 * fractions[0]:.1f}%)"
         y1 = f"{label_prefix}2 ({100 * fractions[1]:.1f}%)"
         x2 = f"{label_prefix}2 ({100 * fractions[1]:.1f}%)"
         y2 = f"{label_prefix}3 ({100 * fractions[2]:.1f}%)"
-        scatter_panel(axes[0, column], values, families, 0, 1, title, x1, y1)
-        scatter_panel(axes[1, column], values, families, 1, 2, "", x2, y2)
-        for row in range(2):
+        scatter_panel(axes[row, 0], values, families, 0, 1, f"{title}: axes 1-2", x1, y1)
+        scatter_panel(axes[row, 1], values, families, 1, 2, f"{title}: axes 2-3", x2, y2)
+        for column in range(2):
+            axes[row, column].set_box_aspect(0.72)
             axes[row, column].text(
                 -0.15,
-                1.05,
+                1.08,
                 next(panel_letters),
                 transform=axes[row, column].transAxes,
                 fontweight="bold",
                 va="top",
             )
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=7, frameon=False, bbox_to_anchor=(0.5, -0.015))
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=7,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.012),
+        columnspacing=1.15,
+        handletextpad=0.35,
+    )
     save_figure(fig, "kPCA_morphospace_comparison_180mm")
 
     fig, axes = plt.subplots(1, 2, figsize=(7.0866, 3.15), constrained_layout=True)
