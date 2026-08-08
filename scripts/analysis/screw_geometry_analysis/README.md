@@ -1,25 +1,29 @@
 # Screw-geometry analysis
 
-This folder contains the scripts used to process and analyse exported
+This folder contains the scripts used to extract, process and analyse
 screw-related geometry from the coxa-trochanteral joint.
 
-The helical-axis and circle fits were originally produced from manually placed
-semilandmarks with a custom Cinema 4D/Python workflow. That source file and the
-raw semilandmark coordinates were not retained in a portable form. The scripts
-here therefore begin with the exported measurement table; they do not recreate
-the measurements from semilandmarks.
+The helical-axis and circle fits were produced from manually placed, ordered
+three-dimensional semilandmarks with the included Cinema 4D/Python script
+`helical_path_metrics_cinema4d.py`. It searches an input directory for
+per-specimen CSV files, estimates the axis through a multi-stage angular grid
+search, fits the projected circle and exports winding angle, turn number,
+start-to-end distance, axial span, fitted radius and fit RMS.
 
 Recommended order:
 
-1. `screw_geometry_extraction_workflow.R`
+1. `helical_path_metrics_cinema4d.py`
+   runs inside a compatible Cinema 4D Python environment and converts ordered
+   semilandmark CSV files into `winding_metrics.csv`.
+2. `screw_geometry_extraction_workflow.R`
    reads PCA and screw-geometry measurements, applies geometry filters,
    computes derived variables such as axial pitch and exports shape-geometry
    regression summaries. Despite its historical filename, this is a downstream
-   measurement-processing script rather than the original helical-fit extractor.
-2. `analyze_joint_type_screw_geometry.R`
+   measurement-processing script rather than the helical-fit extractor.
+3. `analyze_joint_type_screw_geometry.R`
    compares screw-geometry variables among joint-type categories using
    non-phylogenetic group tests and multivariate geometry summaries.
-3. `plot_supplementary_figure_11.R`
+4. `plot_supplementary_figure_11.R`
    rebuilds the three-panel specimen-level relationships figure from the
    corrected plotting table and labels pitch explicitly as a derived quantity.
 

@@ -32,9 +32,10 @@ colour-adjustment and panel-assembly scripts are intentionally excluded.
   phylogenetically informed allometry tests.
 - `scripts/analysis/joint_typology`: joint-character coding, joint-type
   assignment and theoretical character-combination summaries.
-- `scripts/analysis/screw_geometry_analysis`: downstream processing of exported
-  screw-geometry measurements, shape-geometry relationships and joint-type
-  geometry tests.
+- `scripts/analysis/screw_geometry_analysis`: the original Cinema 4D/Python
+  helical-axis and circle-fitting implementation, downstream processing of its
+  exported measurements, shape-geometry relationships and joint-type geometry
+  tests.
 - `scripts/analysis/revision_audit`: reproducible specimen-to-proxy-tip mapping
   and submission-consistency checks.
 - `data/metadata`: the specimen key and explicit specimen-to-proxy-tip mapping
@@ -122,11 +123,11 @@ software described in the Methods and the package versions used for the
 original analyses.
 
 The original Cinema 4D/Python implementation used to fit the helical axis and
-circle to manually exported semilandmark trajectories was not retained as a
-portable source file. Consequently, this repository starts from the exported
-screw-geometry measurements and does not by itself reproduce those measurements
-from raw semilandmark coordinates. The manuscript and the screw-geometry README
-state this limitation explicitly.
+circle to ordered semilandmark trajectories is included as
+`scripts/analysis/screw_geometry_analysis/helical_path_metrics_cinema4d.py`.
+Rerunning this extraction step requires a compatible Cinema 4D Python
+environment and the ordered per-specimen semilandmark CSV inputs; the subsequent
+measurement processing and statistical analyses are provided as R workflows.
 
 ## Citation
 

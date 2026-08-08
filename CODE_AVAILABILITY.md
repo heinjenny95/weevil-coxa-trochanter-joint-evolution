@@ -14,10 +14,12 @@ polishing scripts are otherwise excluded; some analysis scripts still create
 diagnostic plots as workflow byproducts.
 
 The original Cinema 4D/Python implementation used for helical-axis and circle
-fitting was not retained as a portable source file. The geometry workflows
-therefore begin with the exported measurements and cannot reproduce that
-measurement-extraction step from raw semilandmark coordinates. This limitation
-is stated explicitly in the manuscript and workflow README.
+fitting is included as
+`scripts/analysis/screw_geometry_analysis/helical_path_metrics_cinema4d.py`.
+It reads ordered three-dimensional semilandmark CSV files, performs the
+multi-stage axis search and projected circle fit, and exports the winding-angle,
+axial-span, radius and fit-error measurements used by the downstream workflows.
+Running it requires a compatible Cinema 4D Python environment.
 
 Selected compact data used to audit the revised mapping and geometry analyses
 are included under `data/`; the remaining study data are distributed separately
