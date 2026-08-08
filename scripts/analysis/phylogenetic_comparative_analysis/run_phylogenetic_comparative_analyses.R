@@ -3,7 +3,7 @@
 # Project: Curculionoidea coxa-trochanter joint paper
 # Purpose:
 #   Exploratory phylogenetic comparative analyses (PCM) on
-#   genus-level aggregated shape and joint-geometry data.
+#   shape and joint-geometry data aggregated to 15 taxonomic proxy tips.
 #
 # IMPORTANT:
 #   This script treats PCM as exploratory / trend-seeking.

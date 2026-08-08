@@ -23,12 +23,22 @@
 
 rm(list = ls())
 
+analysis_args <- commandArgs(trailingOnly = TRUE)
+resolve_analysis_path <- function(position, env_name, fallback) {
+  if (length(analysis_args) >= position && nzchar(analysis_args[[position]])) {
+    return(analysis_args[[position]])
+  }
+  env_value <- Sys.getenv(env_name, unset = "")
+  if (nzchar(env_value)) return(env_value)
+  fallback
+}
+
 # ------------------- INPUT -------------------
-pca_file  <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
-geom_file <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv"
+pca_file  <- resolve_analysis_path(1, "WEEVIL_PCA_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv")
+geom_file <- resolve_analysis_path(2, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
 
 # ------------------- OUTPUT FOLDER -------------------
-out_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Shape_vs_ScrewGeometry"
+out_dir <- resolve_analysis_path(3, "WEEVIL_SHAPE_GEOMETRY_OUT", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Shape_vs_ScrewGeometry")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 # ------------------- OUTPUT FILES -------------------
@@ -41,6 +51,7 @@ supp_fig_pdf <- file.path(out_dir, "Figure_supplement_shape_vs_screw_geometry_QC
 regression_csv <- file.path(out_dir, "Table_regression_summary.csv")
 plot_data_csv   <- file.path(out_dir, "Table_plotting_dataset.csv")
 subset_ids_csv  <- file.path(out_dir, "Table_subset_membership.csv")
+sample_flow_csv <- file.path(out_dir, "geometry_sample_flow.csv")
 
 # ------------------- PACKAGES -------------------
 library(ggplot2)
@@ -282,6 +293,35 @@ lm_summary_row <- function(model, model_name, subset_name, n_obs) {
     PC1_p = if ("PC1" %in% rownames(coef(sm))) coef(sm)["PC1", "Pr(>|t|)"] else NA,
     PC2_estimate = if ("PC2" %in% rownames(coef(sm))) coef(sm)["PC2", "Estimate"] else NA,
     PC2_p = if ("PC2" %in% rownames(coef(sm))) coef(sm)["PC2", "Pr(>|t|)"] else NA,
+    predictor_name = NA_character_,
+    predictor_estimate = NA_real_,
+    predictor_p = NA_real_,
+    stringsAsFactors = FALSE
+  )
+}
+
+simple_lm_summary_row <- function(model, model_name, predictor_name, subset_name = "full_dataset") {
+  sm <- summary(model)
+  predictor_row <- setdiff(rownames(coef(sm)), "(Intercept)")[[1]]
+  data.frame(
+    model = model_name,
+    subset = subset_name,
+    n = stats::nobs(model),
+    r_squared = sm$r.squared,
+    adj_r_squared = sm$adj.r.squared,
+    f_statistic = unname(sm$fstatistic[1]),
+    df1 = unname(sm$fstatistic[2]),
+    df2 = unname(sm$fstatistic[3]),
+    p_model = pf(sm$fstatistic[1], sm$fstatistic[2], sm$fstatistic[3], lower.tail = FALSE),
+    intercept_estimate = coef(sm)[1, "Estimate"],
+    intercept_p = coef(sm)[1, "Pr(>|t|)"],
+    PC1_estimate = NA_real_,
+    PC1_p = NA_real_,
+    PC2_estimate = NA_real_,
+    PC2_p = NA_real_,
+    predictor_name = predictor_name,
+    predictor_estimate = coef(sm)[predictor_row, "Estimate"],
+    predictor_p = coef(sm)[predictor_row, "Pr(>|t|)"],
     stringsAsFactors = FALSE
   )
 }
@@ -297,6 +337,8 @@ lm_summary_row <- function(model, model_name, subset_name, n_obs) {
 # -------------------
 pca  <- read_csv_robust(pca_file)
 geom <- read_csv_robust(geom_file)
+n_pca_input <- nrow(pca)
+n_geometry_input <- nrow(geom)
 
 names(pca)  <- clean_str(names(pca))
 names(geom) <- clean_str(names(geom))
@@ -366,6 +408,22 @@ if (is.null(axial_span_col) && is.null(start_end_col)) {
 # -------------------
 pca[[id_pca]]   <- clean_str(pca[[id_pca]])
 geom[[id_geom]] <- clean_str(geom[[id_geom]])
+
+# Preserve compatibility with the legacy geometry identifier that omitted
+# "_trochanter" for Lissorhoptrus oryzophilus. The corrected identifier is
+# used in the final input files, but this alias keeps older exports joinable.
+legacy_id_aliases <- c(
+  "308_lisshorhoptrus_oryzophilus_aligned" = "308_lisshorhoptrus_oryzophilus_trochanter_aligned"
+)
+alias_hit <- geom[[id_geom]] %in% names(legacy_id_aliases)
+geom[[id_geom]][alias_hit] <- unname(legacy_id_aliases[geom[[id_geom]][alias_hit]])
+
+geometry_angle_input <- to_num(geom[[angle_col]])
+n_below_angle_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input < 30)
+n_at_or_above_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input >= 30)
+eligible_geometry_ids <- geom[[id_geom]][!is.na(geometry_angle_input) & geometry_angle_input >= 30]
+n_eligible_matched_to_pca <- sum(eligible_geometry_ids %in% pca[[id_pca]])
+eligible_unmatched_ids <- setdiff(eligible_geometry_ids, pca[[id_pca]])
 
 # -------------------
 # Merge PCA and geometry data.
@@ -515,6 +573,9 @@ size_values <- c(
 # -------------------
 model_angle_full <- lm(angle_abs ~ PC1 + PC2, data = df)
 model_pitch_full <- lm(axial_pitch ~ PC1 + PC2, data = df)
+model_span_angle <- lm(axial_metric ~ angle_abs, data = df)
+model_pitch_angle <- lm(axial_pitch ~ angle_abs, data = df)
+model_pitch_span <- lm(axial_pitch ~ axial_metric, data = df)
 
 # -------------------
 # Main-region subset:
@@ -538,7 +599,10 @@ reg_table <- bind_rows(
   lm_summary_row(model_angle_full, "angle_abs ~ PC1 + PC2", "full_dataset", nrow(df)),
   lm_summary_row(model_pitch_full, "axial_pitch ~ PC1 + PC2", "full_dataset", nrow(df)),
   lm_summary_row(model_angle_left, "angle_abs ~ PC1 + PC2", "main_region_PC1_lt_0.1", nrow(df_left)),
-  if (!is.null(model_angle_right)) lm_summary_row(model_angle_right, "angle_abs ~ PC1 + PC2", "right_region_PC1_ge_0.1", nrow(df_right))
+  if (!is.null(model_angle_right)) lm_summary_row(model_angle_right, "angle_abs ~ PC1 + PC2", "right_region_PC1_ge_0.1", nrow(df_right)),
+  simple_lm_summary_row(model_span_angle, "axial_span ~ angle_abs", "angle_abs"),
+  simple_lm_summary_row(model_pitch_angle, "axial_pitch ~ angle_abs", "angle_abs"),
+  simple_lm_summary_row(model_pitch_span, "axial_pitch ~ axial_span", "axial_span")
 )
 
 # -------------------
@@ -578,7 +642,10 @@ corr_export <- corr_table %>%
     PC1_estimate = NA_real_,
     PC1_p = NA_real_,
     PC2_estimate = NA_real_,
-    PC2_p = NA_real_
+    PC2_p = NA_real_,
+    predictor_name = NA_character_,
+    predictor_estimate = NA_real_,
+    predictor_p = NA_real_
   ) %>%
   rename(model = metric) %>%
   mutate(correlation_value = correlation) %>%
@@ -588,6 +655,7 @@ corr_export <- corr_table %>%
     intercept_estimate, intercept_p,
     PC1_estimate, PC1_p,
     PC2_estimate, PC2_p,
+    predictor_name, predictor_estimate, predictor_p,
     correlation_value
   )
 
@@ -602,6 +670,7 @@ reg_export_models <- reg_table %>%
     intercept_estimate, intercept_p,
     PC1_estimate, PC1_p,
     PC2_estimate, PC2_p,
+    predictor_name, predictor_estimate, predictor_p,
     correlation_value
   )
 
@@ -875,6 +944,9 @@ reg_export_clean <- reg_export %>%
     
     PC2_estimate = round(PC2_estimate, 3),
     PC2_p = signif(PC2_p, 3),
+
+    predictor_estimate = round(predictor_estimate, 6),
+    predictor_p = signif(predictor_p, 3),
     
     correlation_value = signif(correlation_value, 3)
   )
@@ -883,6 +955,38 @@ reg_export_clean <- reg_export %>%
 # 1) Regression summary table
 # -------------------
 write_csv_clean(reg_export_clean, regression_csv)
+
+sample_flow <- data.frame(
+  stage = c(
+    "atlas specimens",
+    "specimens with exported screw-trajectory measurements",
+    "geometry measurements below 30-degree cutoff",
+    "geometry measurements at or above 30-degree cutoff",
+    "eligible geometry measurements matched to PCA",
+    "eligible geometry measurements unmatched to PCA",
+    "final specimen-level shape-geometry analysis"
+  ),
+  n = c(
+    n_pca_input,
+    n_geometry_input,
+    n_below_angle_cutoff,
+    n_at_or_above_cutoff,
+    n_eligible_matched_to_pca,
+    length(eligible_unmatched_ids),
+    nrow(df)
+  ),
+  details = c(
+    "complete atlas PCA dataset",
+    "before the angular cutoff",
+    "excluded because derived pitch is unstable at very small angles",
+    "eligible for specimen-level shape-geometry analyses",
+    "after applying documented legacy-ID normalization",
+    if (length(eligible_unmatched_ids)) paste(eligible_unmatched_ids, collapse = "; ") else "none",
+    "used for Supplementary Figure 11 and associated ordinary linear models"
+  ),
+  stringsAsFactors = FALSE
+)
+write_csv_clean(sample_flow, sample_flow_csv)
 
 # -------------------
 # 2) Specimen-level plotting dataset
@@ -1054,9 +1158,10 @@ cat("\nMain results table exported.\n")
 
 # -------------------
 # Why:
-# - explores relationship between raw axial displacement (span)
-#   and normalized displacement (pitch)
-# - helps interpret how different geometry components interact
+# - describes relationships between the two independent input quantities
+#   (winding angle and axial span) and the algebraically derived pitch ratio
+# - pitch regressions are descriptive and must not be interpreted as
+#   independent evidence of biological trait coupling
 # -------------------
 
 library(scales)
@@ -1089,8 +1194,8 @@ p_pitch <- ggplot(df, aes(x = angle_abs, y = log_axial_pitch)) +
   geom_point(alpha = 0.85) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
-    title = "B. Axial pitch vs winding angle",
-    x = "Winding angle ()",
+    title = "B. Derived axial pitch vs winding angle",
+    x = "Winding angle (deg)",
     y = "Axial pitch per 360 (log10)"
   ) +
   theme_classic(base_size = 13) +

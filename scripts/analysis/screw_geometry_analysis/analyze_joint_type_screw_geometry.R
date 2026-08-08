@@ -1,5 +1,5 @@
 # ============================================================
-# Joint type Ã— screw geometry (NON-phylogenetic) â€” UPDATED VERSION
+# Joint type x screw geometry (NON-phylogenetic) - UPDATED VERSION
 #
 # Compatible with new geometry file containing:
 #   specimen_id
@@ -30,17 +30,27 @@
 #
 # Important:
 # - Uses ABSOLUTE winding angle for all biological analyses
-# - Filters out angle < 30Â° by default, because those cases do not
+# - Filters out angle < 30 degrees by default, because those cases do not
 #   represent robust screw-like geometry and destabilize pitch estimates
 # ============================================================
 
 rm(list = ls())
 
-# ------------------- PATHS -------------------
-geom_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv"
-type_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_joint_types.csv"
+analysis_args <- commandArgs(trailingOnly = TRUE)
+resolve_analysis_path <- function(position, env_name, fallback) {
+  if (length(analysis_args) >= position && nzchar(analysis_args[[position]])) {
+    return(analysis_args[[position]])
+  }
+  env_value <- Sys.getenv(env_name, unset = "")
+  if (nzchar(env_value)) return(env_value)
+  fallback
+}
 
-out_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/JointType_Geometry"
+# ------------------- PATHS -------------------
+geom_path <- resolve_analysis_path(1, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
+type_path <- resolve_analysis_path(2, "WEEVIL_JOINT_TYPES_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_joint_types.csv")
+
+out_dir <- resolve_analysis_path(3, "WEEVIL_JOINT_GEOMETRY_OUT", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/JointType_Geometry")
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 out_fig_png <- file.path(out_dir, "joint_type_screw_geometry_1x3.png")
@@ -285,6 +295,14 @@ if (length(missing_typ)  > 0) stop("Missing in specimen_joint_types.csv: ", past
 geom$specimen_id <- clean_str(geom$specimen_id)
 typ$specimen_id  <- clean_str(typ$specimen_id)
 
+# Compatibility alias for the legacy geometry export that omitted
+# "_trochanter" from the Lissorhoptrus oryzophilus identifier.
+legacy_id_aliases <- c(
+  "308_lisshorhoptrus_oryzophilus_aligned" = "308_lisshorhoptrus_oryzophilus_trochanter_aligned"
+)
+alias_hit <- geom$specimen_id %in% names(legacy_id_aliases)
+geom$specimen_id[alias_hit] <- unname(legacy_id_aliases[geom$specimen_id[alias_hit]])
+
 geom$abs_winding_angle_deg    <- to_num(geom$abs_winding_angle_deg)
 geom$signed_winding_angle_deg <- if ("signed_winding_angle_deg" %in% names(geom)) to_num(geom$signed_winding_angle_deg) else NA_real_
 geom$start_end_dist           <- to_num(geom$start_end_dist)
@@ -346,12 +364,12 @@ if (length(excluded) == 0) cat("None.\n") else print(excluded)
 
 # ------------------- ANGLE CUTOFF -------------------
 # Important:
-# Angle < 30Â° does not represent robust screw-like geometry and makes
+# Angle < 30 degrees does not represent robust screw-like geometry and makes
 # pitch unstable. These cases are removed here.
 df <- df %>%
   filter(abs_winding_angle_deg >= ANGLE_CUTOFF_DEG)
 
-cat("\nRows kept after angle cutoff (>= ", ANGLE_CUTOFF_DEG, "Â°): ", nrow(df), "\n", sep = "")
+cat("\nRows kept after angle cutoff (>= ", ANGLE_CUTOFF_DEG, " degrees): ", nrow(df), "\n", sep = "")
 
 if (nrow(df) < 3) stop("Too few screw-joint rows after filtering.")
 
@@ -365,7 +383,7 @@ print(table(df$joint_type))
 cat("\nCounts by screw_state (screw subset):\n")
 print(table(df$screw_state))
 
-preferred_order <- c("True screwâ€“nut joint", "True screw-nut joint", "Unopposed screw joint")
+preferred_order <- c("True screw-nut joint", "Unopposed screw joint")
 present_levels <- levels(df$joint_type)
 matched <- preferred_order[preferred_order %in% present_levels]
 remaining <- setdiff(present_levels, matched)
@@ -401,7 +419,7 @@ write_csv_clean(plot_export, out_plotdata_csv)
 p1 <- make_boxplot(
   data = df,
   yvar = "abs_winding_angle_deg",
-  ylab = "Absolute winding angle (Â°)",
+  ylab = "Absolute winding angle (deg)",
   title_text = "Winding angle",
   palette_vals = palette_vals
 )
@@ -409,7 +427,7 @@ p1 <- make_boxplot(
 p2 <- make_boxplot(
   data = df,
   yvar = "axial_pitch_360",
-  ylab = "Axial pitch per 360Â°",
+  ylab = "Axial pitch per 360 deg",
   title_text = "Axial pitch",
   palette_vals = palette_vals
 )
@@ -493,6 +511,7 @@ disp_anova <- anova(disp)
 print(disp_anova)
 
 cat("\nPERMANOVA (adonis2, Euclidean):\n")
+set.seed(20260808)
 perm <- vegan::adonis2(dist_euc ~ joint_type, data = df, permutations = 999)
 print(perm)
 
