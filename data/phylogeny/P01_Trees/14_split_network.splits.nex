@@ -1,0 +1,55 @@
+#nexus
+
+BEGIN Taxa;
+DIMENSIONS ntax=14;
+TAXLABELS
+[1] 'Curculionidae___Dendroctonus'
+[2] 'Attelabidae___Synolabus'
+[3] 'Brentidae___Nanophyes'
+[4] 'Curculionidae___Oxoplatypus'
+[5] 'Curculionidae___Sitophilus'
+[6] 'Brentidae___Arrhenodes'
+[7] 'Curculionidae___Ips'
+[8] 'Curculionidae___Nedyus'
+[9] 'Nemonychidae___Rhynchitomacerinus'
+[10] 'Curculionidae___Curculio'
+[11] 'Belidae___Agnesiotis'
+[12] 'Curculionidae___Larinus'
+[13] 'Anthribidae___Euparius'
+[14] 'Curculionidae___Diaprepes'
+;
+END; [Taxa]
+
+BEGIN Splits;
+DIMENSIONS ntax=14 nsplits=27;
+FORMAT labels=no weights=yes confidences=no intervals=no;
+MATRIX
+	100	 2,
+	100	 9,
+	100	 13,
+	100	 9 13,
+	100	 11,
+	100	 9 11 13,
+	100	 2 9 11 13,
+	100	 3,
+	100	 6,
+	100	 3 6,
+	100	 2 3 6 9 11 13,
+	100	 4,
+	100	 5,
+	100	 4 5,
+	100	 1 7 8 10 12 14,
+	100	 14,
+	100	 1 7 8 10 12,
+	100	 8,
+	100	 10,
+	100	 8 10,
+	100	 12,
+	100	 8 10 12,
+	100	 1 7,
+	100	 7,
+	100	 1,
+	0	 10 12,
+	0	 1 7 8,
+;
+END; [Splits]

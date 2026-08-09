@@ -68,6 +68,22 @@ specimens$assignment_type <- ifelse(
   "broader taxonomic proxy"
 )
 
+# Retain the source proxy label and the exact label that entered the analysis
+# tree. Two historical source labels required an explicit tree-label mapping.
+analysis_tip_corrections <- c("Belidae" = "Agnesiotis", "Caridae" = "Car")
+specimens$analysis_tree_tip <- specimens$proxy_tip
+correction_hit <- specimens$analysis_tree_tip %in% names(analysis_tip_corrections)
+specimens$analysis_tree_tip[correction_hit] <- unname(
+  analysis_tip_corrections[specimens$analysis_tree_tip[correction_hit]]
+)
+specimens$tree_label_correction_applied <- correction_hit
+specimens$family_proxy_label <- paste(specimens$Family, specimens$analysis_tree_tip, sep = "___")
+specimens$assignment_rationale <- ifelse(
+  specimens$exact_genus_match,
+  "sampled genus occurs as a tree tip",
+  "sample assigned to the documented broader taxonomic proxy"
+)
+
 mapping <- specimens[, c(
   "specimen_key",
   "specimen_id",
@@ -75,9 +91,13 @@ mapping <- specimens[, c(
   "sampled_genus",
   "Family",
   "proxy_tip",
+  "analysis_tree_tip",
+  "family_proxy_label",
+  "tree_label_correction_applied",
   "proxy_tip_n_specimens",
   "exact_genus_match",
-  "assignment_type"
+  "assignment_type",
+  "assignment_rationale"
 )]
 names(mapping)[names(mapping) == "Family"] <- "family"
 

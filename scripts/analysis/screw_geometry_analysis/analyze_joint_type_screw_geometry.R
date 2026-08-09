@@ -570,9 +570,18 @@ if (length(unique(df$screw_state[!is.na(df$screw_state)])) >= 2) {
 # ============================================================
 
 stats_export <- bind_rows(stats_list) %>%
+  mutate(p_value_adjusted_bh = NA_real_)
+
+kw_rows <- which(stats_export$analysis == "kruskal_wallis")
+stats_export$p_value_adjusted_bh[kw_rows] <- p.adjust(
+  stats_export$p_value[kw_rows], method = "BH"
+)
+
+stats_export <- stats_export %>%
   mutate(
     statistic = round(statistic, 3),
-    p_value = signif(p_value, 3)
+    p_value = signif(p_value, 3),
+    p_value_adjusted_bh = signif(p_value_adjusted_bh, 3)
   )
 
 write_csv_clean(stats_export, out_stats_csv)

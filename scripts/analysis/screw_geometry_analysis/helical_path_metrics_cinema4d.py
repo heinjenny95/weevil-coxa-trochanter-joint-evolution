@@ -1,9 +1,12 @@
 ﻿"""
 Estimate helical-path metrics from ordered 3D semilandmark CSV files.
 
-The script searches an input directory for CSV files, fits a best helical axis
-and projected circle for each specimen, and exports winding metrics to a
-semicolon-delimited CSV table.
+The script searches an input directory for ordered semilandmark CSV files,
+fits a cylindrical axis by minimizing radial circle-fit error in projected
+cross-section, and exports winding metrics to a semicolon-delimited CSV table.
+It does not fit a full three-dimensional helix or regress axial position on
+angular position; axial pitch is derived downstream from endpoint axial span
+and absolute winding angle.
 """
 
 import c4d

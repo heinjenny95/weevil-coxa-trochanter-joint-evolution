@@ -3,18 +3,22 @@
 This folder contains the scripts used to extract, process and analyse
 screw-related geometry from the coxa-trochanteral joint.
 
-The helical-axis and circle fits were produced from manually placed, ordered
+The cylindrical-axis and circle fits were produced from manually placed, ordered
 three-dimensional semilandmarks with the included Cinema 4D/Python script
 `helical_path_metrics_cinema4d.py`. It searches an input directory for
-per-specimen CSV files, estimates the axis through a multi-stage angular grid
-search, fits the projected circle and exports winding angle, turn number,
+per-specimen CSV files, estimates the axis by minimizing radial circle-fit RMS
+through a multi-stage angular grid search, fits the projected circle and exports winding angle, turn number,
 start-to-end distance, axial span, fitted radius and fit RMS.
+It does not fit a full three-dimensional helix because axial position is not
+regressed on angular position.
 
 Recommended order:
 
 1. `helical_path_metrics_cinema4d.py`
    runs inside a compatible Cinema 4D Python environment and converts ordered
-   semilandmark CSV files into `winding_metrics.csv`.
+   semilandmark CSV files into `winding_metrics.csv`. The angular search uses
+   +/-40 degrees in 8-degree steps, then +/-10 degrees in 2-degree steps and
+   finally +/-2 degrees in 0.5-degree steps.
 2. `screw_geometry_extraction_workflow.R`
    reads PCA and screw-geometry measurements, applies geometry filters,
    computes derived variables such as axial pitch and exports shape-geometry
@@ -32,7 +36,8 @@ arguments. The shape-geometry workflow uses `<PCA CSV> <geometry CSV>
 <output directory>`; the joint-type workflow uses `<geometry CSV> <joint-type
 CSV> <output directory>`.
 
-Axial pitch is calculated as `axial span * 360 / absolute winding angle`.
+Endpoint-equivalent axial pitch is calculated as
+`axial span * 360 / absolute winding angle`.
 Regressions of pitch against either component are exported for descriptive
 completeness only and are not independent tests of biological trait coupling.
 

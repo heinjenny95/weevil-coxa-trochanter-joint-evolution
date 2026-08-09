@@ -13,7 +13,7 @@ The `r/` scripts reproduce the ordinary-PCA workflow used for the main analyses,
 1. `gamma = 0.25`, retained from the adapted exploratory notebook.
 2. A data-adaptive kernel with `gamma = 1 / (2 * median squared pairwise distance)`.
 
-The script matches and sign-aligns the first five kernel axes to PC1-PC5 and compares global morphospace geometry, family and joint-type structure, allometry, and associations with screw-joint geometry. It writes tables, publication-ready figures and an input-file checksum manifest to the selected output directory.
+The script matches and sign-aligns the first five kernel axes to PC1-PC5 and compares global morphospace geometry, family and joint-type structure, allometry, and associations with screw-joint geometry. Shape--geometry models apply the same minimum absolute winding angle as the main workflow (30 degrees by default; configurable with `--geometry-min-angle`). It writes tables, publication-ready figures and an input-file checksum manifest to the selected output directory.
 
 Run from the repository root with study-specific input paths:
 

@@ -62,11 +62,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--analysis-data", type=Path, required=True, help="Specimen-level PCA and trait table.")
     parser.add_argument("--joint-data", type=Path, required=True, help="Specimen-level joint-type table.")
     parser.add_argument("--output-dir", type=Path, required=True, help="Directory for tables, figures and logs.")
+    parser.add_argument(
+        "--geometry-min-angle",
+        type=float,
+        default=30.0,
+        help="Minimum absolute winding angle (degrees) for all shape--geometry sensitivity models.",
+    )
     return parser.parse_args()
 
 
 def configure_paths(args: argparse.Namespace) -> None:
-    global OUT, TABLES, FIGURES, LOGS, MOMENTA, LINEAR_SCORES, ANALYSIS_DATA, JOINT_DATA
+    global OUT, TABLES, FIGURES, LOGS, MOMENTA, LINEAR_SCORES, ANALYSIS_DATA, JOINT_DATA, GEOMETRY_MIN_ANGLE
     OUT = args.output_dir.resolve()
     TABLES = OUT / "tables"
     FIGURES = OUT / "figures"
@@ -75,6 +81,7 @@ def configure_paths(args: argparse.Namespace) -> None:
     LINEAR_SCORES = args.linear_scores.resolve()
     ANALYSIS_DATA = args.analysis_data.resolve()
     JOINT_DATA = args.joint_data.resolve()
+    GEOMETRY_MIN_ANGLE = float(args.geometry_min_angle)
 
 
 def ensure_dirs() -> None:
@@ -785,14 +792,25 @@ def main() -> None:
 
     geometry = analysis_df.copy()
     geometry["axial_pitch"] = geometry["axial_span"] / geometry["n_turns_abs"].replace(0, np.nan)
+    geometry_eligible = (
+        np.isfinite(geometry["abs_winding_angle_deg"].to_numpy(dtype=float))
+        & (geometry["abs_winding_angle_deg"].to_numpy(dtype=float) >= GEOMETRY_MIN_ANGLE)
+    )
     geometry_records = []
     for trait in ["abs_winding_angle_deg", "axial_span", "axial_pitch"]:
         y = geometry[trait].to_numpy(dtype=float)
+        valid = geometry_eligible & np.isfinite(y)
         for method, values in family_methods.items():
             for n_axes in (2, 5):
-                result = ols_summary(y, values[:, :n_axes])
+                result = ols_summary(y[valid], values[valid, :n_axes])
                 geometry_records.append(
-                    {"response": trait, "method": method, "predictor_axes": n_axes, **result}
+                    {
+                        "response": trait,
+                        "method": method,
+                        "predictor_axes": n_axes,
+                        "minimum_abs_winding_angle_deg": GEOMETRY_MIN_ANGLE,
+                        **result,
+                    }
                 )
     pd.DataFrame(geometry_records).to_csv(TABLES / "shape_geometry_regressions.csv", index=False)
 
@@ -887,7 +905,7 @@ The legacy setting produces a broad, nearly linear kernel. The adaptive setting 
 - Morphospace geometry and axis correspondence with the released linear PCA.
 - Family location and within-family disparity.
 - Joint-type separation.
-- Shape associations with winding angle, axial span and axial pitch.
+- Shape associations with winding angle, axial span and endpoint-equivalent axial pitch, consistently restricted to trajectories with absolute winding angle >= {GEOMETRY_MIN_ANGLE:g} degrees.
 - Multivariate association with log centroid size.
 
 For direct visual and inferential comparison, the first five kPCA axes were matched to PC1-PC5 by maximum absolute Pearson correlation and sign-aligned. Native kPCA scores are also retained.
