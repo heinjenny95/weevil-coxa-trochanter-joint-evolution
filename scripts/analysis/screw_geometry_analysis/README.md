@@ -45,7 +45,9 @@ Recommended order:
    schematic as panel a and regenerates the robust morphospace as panel b; the
    separate PC1--winding-angle regression remains in Supplementary Figure 10.
    The renderer replaces raw diagnostic plotting templates and does not alter
-   any numerical analysis results.
+   any numerical analysis results. In Extended Data Figure 5, the reference-
+   phylogeny tips in panel a are intentionally black; the continuous trait
+   palette is reserved for the ancestral-state maps in panels b--h.
 
 The downstream scripts accept input and output paths as command-line
 arguments. The shape-geometry workflow uses `<PCA CSV> <geometry CSV>

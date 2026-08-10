@@ -253,8 +253,8 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   on.exit(dev.off(), add = TRUE)
   layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1.08,1,1), heights = c(1,1,1))
   par(mar = c(1.0, 0.4, 2.4, 0.4), oma = c(0.5, 0.2, 0.5, 0.2), family = "sans", fg = ink, col.axis = ink, col.lab = ink)
-  plot(asr_tree, show.tip.label = TRUE, tip.color = family_cols[sub("___.*$", "", asr_tree$tip.label)], cex = 0.58, label.offset = 2.5, edge.color = "#A7B8C2", no.margin = FALSE)
-  tiplabels(pch = 16, col = family_cols[sub("___.*$", "", asr_tree$tip.label)], cex = 0.62)
+  plot(asr_tree, show.tip.label = TRUE, tip.color = "#000000", cex = 0.58, label.offset = 2.5, edge.color = "#A7B8C2", no.margin = FALSE)
+  tiplabels(pch = 16, col = "#000000", cex = 0.62)
   title(main = "a   Reference phylogeny", adj = 0, line = 0.25, cex.main = 0.86, col.main = ink)
   for (i in seq_along(asr_maps)) {
     plot(asr_maps[[i]], legend = FALSE, ftype = "off", lwd = 3.0, outline = FALSE, mar = c(0.5,0.2,1.7,0.2), direction = "rightwards")
@@ -262,7 +262,14 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   }
   plot.new()
   par(xpd = NA)
-  add.color.bar(0.62, cols = colorRampPalette(continuous_cols)(120), title = "Standardized trait score", lims = c(-2.2, 2.2), digits = 1, prompt = FALSE, x = 0.18, y = 0.52, lwd = 6, outline = FALSE, subtitle = "low                                      high")
+  legend_cols <- colorRampPalette(continuous_cols)(120)
+  legend_x <- seq(0.18, 0.82, length.out = length(legend_cols) + 1)
+  for (j in seq_along(legend_cols)) {
+    rect(legend_x[[j]], 0.46, legend_x[[j + 1]], 0.51, col = legend_cols[[j]], border = NA)
+  }
+  text(0.50, 0.64, "Standardized trait score", cex = 0.72, col = ink)
+  text(0.18, 0.36, "-2.2\nlow", cex = 0.66, col = ink)
+  text(0.82, 0.36, "2.2\nhigh", cex = 0.66, col = ink)
 }
 
 draw_ed5(file.path(out_dir, "Extended_Data_Fig_5_robust_ASR.jpg"), "jpeg")
