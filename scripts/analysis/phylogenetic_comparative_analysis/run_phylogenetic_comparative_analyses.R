@@ -85,6 +85,10 @@ output_dir <- Sys.getenv(
   "WEV_PCM_OUTPUT_DIR",
   unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/PCM"
 )
+require_geometry_matched_specimens <- tolower(Sys.getenv(
+  "WEV_REQUIRE_GEOMETRY_MATCHED_SPECIMENS",
+  unset = "false"
+)) %in% c("true", "1", "yes")
 
 tree_variant_files <- c(
   ml_unrooted = "curc_fig1.treefile",
@@ -109,6 +113,7 @@ geometry_vars_main <- c(
   "n_turns_abs",
   "start_end_dist",
   "axial_span",
+  "axial_pitch_360",
   "fit_radius"
 )
 
@@ -166,10 +171,11 @@ purrr::walk(file.path(output_dir, subdirs), ~ dir.create(.x, recursive = TRUE, s
 read_delim_guess <- function(path) {
   first_line <- readLines(path, n = 1, warn = FALSE, encoding = "UTF-8")
   delim <- if (grepl(";", first_line)) ";" else ","
+  decimal_mark <- if (identical(delim, ";")) "," else "."
   df <- data.table::fread(
     path,
     sep = delim,
-    dec = ",",
+    dec = decimal_mark,
     encoding = "UTF-8",
     data.table = FALSE
   )
@@ -703,6 +709,14 @@ specimen_merged <- specimen_key_df %>%
   dplyr::left_join(pc_df, by = "specimen_id") %>%
   dplyr::left_join(geometry_df, by = "specimen_id") %>%
   dplyr::left_join(centroid_df, by = "specimen_id")
+
+if (isTRUE(require_geometry_matched_specimens)) {
+  specimen_merged <- specimen_merged %>%
+    dplyr::semi_join(
+      geometry_df %>% dplyr::select(specimen_id) %>% dplyr::distinct(),
+      by = "specimen_id"
+    )
+}
 
 specimen_merged <- specimen_merged %>%
   dplyr::mutate(

@@ -8,6 +8,7 @@ desktop.ini
 .RData
 .Ruserdata
 .Rproj.user/
+Rplots.pdf
 
 # Python cache/build files
 __pycache__/

@@ -16,13 +16,21 @@ suppressPackageStartupMessages({
 })
 
 # ------------------- PATHS -------------------
-lm_dir   <- "<BEETLE_JOINTS_ROOT>/Processed/Curculionoidea/Landmarks"
-key_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv"
-pca_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
-geom_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv"
+analysis_args <- commandArgs(trailingOnly = TRUE)
+resolve_analysis_path <- function(position, env_name, fallback) {
+  if (length(analysis_args) >= position && nzchar(analysis_args[[position]])) {
+    return(analysis_args[[position]])
+  }
+  env_value <- Sys.getenv(env_name, unset = "")
+  if (nzchar(env_value)) return(env_value)
+  fallback
+}
 
-base_results_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results"
-out_dir <- file.path(base_results_dir, "Allometry")
+lm_dir   <- resolve_analysis_path(1, "WEV_ALLOMETRY_LANDMARK_DIR", "<BEETLE_JOINTS_ROOT>/Processed/Curculionoidea/Landmarks")
+key_path <- resolve_analysis_path(2, "WEV_SPECIMEN_KEY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv")
+pca_path <- resolve_analysis_path(3, "WEV_PCA_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv")
+geom_path <- resolve_analysis_path(4, "WEV_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
+out_dir <- resolve_analysis_path(5, "WEV_ALLOMETRY_OUTPUT_DIR", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 # ------------------- OUTPUT FILES -------------------
@@ -60,7 +68,7 @@ out_plot_geom_pdf           <- file.path(out_dir, "allometry_geometry_selected_p
 
 # ------------------- SETTINGS -------------------
 pcs_use                <- paste0("PC", 1:5)
-n_permutations         <- 9999
+n_permutations         <- as.integer(Sys.getenv("WEV_ALLOMETRY_PERMUTATIONS", unset = "9999"))
 p_adjust_method        <- "holm"
 min_n_for_group_test   <- 3
 max_panels_geometry    <- 6
@@ -94,6 +102,7 @@ norm_id <- function(x) {
   x <- gsub("[^a-z0-9_]+", "_", x)
   x <- gsub("_+", "_", x)
   x <- gsub("^_|_$", "", x)
+  x <- gsub("pseudonasutus", "pseudonastus", x, fixed = TRUE)
   x
 }
 
@@ -244,6 +253,7 @@ canonicalize_geometry_cols <- function(df) {
   df <- rename_first_match(df, c("n_turns_abs", "turns_abs", "absolute_turn_number"), "n_turns_abs")
   df <- rename_first_match(df, c("start_end_dist", "start_end_distance"), "start_end_dist")
   df <- rename_first_match(df, c("axial_span"), "axial_span")
+  df <- rename_first_match(df, c("axial_pitch_360", "fitted_pitch_360", "axial_pitch"), "axial_pitch_360")
   df <- rename_first_match(df, c("fit_radius", "fitted_radius", "radius"), "fit_radius")
   df <- rename_first_match(df, c("fit_rms", "rms", "fit_error"), "fit_rms")
   df
@@ -584,7 +594,7 @@ pca2 <- pca2 %>%
 geom_trait_candidates <- c(
   "signed_winding_angle_deg", "abs_winding_angle_deg",
   "n_turns_signed", "n_turns_abs",
-  "start_end_dist", "axial_span", "fit_radius", "fit_rms"
+  "start_end_dist", "axial_span", "axial_pitch_360", "fit_radius", "fit_rms"
 )
 geom_traits_present <- intersect(geom_trait_candidates, names(geom2))
 
@@ -692,6 +702,7 @@ geom_aliases <- list(
   abs_winding_angle_deg    = c("abs_winding_angle_deg"),
   signed_winding_angle_deg = c("signed_winding_angle_deg"),
   axial_span               = c("axial_span"),
+  axial_pitch_360          = c("axial_pitch_360"),
   start_end_dist           = c("start_end_dist"),
   fit_radius               = c("fit_radius"),
   n_turns_abs              = c("n_turns_abs"),
@@ -1230,7 +1241,10 @@ suppressPackageStartupMessages({
 })
 
 # ------------------- PATHS -------------------
-allom_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry"
+allom_dir <- Sys.getenv(
+  "WEV_ALLOMETRY_OUTPUT_DIR",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry"
+)
 
 merged_table_path <- file.path(allom_dir, "allometry_merged_table.csv")
 univar_path <- file.path(allom_dir, "allometry_univariate_PC1_to_PC5_results.csv")
@@ -1538,7 +1552,7 @@ pD <- make_reg_panel(
   xvar = "logCS",
   yvar = "abs_winding_angle_deg",
   title = NULL,
-  ylab = "Absolute winding angle ()",
+  ylab = "Absolute winding angle (deg)",
   stats_label = wind_label,
   xlim_vals = xlim_common,
   ylim_vals = wind_ylim,
@@ -1607,12 +1621,13 @@ out_geom_supp_pdf <- file.path(supp_dir, "Supp_Allometry_Geometry_Remaining.pdf"
 # ------------------- HELPERS -------------------
 format_trait_label <- function(x) {
   dplyr::case_when(
-    x == "signed_winding_angle_deg"   ~ "Signed winding angle ()",
-    x == "abs_winding_angle_deg"      ~ "Absolute winding angle ()",
+    x == "signed_winding_angle_deg"   ~ "Signed winding angle (deg)",
+    x == "abs_winding_angle_deg"      ~ "Absolute winding angle (deg)",
     x == "n_turns_signed"             ~ "Signed number of turns",
     x == "n_turns_abs"                ~ "Absolute number of turns",
     x == "start_end_dist"             ~ "Start-end distance",
     x == "axial_span"                 ~ "Axial span",
+    x == "axial_pitch_360"            ~ "Fitted axial pitch per 360 degrees",
     x == "fit_radius"                 ~ "Fitted radius",
     x == "fit_rms"                    ~ "Fit RMS",
     x == "ratio_axial_span_fit_radius" ~ "Axial span / fitted radius",
@@ -1890,12 +1905,24 @@ suppressPackageStartupMessages({
 })
 
 # ------------------- PATHS -------------------
-merged_table_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry/allometry_merged_table.csv"
-key_path    <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv"
-tree_path   <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_withCaridae_calibrated_Grafen.tre"
+allometry_parent_dir <- Sys.getenv(
+  "WEV_ALLOMETRY_OUTPUT_DIR",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry"
+)
+merged_table_path <- Sys.getenv(
+  "WEV_ALLOMETRY_MERGED_TABLE",
+  unset = file.path(allometry_parent_dir, "allometry_merged_table.csv")
+)
+key_path <- Sys.getenv(
+  "WEV_SPECIMEN_KEY_FILE",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv"
+)
+tree_path <- Sys.getenv(
+  "WEV_TREE_FILE",
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_withCaridae_calibrated_Grafen.tre"
+)
 
-base_results_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results"
-out_dir <- file.path(base_results_dir, "Allometry_Phylogenetic")
+out_dir <- file.path(allometry_parent_dir, "Allometry_Phylogenetic")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 out_input_specimen_csv <- file.path(out_dir, "pgls_input_specimen_level.csv")
@@ -2384,7 +2411,7 @@ for (tr in traits_to_test) {
   ylab_i <- dplyr::case_when(
     tr == "PC1" ~ "PC1 score",
     tr == "PC2" ~ "PC2 score",
-    tr == "abs_winding_angle_deg" ~ "Absolute winding angle ()",
+    tr == "abs_winding_angle_deg" ~ "Absolute winding angle (deg)",
     TRUE ~ tr
   )
   
@@ -2463,6 +2490,3 @@ cat(out_dir, "\n")
 cat("Main result table:\n")
 cat(out_results_csv, "\n")
 cat("============================================================\n")
-
-
-

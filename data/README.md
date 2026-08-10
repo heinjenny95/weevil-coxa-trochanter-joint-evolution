@@ -15,29 +15,46 @@ corrections made during the final consistency review.
 
 ## `screw_geometry`
 
-- `winding_metrics.csv`: 64 exported traced surface trajectories before the 30-degree
-  winding-angle eligibility cutoff.
-- `geometry_sample_flow.csv`: explicit accounting of the four excluded and 60
-  eligible trajectories.
-- `geometry_cutoff_sensitivity.csv`: model summaries at 0, 10, 20, 30 and 45
-  degree minimum winding-angle thresholds (n = 64 down to n = 58).
-- `shape_geometry_analysis_dataset.csv`: the corrected 60-specimen dataset used
-  for shape--geometry regressions.
-- `regression_summary.csv`: revised OLS results, including the three simple
-  geometry-on-geometry regressions.
-- `joint_type_geometry_stats.csv`: joint-type comparison results for the 58
-  specimens in recurrent screw-bearing joint categories.
-- `main_results.csv`: corrected model-level and PC1/PC2 effect statistics for
-  the 60-specimen analysis and 56-specimen main-region sensitivity subset.
-- `specimen_level_screw_joint_geometry.csv`: all 60 eligible trajectories,
-  including the two specimens outside the recurrent joint-type comparison.
+- `robust_helix_metrics.csv`: all 64 robust circular-helix fits, bootstrap
+  intervals, fit diagnostics, quality flags and analysis-set membership.
+- `robust_helix_bootstrap_draws.csv`: 200 successful conditional-residual
+  bootstrap draws for each of the 64 trajectories.
+- `robust_helix_point_residuals.csv`: point-level radial, axial and combined
+  residuals for the fitted trajectory.
+- `robust_geometry_all.csv`, `robust_geometry_primary_adequate.csv` and
+  `robust_geometry_strict_good.csv`: downstream-compatible tables for all 64,
+  the primary 63 and the strict 53 trajectories.
+- `geometry_sample_flow.csv`, `shape_geometry_analysis_dataset.csv`,
+  `regression_summary.csv`, `main_results.csv`,
+  `joint_type_geometry_stats.csv` and
+  `specimen_level_screw_joint_geometry.csv`: primary-set downstream outputs.
+  Files with the `_strict_good` suffix provide the corresponding quality
+  sensitivity where applicable.
+- `shape_model_uncertainty_summary.csv`,
+  `shape_coefficients_rubin_summary.csv`,
+  `joint_type_uncertainty_summary.csv`,
+  `pgls_shape_geometry_rubin_summary.csv` and
+  `ecology_pgls_rubin_summary.csv`: downstream propagation of conditional
+  measurement uncertainty.
+- `ROBUST_REANALYSIS_SUMMARY.md`: interpretation audit across quality sets,
+  bootstrap draws, phylogenetic trees, leave-one-out checks, allometry and
+  ecology.
+- `figures/`: robust-fit QC plus primary and strict shape-geometry sensitivity
+  figures.
+- `sensitivity/`: matched-tip PGLS, alternative-tree and leave-one-out
+  summaries plus primary/strict allometry and ecology tables.
+- `winding_metrics.csv`, `winding_metrics_legacy_endpoint_axis.csv` and
+  `geometry_cutoff_sensitivity.csv`: legacy endpoint-axis outputs retained for
+  numerical audit, not the current primary geometry analysis.
 
 ## `morphospace`
 
 - `kPCA_sensitivity_summary.csv` and
-  `kPCA_shape_geometry_regressions.csv`: threshold-aligned ordinary-PCA and
-  kernel-PCA sensitivity results; all geometry models use the >=30-degree,
-  n = 60 subset.
+  `kPCA_shape_geometry_regressions.csv`: legacy threshold-aligned ordinary-PCA
+  and kernel-PCA sensitivity results using the >=30-degree, n = 60 subset. The
+  code now accepts robust fitted pitch and an upstream-filtered zero-degree
+  cutoff, but numerical regeneration requires the source `Atlas_Momentas.txt`,
+  which is not included in this compact repository.
 
 ## `phylogeny`
 
@@ -45,7 +62,7 @@ corrections made during the final consistency review.
   comparative results remain conditional on the documented 15-tip taxonomic
   proxy mapping.
 
-The identifier for *Lissorhoptrus oryzophilus* is normalized to
-`308_lisshorhoptrus_oryzophilus_trochanter_aligned`, matching the atlas/PCA
-dataset. Pitch is algebraically derived from winding angle and axial span and
-must not be interpreted as an independent measured trait.
+The identifiers for *Lissorhoptrus oryzophilus*, *Ormiscus saltator* and
+*Tropiphorus pseudonasutus* are normalized to the atlas/PCA spellings. Current
+pitch is the fitted axial rise per complete turn using all trajectory points;
+the algebraic endpoint quotient is retained only in the legacy tables.

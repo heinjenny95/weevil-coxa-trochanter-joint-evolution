@@ -136,6 +136,8 @@ def load_inputs() -> tuple[np.ndarray, pd.DataFrame, pd.DataFrame, pd.DataFrame,
             "abs_winding_angle_deg",
             "n_turns_abs",
             "axial_span",
+            "axial_pitch_360",
+            "fitted_pitch_360",
             "fit_radius",
             "fit_rms",
         }:
@@ -791,7 +793,15 @@ def main() -> None:
     pd.DataFrame(joint_records).to_csv(TABLES / "joint_type_structure_tests.csv", index=False)
 
     geometry = analysis_df.copy()
-    geometry["axial_pitch"] = geometry["axial_span"] / geometry["n_turns_abs"].replace(0, np.nan)
+    if "fitted_pitch_360" in geometry.columns:
+        geometry["axial_pitch"] = geometry["fitted_pitch_360"]
+        pitch_definition = "robust fitted axial pitch across all ordered trajectory points"
+    elif "axial_pitch_360" in geometry.columns:
+        geometry["axial_pitch"] = geometry["axial_pitch_360"]
+        pitch_definition = "provided axial pitch per 360 degrees"
+    else:
+        geometry["axial_pitch"] = geometry["axial_span"] / geometry["n_turns_abs"].replace(0, np.nan)
+        pitch_definition = "endpoint-equivalent axial pitch derived from axial span and winding angle"
     geometry_eligible = (
         np.isfinite(geometry["abs_winding_angle_deg"].to_numpy(dtype=float))
         & (geometry["abs_winding_angle_deg"].to_numpy(dtype=float) >= GEOMETRY_MIN_ANGLE)
@@ -809,6 +819,7 @@ def main() -> None:
                         "method": method,
                         "predictor_axes": n_axes,
                         "minimum_abs_winding_angle_deg": GEOMETRY_MIN_ANGLE,
+                        "pitch_definition": pitch_definition,
                         **result,
                     }
                 )
@@ -905,14 +916,14 @@ The legacy setting produces a broad, nearly linear kernel. The adaptive setting 
 - Morphospace geometry and axis correspondence with the released linear PCA.
 - Family location and within-family disparity.
 - Joint-type separation.
-- Shape associations with winding angle, axial span and endpoint-equivalent axial pitch, consistently restricted to trajectories with absolute winding angle >= {GEOMETRY_MIN_ANGLE:g} degrees.
+- Shape associations with winding angle, axial span and axial pitch ({pitch_definition}), consistently restricted to trajectories with absolute winding angle >= {GEOMETRY_MIN_ANGLE:g} degrees.
 - Multivariate association with log centroid size.
 
 For direct visual and inferential comparison, the first five kPCA axes were matched to PC1-PC5 by maximum absolute Pearson correlation and sign-aligned. Native kPCA scores are also retained.
 
 Run with:
 
-`python scripts/run_kpca_sensitivity.py --momenta path/to/Atlas_Momentas.txt --linear-scores path/to/PCA_scores_with_specimen_id.csv --analysis-data path/to/PCA_scores_with_specimen_id_with_centroid_size.csv --joint-data path/to/specimen_joint_types.csv --output-dir path/to/kpca_sensitivity_output`
+`python scripts/run_kpca_sensitivity.py --momenta path/to/Atlas_Momentas.txt --linear-scores path/to/PCA_scores_with_specimen_id.csv --analysis-data path/to/PCA_scores_with_specimen_id_with_centroid_size.csv --joint-data path/to/specimen_joint_types.csv --geometry-min-angle 0 --output-dir path/to/kpca_sensitivity_output`
 """
     (OUT / "README.md").write_text(readme, encoding="utf-8")
 

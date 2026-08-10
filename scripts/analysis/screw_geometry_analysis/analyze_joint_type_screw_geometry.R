@@ -19,7 +19,8 @@
 #   joint_type_strict   (optional)
 #
 # Computes:
-# - axial_pitch_360 = axial_span * 360 / abs_winding_angle_deg
+# - robust input: axial_pitch_360 is fitted across all ordered points
+# - legacy input: axial_pitch_360 = axial_span * 360 / abs_winding_angle_deg
 #
 # Analyses (ONLY for screw joints):
 # - Combined 1x3 figure:
@@ -280,6 +281,8 @@ typ  <- read_csv_robust(type_path)
 
 names(geom) <- clean_str(names(geom))
 names(typ)  <- clean_str(names(typ))
+robust_fitted_pitch_present <- any(c("fitted_pitch_360", "axial_pitch_360") %in% names(geom))
+if (robust_fitted_pitch_present) ANGLE_CUTOFF_DEG <- 0
 
 # ------------------- CHECK REQUIRED COLUMNS -------------------
 req_geom <- c("specimen_id", "abs_winding_angle_deg", "start_end_dist", "axial_span")
@@ -309,6 +312,8 @@ geom$start_end_dist           <- to_num(geom$start_end_dist)
 geom$axial_span               <- to_num(geom$axial_span)
 geom$fit_radius               <- if ("fit_radius" %in% names(geom)) to_num(geom$fit_radius) else NA_real_
 geom$fit_rms                  <- if ("fit_rms" %in% names(geom)) to_num(geom$fit_rms) else NA_real_
+if ("fitted_pitch_360" %in% names(geom)) geom$fitted_pitch_360 <- to_num(geom$fitted_pitch_360)
+if ("axial_pitch_360" %in% names(geom)) geom$axial_pitch_360 <- to_num(geom$axial_pitch_360)
 
 typ$joint_type <- clean_str(typ$joint_type)
 typ$screw_state <- clean_str(typ$screw_state)
@@ -325,10 +330,15 @@ df_all <- merge(
 if (nrow(df_all) == 0) stop("Merge produced 0 rows. specimen_id mismatch?")
 
 # ------------------- COMPUTE AXIAL PITCH -------------------
-# Uses ABSOLUTE winding angle to avoid sign artefacts
-df_all$axial_pitch_360 <- NA_real_
-ok <- !is.na(df_all$axial_span) & !is.na(df_all$abs_winding_angle_deg) & df_all$abs_winding_angle_deg != 0
-df_all$axial_pitch_360[ok] <- df_all$axial_span[ok] * 360 / df_all$abs_winding_angle_deg[ok]
+# Robust input supplies a pitch fitted from all points. Only legacy input falls
+# back to the endpoint-equivalent quotient.
+if ("fitted_pitch_360" %in% names(df_all)) {
+  df_all$axial_pitch_360 <- df_all$fitted_pitch_360
+} else if (!("axial_pitch_360" %in% names(df_all))) {
+  df_all$axial_pitch_360 <- NA_real_
+  ok <- !is.na(df_all$axial_span) & !is.na(df_all$abs_winding_angle_deg) & df_all$abs_winding_angle_deg != 0
+  df_all$axial_pitch_360[ok] <- df_all$axial_span[ok] * 360 / df_all$abs_winding_angle_deg[ok]
+}
 
 # ------------------- BASIC GEOMETRY FILTER -------------------
 df_all <- df_all %>%
@@ -364,8 +374,8 @@ if (length(excluded) == 0) cat("None.\n") else print(excluded)
 
 # ------------------- ANGLE CUTOFF -------------------
 # Important:
-# Angle < 30 degrees does not represent robust screw-like geometry and makes
-# pitch unstable. These cases are removed here.
+# The 30-degree cutoff applies only to legacy endpoint-derived pitch. Robust
+# input has already been selected by upstream helix model adequacy.
 df <- df %>%
   filter(abs_winding_angle_deg >= ANGLE_CUTOFF_DEG)
 

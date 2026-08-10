@@ -1,8 +1,8 @@
 stage;n;details
 atlas specimens;68;complete atlas PCA dataset
-specimens with exported screw-trajectory measurements;64;before the angular cutoff
-geometry measurements below 30-degree cutoff;4;excluded because derived pitch is unstable at very small angles
-geometry measurements at or above 30-degree cutoff;60;eligible for specimen-level shape-geometry analyses
-eligible geometry measurements matched to PCA;60;after applying documented legacy-ID normalization
+specimens with exported screw-trajectory measurements;63;input analysis set selected upstream by robust-helix model adequacy
+geometry measurements below 0-degree cutoff;0;none; robust fitted pitch is used
+geometry measurements at or above 0-degree cutoff;63;eligible after upstream robust-helix model-adequacy selection
+eligible geometry measurements matched to PCA;63;after applying documented legacy-ID normalization
 eligible geometry measurements unmatched to PCA;0;none
-final specimen-level shape-geometry analysis;60;used for Supplementary Figure 11 and associated ordinary linear models
+final specimen-level shape-geometry analysis;63;used for Supplementary Figure 11 and associated ordinary linear models

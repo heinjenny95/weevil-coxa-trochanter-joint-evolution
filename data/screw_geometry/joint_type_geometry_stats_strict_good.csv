@@ -1,0 +1,6 @@
+analysis;response;grouping;statistic;df;p_value;p_value_adjusted_bh
+kruskal_wallis;abs_winding_angle_deg;joint_type;1.866;1;0.172;0.258
+kruskal_wallis;axial_pitch_360;joint_type;2.248;1;0.134;0.258
+kruskal_wallis;axial_span;joint_type;0.09;1;0.764;0.764
+betadisper_anova;abs_winding_angle_deg + axial_pitch_360 + axial_span;joint_type;1.471;1;0.231;NA
+permanova_adonis2;abs_winding_angle_deg + axial_pitch_360 + axial_span;joint_type;0.996;1;0.191;NA

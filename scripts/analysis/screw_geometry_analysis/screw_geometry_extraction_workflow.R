@@ -5,7 +5,8 @@
 # This script does ALL of the following:
 # 1) reads PCA and screw-geometry CSV files robustly
 # 2) cleans and merges the data
-# 3) applies the biologically motivated cutoff angle_abs >= 30
+# 3) applies the legacy 30-degree cutoff only to endpoint-pitch input; robust
+#    fitted-pitch tables are filtered by upstream geometric model adequacy
 # 4) computes axial pitch
 # 5) creates:
 #    - MAIN TEXT FIGURE: 1x2 grid
@@ -397,6 +398,20 @@ fit_radius_col <- find_col(
   required = FALSE
 )
 
+fitted_pitch_col <- find_col(
+  geom,
+  c("fitted_pitch_360", "axial_pitch_360"),
+  "robust fitted pitch per 360 degrees",
+  required = FALSE
+)
+
+# Legacy tables require the historical 30-degree cutoff because their pitch is
+# an endpoint quotient. Robust-helix input tables already carry an explicit
+# geometry-quality analysis-set selection and provide pitch fitted from all
+# ordered points, so no additional angular cutoff is applied.
+angle_cutoff_deg <- if (is.null(fitted_pitch_col)) 30 else 0
+pitch_source_label <- if (is.null(fitted_pitch_col)) "Endpoint-equivalent axial pitch" else "Fitted axial pitch"
+
 if (is.null(axial_span_col) && is.null(start_end_col)) {
   stop("Neither axial_span nor start_end_dist found in geometry file.")
 }
@@ -419,9 +434,9 @@ alias_hit <- geom[[id_geom]] %in% names(legacy_id_aliases)
 geom[[id_geom]][alias_hit] <- unname(legacy_id_aliases[geom[[id_geom]][alias_hit]])
 
 geometry_angle_input <- to_num(geom[[angle_col]])
-n_below_angle_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input < 30)
-n_at_or_above_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input >= 30)
-eligible_geometry_ids <- geom[[id_geom]][!is.na(geometry_angle_input) & geometry_angle_input >= 30]
+n_below_angle_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input < angle_cutoff_deg)
+n_at_or_above_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input >= angle_cutoff_deg)
+eligible_geometry_ids <- geom[[id_geom]][!is.na(geometry_angle_input) & geometry_angle_input >= angle_cutoff_deg]
 n_eligible_matched_to_pca <- sum(eligible_geometry_ids %in% pca[[id_pca]])
 eligible_unmatched_ids <- setdiff(eligible_geometry_ids, pca[[id_pca]])
 
@@ -436,6 +451,7 @@ if (!is.null(axial_span_col))   geom_keep <- c(geom_keep, axial_span_col)
 if (!is.null(start_end_col))    geom_keep <- c(geom_keep, start_end_col)
 if (!is.null(fit_rms_col))      geom_keep <- c(geom_keep, fit_rms_col)
 if (!is.null(fit_radius_col))   geom_keep <- c(geom_keep, fit_radius_col)
+if (!is.null(fitted_pitch_col)) geom_keep <- c(geom_keep, fitted_pitch_col)
 
 geom_keep <- unique(geom_keep)
 
@@ -456,7 +472,7 @@ if (nrow(df) == 0) {
 # -------------------
 # Convert key columns to numeric.
 # -------------------
-num_cols <- c(pc1, pc2, angle_col, signed_angle_col, axial_span_col, start_end_col, fit_rms_col, fit_radius_col)
+num_cols <- c(pc1, pc2, angle_col, signed_angle_col, axial_span_col, start_end_col, fit_rms_col, fit_radius_col, fitted_pitch_col)
 num_cols <- unique(num_cols[!is.null(num_cols)])
 
 for (cc in num_cols) {
@@ -483,11 +499,15 @@ df$axial_metric <- if (!is.null(axial_span_col)) {
   df[[start_end_col]]
 }
 
-df$axial_pitch <- ifelse(
-  is.na(df$angle_abs) | df$angle_abs == 0,
-  NA,
-  df$axial_metric * 360 / df$angle_abs
-)
+df$axial_pitch <- if (!is.null(fitted_pitch_col)) {
+  df[[fitted_pitch_col]]
+} else {
+  ifelse(
+    is.na(df$angle_abs) | df$angle_abs == 0,
+    NA,
+    df$axial_metric * 360 / df$angle_abs
+  )
+}
 
 if (!is.null(fit_rms_col)) {
   df$fit_rms <- df[[fit_rms_col]]
@@ -512,9 +532,9 @@ if (!is.null(fit_radius_col)) {
 # ============================================================
 
 # -------------------
-# Why angle_abs >= 30?
-# Very small winding angles do not represent a meaningful screw-like geometry
-# and produce unstable pitch estimates.
+# Legacy endpoint-derived pitch uses angle_abs >= 30. Robust fitted-pitch input
+# uses angle_cutoff_deg = 0 because model adequacy was selected upstream and
+# conditional uncertainty is propagated separately.
 # -------------------
 df <- df %>%
   filter(
@@ -524,7 +544,7 @@ df <- df %>%
     !is.na(axial_pitch),
     is.finite(axial_pitch),
     axial_pitch > 0,
-    angle_abs >= 30
+    angle_abs >= angle_cutoff_deg
   )
 
 cat("Rows after final filtering:", nrow(df), "\n")
@@ -704,7 +724,7 @@ p_main_A <- ggplot(df, aes(x = .data[[pc1]], y = .data[[pc2]])) +
   ) +
   scale_color_viridis_c(
     option = "plasma",
-    name = "Winding angle ()"
+    name = "Winding angle (deg)"
   ) +
   labs(
     title = "A. Morphospace of screw joint geometry",
@@ -736,7 +756,7 @@ p_main_B <- ggplot(df, aes(x = .data[[pc1]], y = angle_abs)) +
   labs(
     title = "B. Global relationship between PC1 and winding angle",
     x = "PC1",
-    y = "Absolute winding angle ()"
+    y = "Absolute winding angle (deg)"
   ) +
   theme_classic(base_size = 13) +
   theme(
@@ -764,7 +784,7 @@ p_supp_1 <- ggplot(df, aes(x = angle_abs)) +
   geom_histogram(bins = 20) +
   labs(
     title = "S1. Distribution of absolute winding angle",
-    x = "Absolute winding angle ()",
+    x = "Absolute winding angle (deg)",
     y = "Count"
   ) +
   theme_classic(base_size = 12) +
@@ -785,7 +805,7 @@ p_supp_2 <- ggplot(df, aes(x = angle_abs, y = fit_rms)) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.7) +
   labs(
     title = "S2. Winding angle vs fit RMS",
-    x = "Absolute winding angle ()",
+    x = "Absolute winding angle (deg)",
     y = "fit_rms"
   ) +
   theme_classic(base_size = 12) +
@@ -830,7 +850,7 @@ p_supp_4 <- ggplot(df, aes(x = .data[[pc1]], y = .data[[pc2]])) +
   geom_point(aes(color = angle_abs, size = fit_rms), alpha = 0.9) +
   scale_color_viridis_c(
     option = "plasma",
-    name = "Winding angle ()"
+    name = "Winding angle (deg)"
   ) +
   scale_size_continuous(
     name = "fit_rms"
@@ -863,7 +883,7 @@ p_supp_5 <- ggplot(df, aes(x = angle_abs, y = fit_rms_rel)) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.7) +
   labs(
     title = "S5. Winding angle vs relative fit RMS",
-    x = "Absolute winding angle ()",
+    x = "Absolute winding angle (deg)",
     y = "fit_rms / fit_radius"
   ) +
   theme_classic(base_size = 12) +
@@ -886,7 +906,7 @@ p_supp_6 <- ggplot(df_left, aes(x = .data[[pc1]], y = angle_abs)) +
   labs(
     title = "S6. Main-region relationship: PC1 vs winding angle",
     x = "PC1",
-    y = "Absolute winding angle ()"
+    y = "Absolute winding angle (deg)"
   ) +
   theme_classic(base_size = 12) +
   theme(
@@ -960,8 +980,8 @@ sample_flow <- data.frame(
   stage = c(
     "atlas specimens",
     "specimens with exported screw-trajectory measurements",
-    "geometry measurements below 30-degree cutoff",
-    "geometry measurements at or above 30-degree cutoff",
+    paste0("geometry measurements below ", angle_cutoff_deg, "-degree cutoff"),
+    paste0("geometry measurements at or above ", angle_cutoff_deg, "-degree cutoff"),
     "eligible geometry measurements matched to PCA",
     "eligible geometry measurements unmatched to PCA",
     "final specimen-level shape-geometry analysis"
@@ -977,9 +997,9 @@ sample_flow <- data.frame(
   ),
   details = c(
     "complete atlas PCA dataset",
-    "before the angular cutoff",
-    "excluded because derived pitch is unstable at very small angles",
-    "eligible for specimen-level shape-geometry analyses",
+    if (is.null(fitted_pitch_col)) "before the angular cutoff" else "input analysis set selected upstream by robust-helix model adequacy",
+    if (is.null(fitted_pitch_col)) "excluded because endpoint-derived pitch is unstable at very small angles" else "none; robust fitted pitch is used",
+    if (is.null(fitted_pitch_col)) "eligible after the legacy angle cutoff" else "eligible after upstream robust-helix model-adequacy selection",
     "after applying documented legacy-ID normalization",
     if (length(eligible_unmatched_ids)) paste(eligible_unmatched_ids, collapse = "; ") else "none",
     "used for Supplementary Figure 11 and associated ordinary linear models"
@@ -1178,7 +1198,7 @@ p_span <- ggplot(df, aes(x = angle_abs, y = log_axial_span)) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
     title = "A. Axial span vs winding angle",
-    x = "Winding angle ()",
+    x = "Winding angle (deg)",
     y = "Axial span (log10)"
   ) +
   theme_classic(base_size = 13) +
@@ -1194,7 +1214,7 @@ p_pitch <- ggplot(df, aes(x = angle_abs, y = log_axial_pitch)) +
   geom_point(alpha = 0.85) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
-    title = "B. Derived axial pitch vs winding angle",
+    title = paste0("B. ", pitch_source_label, " vs winding angle"),
     x = "Winding angle (deg)",
     y = "Axial pitch per 360 (log10)"
   ) +
