@@ -168,23 +168,41 @@ rrpp_stats <- read_mixed(file.path(source_dir, "allometry_rrpp_multivariate_resu
 
 # Main Figure 5 ----------------------------------------------------------------
 schematic_file <- file.path(source_dir, "Figure_5_geometry_schematic.png")
-p5a <- wrap_elements(
-  full = grid::rasterGrob(png::readPNG(schematic_file), interpolate = TRUE)
-)
+schematic_composite <- png::readPNG(schematic_file)
+schematic_crop <- schematic_composite[
+  , seq_len(round(dim(schematic_composite)[[2]] * 0.505)), , drop = FALSE
+]
+# Remove the panel letters embedded in the original composite. Both labels are
+# added to the final two-panel layout with one shared style below.
+schematic_crop[seq_len(round(dim(schematic_crop)[[1]] * 0.12)), , ] <- 1
+p5a <- ggplot() +
+  annotation_custom(
+    grid::rasterGrob(schematic_crop, interpolate = TRUE),
+    xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf
+  ) +
+  coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE, clip = "off") +
+  theme_void() +
+  theme(plot.margin = margin(7, 4, 4, 6))
 p5b <- ggplot(shape, aes(PC1, PC2, colour = angle_abs, size = axial_pitch)) +
   geom_point(alpha = 0.9) +
   scale_colour_viridis_c(option = "plasma", name = "Winding angle (degrees)") +
   scale_size_continuous(range = c(1.7, 5.0), guide = "none") +
   guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5, barwidth = grid::unit(3.0, "cm"), barheight = grid::unit(0.22, "cm"))) +
-  labs(x = "PC1", y = "PC2", tag = "b") +
+  labs(x = "PC1", y = "PC2") +
   theme_pub() +
   theme(
     legend.position = "bottom",
-    plot.tag = element_text(face = "bold", size = 12, colour = ink),
-    plot.tag.position = c(0.01, 0.99),
     plot.margin = margin(7, 6, 4, 4)
   )
-fig5 <- (p5a | p5b) + plot_layout(widths = c(1.0, 1.08))
+fig5 <- (p5a | p5b) +
+  plot_layout(widths = c(1, 1)) +
+  plot_annotation(
+    tag_levels = "a",
+    theme = theme(
+      plot.tag = element_text(face = "bold", size = 12, colour = ink),
+      plot.tag.position = c(0.01, 0.99)
+    )
+  )
 save_repo(fig5, "Figure_5_robust_shape_geometry.png", 12.4, 6.9)
 save_canonical(fig5, "02_Main_Figures/Figure_5_screw_geometry_and_morphospace_180mm", 7.09, 3.94, tiff = TRUE)
 

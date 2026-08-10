@@ -43,8 +43,9 @@ corrections made during the final consistency review.
   publication-style main, Extended Data and Supplementary figures. The
   phylogenetic comparative tables use the 14-tip `pcm_matched` primary set
   reported in the manuscript. `Figure_5_geometry_schematic.png` preserves the
-  original descriptive trochanter/helix panel from the pre-reanalysis main
-  figure; the adjacent morphospace panel is regenerated from the robust data.
+  original pre-reanalysis Figure 5 composite at full resolution; the renderer
+  extracts the complete descriptive trochanter/helix panel, removes its old
+  embedded panel label and places it beside the robust regenerated morphospace.
 - `figures/`: publication-style robust-analysis figures plus primary and
   strict shape-geometry sensitivity outputs.
 - `sensitivity/`: matched-tip PGLS, alternative-tree and leave-one-out

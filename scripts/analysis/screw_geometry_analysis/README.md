@@ -41,9 +41,11 @@ Recommended order:
    rebuilds the manuscript-facing main, Extended Data and Supplementary
    figures from the checked-in robust-analysis tables while retaining the
    established manuscript palette, panel lettering and white-background
-   layout. Main Figure 5 retains the original descriptive trochanter/helix
-   schematic as panel a and regenerates the robust morphospace as panel b; the
-   separate PC1--winding-angle regression remains in Supplementary Figure 10.
+   layout. Main Figure 5 extracts the complete original descriptive
+   trochanter/helix schematic as panel a, gives panels a and b equal widths and
+   identical programmatic labels, and regenerates the robust morphospace as
+   panel b; the separate PC1--winding-angle regression remains in
+   Supplementary Figure 10.
    The renderer replaces raw diagnostic plotting templates and does not alter
    any numerical analysis results. In Extended Data Figure 5, the reference-
    phylogeny tips in panel a are intentionally black; the continuous trait
