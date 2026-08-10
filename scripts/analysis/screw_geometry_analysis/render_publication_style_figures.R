@@ -175,6 +175,18 @@ schematic_crop <- schematic_composite[
 # Remove the panel letters embedded in the original composite. Both labels are
 # added to the final two-panel layout with one shared style below.
 schematic_crop[seq_len(round(dim(schematic_crop)[[1]] * 0.12)), , ] <- 1
+# The original composite's panel-b y-axis title begins just to the right of the
+# complete trochanter tip. Mask that isolated carry-over without narrowing the
+# crop, which would remove the rounded distal end again.
+label_rows <- seq(
+  round(dim(schematic_crop)[[1]] * 0.38),
+  round(dim(schematic_crop)[[1]] * 0.47)
+)
+label_cols <- seq(
+  round(dim(schematic_crop)[[2]] * 0.965),
+  dim(schematic_crop)[[2]]
+)
+schematic_crop[label_rows, label_cols, ] <- 1
 p5a <- ggplot() +
   annotation_custom(
     grid::rasterGrob(schematic_crop, interpolate = TRUE),
