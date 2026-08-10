@@ -37,6 +37,12 @@ Recommended order:
 7. `plot_robust_supplementary_pgls.R`
    rebuilds the publication-labelled primary-set PC1 plots for fitted winding
    angle and fitted axial pitch from the released proxy-tip and PGLS tables.
+8. `render_publication_style_figures.R`
+   rebuilds the manuscript-facing main, Extended Data and Supplementary
+   figures from the checked-in robust-analysis tables while retaining the
+   established manuscript palette, panel lettering and white-background
+   layout. It replaces the raw diagnostic plotting templates and does not
+   alter any numerical analysis results.
 
 The downstream scripts accept input and output paths as command-line
 arguments. The shape-geometry workflow uses `<PCA CSV> <geometry CSV>
@@ -56,6 +62,18 @@ trajectories, and the strict quality-sensitivity set contains 53.
 
 The joint-type PERMANOVA uses 999 permutations with the fixed seed `20260808`
 so its tabulated P value is exactly reproducible.
+
+Rebuild the publication-style figure set from the repository root with:
+
+```bash
+Rscript scripts/analysis/screw_geometry_analysis/render_publication_style_figures.R \
+  . \
+  data/screw_geometry/figures
+```
+
+An optional third argument may point to the manuscript asset directory. When
+provided, matching PNG, PDF and (for main Figure 5) TIFF deliverables are
+written there in addition to the repository rasters.
 
 ## Robust three-dimensional helix analysis
 

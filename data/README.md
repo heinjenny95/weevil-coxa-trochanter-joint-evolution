@@ -39,8 +39,12 @@ corrections made during the final consistency review.
 - `ROBUST_REANALYSIS_SUMMARY.md`: interpretation audit across quality sets,
   bootstrap draws, phylogenetic trees, leave-one-out checks, allometry and
   ecology.
-- `figures/`: robust-fit QC plus primary and strict shape-geometry sensitivity
-  figures.
+- `figure_source_data/`: compact, checked-in plotting inputs for the final
+  publication-style main, Extended Data and Supplementary figures. The
+  phylogenetic comparative tables use the 14-tip `pcm_matched` primary set
+  reported in the manuscript.
+- `figures/`: publication-style robust-analysis figures plus primary and
+  strict shape-geometry sensitivity outputs.
 - `sensitivity/`: matched-tip PGLS, alternative-tree and leave-one-out
   summaries plus primary/strict allometry and ecology tables.
 - `winding_metrics.csv`, `winding_metrics_legacy_endpoint_axis.csv` and
