@@ -41,8 +41,11 @@ Recommended order:
    rebuilds the manuscript-facing main, Extended Data and Supplementary
    figures from the checked-in robust-analysis tables while retaining the
    established manuscript palette, panel lettering and white-background
-   layout. It replaces the raw diagnostic plotting templates and does not
-   alter any numerical analysis results.
+   layout. Main Figure 5 retains the original descriptive trochanter/helix
+   schematic as panel a and regenerates the robust morphospace as panel b; the
+   separate PC1--winding-angle regression remains in Supplementary Figure 10.
+   The renderer replaces raw diagnostic plotting templates and does not alter
+   any numerical analysis results.
 
 The downstream scripts accept input and output paths as command-line
 arguments. The shape-geometry workflow uses `<PCA CSV> <geometry CSV>
