@@ -1,0 +1,3 @@
+﻿"response";"predictor";"n_models";"n_failed";"sign_consistent_positive";"sign_consistent_negative";"min_estimate";"max_estimate";"median_estimate";"min_p";"max_p";"n_nominal_sig";"n_fdr_sig";"min_lambda";"max_lambda";"median_lambda"
+"PC1";"axial_span";"12";"0";FALSE;TRUE;"-0,911665950384857";"-0,1977317518745356";"-0,437606066646232";"0,0928523875968636";"0,579612213642038";"0";"0";"1";"1";"1"
+"PC2";"axial_span";"12";"0";FALSE;TRUE;"-1,369781340171795";"-0,0914517202732309";"-0,183872072258567";"0,1834121359959908";"0,890294852029612";"0";"0";"1";"1";"1"

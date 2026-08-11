@@ -62,11 +62,17 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--analysis-data", type=Path, required=True, help="Specimen-level PCA and trait table.")
     parser.add_argument("--joint-data", type=Path, required=True, help="Specimen-level joint-type table.")
     parser.add_argument("--output-dir", type=Path, required=True, help="Directory for tables, figures and logs.")
+    parser.add_argument(
+        "--geometry-min-angle",
+        type=float,
+        default=30.0,
+        help="Minimum absolute winding angle (degrees) for all shape--geometry sensitivity models.",
+    )
     return parser.parse_args()
 
 
 def configure_paths(args: argparse.Namespace) -> None:
-    global OUT, TABLES, FIGURES, LOGS, MOMENTA, LINEAR_SCORES, ANALYSIS_DATA, JOINT_DATA
+    global OUT, TABLES, FIGURES, LOGS, MOMENTA, LINEAR_SCORES, ANALYSIS_DATA, JOINT_DATA, GEOMETRY_MIN_ANGLE
     OUT = args.output_dir.resolve()
     TABLES = OUT / "tables"
     FIGURES = OUT / "figures"
@@ -75,6 +81,7 @@ def configure_paths(args: argparse.Namespace) -> None:
     LINEAR_SCORES = args.linear_scores.resolve()
     ANALYSIS_DATA = args.analysis_data.resolve()
     JOINT_DATA = args.joint_data.resolve()
+    GEOMETRY_MIN_ANGLE = float(args.geometry_min_angle)
 
 
 def ensure_dirs() -> None:
@@ -129,6 +136,8 @@ def load_inputs() -> tuple[np.ndarray, pd.DataFrame, pd.DataFrame, pd.DataFrame,
             "abs_winding_angle_deg",
             "n_turns_abs",
             "axial_span",
+            "axial_pitch_360",
+            "fitted_pitch_360",
             "fit_radius",
             "fit_rms",
         }:
@@ -508,31 +517,49 @@ def make_figures(
 ) -> None:
     configure_plotting()
 
-    fig, axes = plt.subplots(2, 3, figsize=(7.0866, 4.35), constrained_layout=True)
+    fig, axes = plt.subplots(3, 2, figsize=(7.0866, 7.10))
+    fig.subplots_adjust(
+        left=0.095,
+        right=0.985,
+        top=0.985,
+        bottom=0.085,
+        wspace=0.24,
+        hspace=0.34,
+    )
     datasets = [
         (linear, "Linear PCA", linear_fraction, "PC"),
         (legacy_aligned, "RBF-kPCA, legacy gamma = 0.25", legacy_fraction, "matched kPC"),
         (adaptive_aligned, "RBF-kPCA, median-distance gamma", adaptive_fraction, "matched kPC"),
     ]
     panel_letters = iter("abcdef")
-    for column, (values, title, fractions, label_prefix) in enumerate(datasets):
+    for row, (values, title, fractions, label_prefix) in enumerate(datasets):
         x1 = f"{label_prefix}1 ({100 * fractions[0]:.1f}%)"
         y1 = f"{label_prefix}2 ({100 * fractions[1]:.1f}%)"
         x2 = f"{label_prefix}2 ({100 * fractions[1]:.1f}%)"
         y2 = f"{label_prefix}3 ({100 * fractions[2]:.1f}%)"
-        scatter_panel(axes[0, column], values, families, 0, 1, title, x1, y1)
-        scatter_panel(axes[1, column], values, families, 1, 2, "", x2, y2)
-        for row in range(2):
+        scatter_panel(axes[row, 0], values, families, 0, 1, f"{title}: axes 1-2", x1, y1)
+        scatter_panel(axes[row, 1], values, families, 1, 2, f"{title}: axes 2-3", x2, y2)
+        for column in range(2):
+            axes[row, column].set_box_aspect(0.72)
             axes[row, column].text(
                 -0.15,
-                1.05,
+                1.08,
                 next(panel_letters),
                 transform=axes[row, column].transAxes,
                 fontweight="bold",
                 va="top",
             )
     handles, labels = axes[0, 0].get_legend_handles_labels()
-    fig.legend(handles, labels, loc="lower center", ncol=7, frameon=False, bbox_to_anchor=(0.5, -0.015))
+    fig.legend(
+        handles,
+        labels,
+        loc="lower center",
+        ncol=7,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.012),
+        columnspacing=1.15,
+        handletextpad=0.35,
+    )
     save_figure(fig, "kPCA_morphospace_comparison_180mm")
 
     fig, axes = plt.subplots(1, 2, figsize=(7.0866, 3.15), constrained_layout=True)
@@ -766,15 +793,35 @@ def main() -> None:
     pd.DataFrame(joint_records).to_csv(TABLES / "joint_type_structure_tests.csv", index=False)
 
     geometry = analysis_df.copy()
-    geometry["axial_pitch"] = geometry["axial_span"] / geometry["n_turns_abs"].replace(0, np.nan)
+    if "fitted_pitch_360" in geometry.columns:
+        geometry["axial_pitch"] = geometry["fitted_pitch_360"]
+        pitch_definition = "robust fitted axial pitch across all ordered trajectory points"
+    elif "axial_pitch_360" in geometry.columns:
+        geometry["axial_pitch"] = geometry["axial_pitch_360"]
+        pitch_definition = "provided axial pitch per 360 degrees"
+    else:
+        geometry["axial_pitch"] = geometry["axial_span"] / geometry["n_turns_abs"].replace(0, np.nan)
+        pitch_definition = "endpoint-equivalent axial pitch derived from axial span and winding angle"
+    geometry_eligible = (
+        np.isfinite(geometry["abs_winding_angle_deg"].to_numpy(dtype=float))
+        & (geometry["abs_winding_angle_deg"].to_numpy(dtype=float) >= GEOMETRY_MIN_ANGLE)
+    )
     geometry_records = []
     for trait in ["abs_winding_angle_deg", "axial_span", "axial_pitch"]:
         y = geometry[trait].to_numpy(dtype=float)
+        valid = geometry_eligible & np.isfinite(y)
         for method, values in family_methods.items():
             for n_axes in (2, 5):
-                result = ols_summary(y, values[:, :n_axes])
+                result = ols_summary(y[valid], values[valid, :n_axes])
                 geometry_records.append(
-                    {"response": trait, "method": method, "predictor_axes": n_axes, **result}
+                    {
+                        "response": trait,
+                        "method": method,
+                        "predictor_axes": n_axes,
+                        "minimum_abs_winding_angle_deg": GEOMETRY_MIN_ANGLE,
+                        "pitch_definition": pitch_definition,
+                        **result,
+                    }
                 )
     pd.DataFrame(geometry_records).to_csv(TABLES / "shape_geometry_regressions.csv", index=False)
 
@@ -869,14 +916,14 @@ The legacy setting produces a broad, nearly linear kernel. The adaptive setting 
 - Morphospace geometry and axis correspondence with the released linear PCA.
 - Family location and within-family disparity.
 - Joint-type separation.
-- Shape associations with winding angle, axial span and axial pitch.
+- Shape associations with winding angle, axial span and axial pitch ({pitch_definition}), consistently restricted to trajectories with absolute winding angle >= {GEOMETRY_MIN_ANGLE:g} degrees.
 - Multivariate association with log centroid size.
 
 For direct visual and inferential comparison, the first five kPCA axes were matched to PC1-PC5 by maximum absolute Pearson correlation and sign-aligned. Native kPCA scores are also retained.
 
 Run with:
 
-`python scripts/run_kpca_sensitivity.py --momenta path/to/Atlas_Momentas.txt --linear-scores path/to/PCA_scores_with_specimen_id.csv --analysis-data path/to/PCA_scores_with_specimen_id_with_centroid_size.csv --joint-data path/to/specimen_joint_types.csv --output-dir path/to/kpca_sensitivity_output`
+`python scripts/run_kpca_sensitivity.py --momenta path/to/Atlas_Momentas.txt --linear-scores path/to/PCA_scores_with_specimen_id.csv --analysis-data path/to/PCA_scores_with_specimen_id_with_centroid_size.csv --joint-data path/to/specimen_joint_types.csv --geometry-min-angle 0 --output-dir path/to/kpca_sensitivity_output`
 """
     (OUT / "README.md").write_text(readme, encoding="utf-8")
 

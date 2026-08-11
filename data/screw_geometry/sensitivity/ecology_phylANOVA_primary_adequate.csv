@@ -1,0 +1,16 @@
+"predictor","response","n","group_levels","group_n","f_statistic","p_value","p_adj_fdr"
+"woody_association_broad","PC1",9,"nonwoody vs woody","5 vs 4",2.2193436764543,0.218,0.853
+"woody_association_broad","PC2",9,"nonwoody vs woody","5 vs 4",2.02469298800955,0.231,0.853
+"woody_association_broad","abs_winding_angle_deg",9,"nonwoody vs woody","5 vs 4",0.32109735928529,0.622,0.853
+"woody_association_broad","axial_span",9,"nonwoody vs woody","5 vs 4",0.139520115225489,0.753,0.853
+"woody_association_broad","centroid_size",9,"nonwoody vs woody","5 vs 4",1.56271017913681,0.267,0.853
+"larval_lifestyle_broad","PC1",13,"internal vs other","9 vs 4",0.646521000253,0.448,0.853
+"larval_lifestyle_broad","PC2",13,"internal vs other","9 vs 4",0.0650849259690372,0.82,0.853
+"larval_lifestyle_broad","abs_winding_angle_deg",13,"internal vs other","9 vs 4",1.0974839647966,0.367,0.853
+"larval_lifestyle_broad","axial_span",13,"internal vs other","9 vs 4",1.29009180464612,0.337,0.853
+"larval_lifestyle_broad","centroid_size",13,"internal vs other","9 vs 4",0.568768877680186,0.514,0.853
+"fungal_association_broad","PC1",11,"no vs yes","9 vs 2",0.177949333957839,0.639,0.853
+"fungal_association_broad","PC2",11,"no vs yes","9 vs 2",0.0290157153506156,0.85,0.853
+"fungal_association_broad","abs_winding_angle_deg",11,"no vs yes","9 vs 2",0.0307708854323293,0.853,0.853
+"fungal_association_broad","axial_span",11,"no vs yes","9 vs 2",0.686008832698263,0.416,0.853
+"fungal_association_broad","centroid_size",11,"no vs yes","9 vs 2",0.379127174937594,0.503,0.853

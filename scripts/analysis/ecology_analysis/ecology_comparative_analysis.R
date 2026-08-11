@@ -71,6 +71,19 @@ write_output <- function(x, path) {
   write.csv(x, sub("\\.csv$", "_gsheets.csv", path), row.names = FALSE)
 }
 
+read_delim_guess <- function(path) {
+  first_line <- readLines(path, n = 1, warn = FALSE, encoding = "UTF-8")
+  delimiter <- if (grepl(";", first_line, fixed = TRUE)) ";" else ","
+  decimal_mark <- if (identical(delimiter, ";")) "," else "."
+  data.table::fread(
+    path,
+    sep = delimiter,
+    dec = decimal_mark,
+    encoding = "UTF-8",
+    data.table = FALSE
+  )
+}
+
 fit_pgls_with_fallback <- function(formula_obj, comp_obj, lambda_bounds = c(0, 1)) {
   attempts <- list(
     list(label = "lambda_ML", lambda = "ML", bounds = list(lambda = lambda_bounds)),
@@ -138,8 +151,8 @@ sanitize_tree_labels <- function(x) {
 }
 
 # ------------------- READ INPUT -------------------
-ecology <- read.csv2(ecology_path, stringsAsFactors = FALSE, check.names = FALSE)
-pcm <- read.csv2(pcm_tip_path, stringsAsFactors = FALSE, check.names = FALSE)
+ecology <- read_delim_guess(ecology_path)
+pcm <- read_delim_guess(pcm_tip_path)
 tree <- ape::read.tree(tree_path)
 tree$tip.label <- sanitize_tree_labels(tree$tip.label)
 tree$node.label <- NULL
