@@ -126,15 +126,33 @@ add_stat <- function(p, label) {
   p + annotate("text", x = -Inf, y = Inf, label = label, hjust = -0.05, vjust = 1.3, size = 2.7, colour = "#607487")
 }
 
-lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE, stats = "", log_y = FALSE) {
+lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE, stats = "", log_y = FALSE, stats_outside = FALSE) {
   aes_points <- if (colour_family && "Family" %in% names(data)) aes(x = .data[[x]], y = .data[[y]], colour = Family) else aes(x = .data[[x]], y = .data[[y]])
   p <- ggplot(data, aes_points) +
     geom_smooth(aes(x = .data[[x]], y = .data[[y]]), method = "lm", se = TRUE, inherit.aes = FALSE, colour = teal, fill = teal_light, linewidth = 0.85, alpha = 0.75) +
     geom_point(size = 2.1, alpha = 0.9, stroke = 0.25) +
-    labs(x = xlab, y = ylab, title = title) +
+    labs(
+      x = xlab,
+      y = ylab,
+      title = title,
+      subtitle = if (stats_outside && nzchar(stats)) stats else NULL
+    ) +
     theme_pub()
   if (colour_family && "Family" %in% names(data)) p <- p + scale_colour_manual(values = family_cols, drop = FALSE)
   if (log_y) p <- p + scale_y_log10()
+  if (stats_outside) {
+    return(
+      p + theme(
+        plot.subtitle = element_text(
+          colour = "#607487",
+          size = rel(0.82),
+          hjust = 0,
+          margin = margin(l = 18, b = 8)
+        ),
+        plot.margin = margin(12, 8, 9, 8)
+      )
+    )
+  }
   add_stat(p, stats)
 }
 
@@ -223,11 +241,11 @@ shape_score <- read_mixed(file.path(source_dir, "allometry_full_shape_regression
 rrpp_row <- rrpp_stats %>% filter(Term == "logCS") %>% slice(1)
 rrpp_label <- if (nrow(rrpp_row) == 1) sprintf("Full shape: R2 = %.3f; F = %.2f; Z = %.2f; P = %s", rrpp_row$Rsq, rrpp_row$F, rrpp_row$Z, fmt_p(rrpp_row$`Pr(>F)`)) else ""
 
-ed3a <- lm_panel(shape_score, "logCS", "full_shape_regression_score", "log centroid size", "Multivariate allometry score", stats = rrpp_label)
-ed3b <- lm_panel(allom, "logCS", "PC1", "log centroid size", "PC1", stats = stat_line(uni_stats %>% filter(trait == "PC1")))
-ed3c <- lm_panel(allom, "logCS", "PC2", "log centroid size", "PC2", stats = stat_line(uni_stats %>% filter(trait == "PC2")))
-ed3d <- lm_panel(allom %>% filter(!is.na(abs_winding_angle_deg)), "logCS", "abs_winding_angle_deg", "log centroid size", "Absolute winding angle (degrees)", stats = stat_line(geom_stats %>% filter(trait == "abs_winding_angle_deg")))
-ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Fitted axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")))
+ed3a <- lm_panel(shape_score, "logCS", "full_shape_regression_score", "log centroid size", "Multivariate allometry score", stats = rrpp_label, stats_outside = TRUE)
+ed3b <- lm_panel(allom, "logCS", "PC1", "log centroid size", "PC1", stats = stat_line(uni_stats %>% filter(trait == "PC1")), stats_outside = TRUE)
+ed3c <- lm_panel(allom, "logCS", "PC2", "log centroid size", "PC2", stats = stat_line(uni_stats %>% filter(trait == "PC2")), stats_outside = TRUE)
+ed3d <- lm_panel(allom %>% filter(!is.na(abs_winding_angle_deg)), "logCS", "abs_winding_angle_deg", "log centroid size", "Absolute winding angle (degrees)", stats = stat_line(geom_stats %>% filter(trait == "abs_winding_angle_deg")), stats_outside = TRUE)
+ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Fitted axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")), stats_outside = TRUE)
 ed3_legend <- get_legend(
   ed3b +
     guides(colour = guide_legend(title = "Family", ncol = 2, byrow = TRUE)) +
@@ -247,8 +265,8 @@ ed3 <- wrap_plots(
   ed3_legend_panel,
   ncol = 2
 ) + plot_annotation(tag_levels = list(c("a", "b", "c", "d", "e", "")))
-save_repo(ed3, "Extended_Data_Fig_3_robust_allometry.png", 12.8, 13.8)
-save_canonical(ed3, "03_Extended_Data_Figures/Extended_Data_Figure_3_allometry_180mm", 7.09, 7.65)
+save_repo(ed3, "Extended_Data_Fig_3_robust_allometry.png", 12.8, 14.4)
+save_canonical(ed3, "03_Extended_Data_Figures/Extended_Data_Figure_3_allometry_180mm", 7.09, 7.95)
 
 # Extended Data Figure 4 -------------------------------------------------------
 signal_df <- read_mixed(file.path(source_dir, "phylogenetic_signal_plot_data.csv")) %>%
