@@ -6,8 +6,10 @@ the biological screw joint in weevils**.
 The repository contains the preprocessing, Deformetrica atlas, statistical
 and morphometric analysis workflows used to study trochanter shape,
 screw-joint geometry, joint typology, phylogenetic history, allometry and
-broad ecological associations across Curculionoidea. Final journal-layout,
-colour-adjustment and panel-assembly scripts are intentionally excluded.
+broad ecological associations across Curculionoidea. It also includes the
+reproducible renderer for the robust analysis figures; additional manual
+journal-layout, colour-adjustment and panel-assembly steps are intentionally
+excluded.
 
 ## Repository contents
 
@@ -107,8 +109,8 @@ visualization and is not used as the response variable for inference.
 Selected compact source and derived data needed to audit the revised
 specimen-to-proxy mapping and robust screw-geometry results are included under
 `data/`, including all specimen-level fit parameters, point residuals and
-conditional bootstrap draws. Tomographic data, processed meshes, the full morphometric scores,
-phylogenetic trees and the complete supplementary source-data package are
+conditional bootstrap draws. Tomographic data, processed meshes, the full
+morphometric scores and the complete supplementary source-data package are
 distributed separately as described in the manuscript's Data availability
 statement.
 
@@ -120,8 +122,9 @@ manuscript.
 Release checks were performed with R 4.5.2 and Python 3.12.8; the final
 whole-volume coxa-thickness extraction used the Python environment documented
 in `scripts/analysis/coxa_wall_analysis`, and atlas construction used
-Deformetrica 4.3.0 in its compatible Python environment. Scripts were checked for portable paths and
-release-ready repository structure for the v1.0.0 release. Exact numerical
+Deformetrica 4.3.0 in its compatible Python environment. Scripts were checked
+for portable paths and release-ready repository structure for the v1.1.0
+submission release. Exact numerical
 reproduction additionally depends on the deposited study data, external
 software described in the Methods and the package versions used for the
 original analyses.
