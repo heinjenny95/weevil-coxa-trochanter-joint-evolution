@@ -172,34 +172,38 @@ label_cols <- seq(
   dim(schematic_crop)[[2]]
 )
 schematic_crop[label_rows, label_cols, ] <- 1
+figure5_tag_theme <- theme(
+  plot.tag = element_text(
+    family = "Arial",
+    face = "bold",
+    size = 12,
+    colour = ink,
+    hjust = 0,
+    vjust = 1
+  ),
+  plot.tag.position = c(0.015, 0.985)
+)
 p5a <- ggplot() +
   annotation_custom(
     grid::rasterGrob(schematic_crop, interpolate = TRUE),
     xmin = -Inf, xmax = Inf, ymin = -Inf, ymax = Inf
   ) +
   coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE, clip = "off") +
+  labs(tag = "a") +
   theme_void() +
-  theme(plot.margin = margin(7, 4, 4, 6))
+  figure5_tag_theme +
+  theme(plot.margin = margin(7, 5, 4, 5))
 p5b <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = axial_pitch)) +
   geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
   scale_fill_viridis_c(option = "plasma", name = "Winding angle (degrees)") +
   scale_size_continuous(range = c(1.7, 5.0), guide = "none") +
   guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, barwidth = grid::unit(3.0, "cm"), barheight = grid::unit(0.22, "cm"))) +
-  labs(x = "PC1", y = "PC2") +
+  labs(x = "PC1", y = "PC2", tag = "b") +
   theme_pub() +
-  theme(
-    legend.position = "bottom",
-    plot.margin = margin(7, 6, 4, 4)
-  )
+  figure5_tag_theme +
+  theme(legend.position = "bottom", plot.margin = margin(7, 5, 4, 5))
 fig5 <- (p5a | p5b) +
-  plot_layout(widths = c(1, 1)) +
-  plot_annotation(
-    tag_levels = "a",
-    theme = theme(
-      plot.tag = element_text(face = "bold", size = 12, colour = ink),
-      plot.tag.position = c(0.01, 0.99)
-    )
-  )
+  plot_layout(widths = c(1, 1))
 save_repo(fig5, "Figure_5_robust_shape_geometry.png", 12.4, 6.9)
 save_canonical(fig5, "02_Main_Figures/Figure_5_screw_geometry_and_morphospace_180mm", 7.09, 3.94, tiff = TRUE)
 

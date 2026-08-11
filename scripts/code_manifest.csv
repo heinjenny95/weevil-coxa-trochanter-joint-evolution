@@ -56,7 +56,7 @@
 "scripts/analysis/screw_geometry_analysis/prepare_robust_geometry_inputs.py","5003","429166e3f64eb2bb8a5051a2ecb069c298f925ce5fd595b81837dee4d3270f48"
 "scripts/analysis/screw_geometry_analysis/propagate_robust_geometry_uncertainty.R","23183","86b62e36c34da9569fd6bc742d917efb0a0b916f76913155332c3f4771300132"
 "scripts/analysis/screw_geometry_analysis/README.md","7552","5d82e86e22f1e47081760dc512b902f4ec4c808fda345fe2ee8cce6ceb2ec609"
-"scripts/analysis/screw_geometry_analysis/render_publication_style_figures.R","35935","15ccdbb58b755a1b98791408801a3dbca3ff3ed08d2d63e565ce5f0080d84340"
+"scripts/analysis/screw_geometry_analysis/render_publication_style_figures.R","36018","fe8bddb1f393282abef9a25d984391d781e315731b19f27410ce60d778b64e9e"
 "scripts/analysis/screw_geometry_analysis/requirements-python.txt","49","835fb10e4146136f0ed95a3a6ae2c6c96e9b3a6f566f12aea6fc5a4cd9123bc4"
 "scripts/analysis/screw_geometry_analysis/screw_geometry_extraction_workflow.R","36671","1a004707c865a05441568e6242fe62bfaa2c35bfe1450e38b7b38b0f195166c3"
 "scripts/analysis/screw_geometry_analysis/test_fit_helical_paths.py","3300","736fc8f7a22c58bd03bc7ed45bb69c2653fd0f43c2b213f98037add8e29aab7f"
