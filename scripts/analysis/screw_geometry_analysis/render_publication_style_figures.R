@@ -228,9 +228,25 @@ ed3b <- lm_panel(allom, "logCS", "PC1", "log centroid size", "PC1", stats = stat
 ed3c <- lm_panel(allom, "logCS", "PC2", "log centroid size", "PC2", stats = stat_line(uni_stats %>% filter(trait == "PC2")))
 ed3d <- lm_panel(allom %>% filter(!is.na(abs_winding_angle_deg)), "logCS", "abs_winding_angle_deg", "log centroid size", "Absolute winding angle (degrees)", stats = stat_line(geom_stats %>% filter(trait == "abs_winding_angle_deg")))
 ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Fitted axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")))
-ed3 <- ((ed3a | ed3b) / (ed3c | ed3d) / (ed3e | guide_area())) +
-  plot_annotation(tag_levels = "a") +
-  plot_layout(guides = "collect") & theme(legend.position = "bottom")
+ed3_legend <- get_legend(
+  ed3b +
+    guides(colour = guide_legend(title = "Family", ncol = 2, byrow = TRUE)) +
+    theme(
+      legend.position = "right",
+      legend.direction = "vertical",
+      legend.box.just = "center"
+    )
+)
+ed3_legend_panel <- wrap_elements(full = ed3_legend)
+ed3 <- wrap_plots(
+  ed3a + theme(legend.position = "none"),
+  ed3b + theme(legend.position = "none"),
+  ed3c + theme(legend.position = "none"),
+  ed3d + theme(legend.position = "none"),
+  ed3e + theme(legend.position = "none"),
+  ed3_legend_panel,
+  ncol = 2
+) + plot_annotation(tag_levels = list(c("a", "b", "c", "d", "e", "")))
 save_repo(ed3, "Extended_Data_Fig_3_robust_allometry.png", 12.8, 13.8)
 save_canonical(ed3, "03_Extended_Data_Figures/Extended_Data_Figure_3_allometry_180mm", 7.09, 7.65)
 
@@ -283,6 +299,7 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   on.exit(dev.off(), add = TRUE)
   layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1.08,1,1), heights = c(1,1,1))
   par(mar = c(1.0, 0.4, 2.4, 0.4), oma = c(0.5, 0.2, 0.5, 0.2), family = "sans", fg = ink, col.axis = ink, col.lab = ink)
+  par(mar = c(0.5, 0.2, 1.7, 0.2))
   plot(asr_tree, show.tip.label = TRUE, tip.color = "#000000", cex = 0.58, label.offset = 2.5, edge.color = "#A7B8C2", no.margin = FALSE)
   tiplabels(pch = 16, col = "#000000", cex = 0.62)
   title(main = "a   Reference phylogeny", adj = 0, line = 0.25, cex.main = 0.86, col.main = ink)
