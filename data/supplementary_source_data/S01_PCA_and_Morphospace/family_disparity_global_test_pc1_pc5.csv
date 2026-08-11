@@ -1,0 +1,2 @@
+test,dimensions,families,specimens,minimum_family_n,F,p_value,permutations
+PERMDISP on Euclidean distances to family centroids,PC1-PC5,4,64,3,6.947501161034939,0.0038,9999

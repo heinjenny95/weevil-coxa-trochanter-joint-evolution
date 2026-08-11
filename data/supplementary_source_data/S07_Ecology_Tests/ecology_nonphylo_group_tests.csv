@@ -1,0 +1,19 @@
+"predictor";"response";"n";"group_levels";"group_n";"statistic";"p_value";"p_adj_fdr"
+"host_lineage_broad";"PC1";12;"angiosperm vs gymnosperm";"10 vs 2";5;0,333666485082971;0,805434013449738
+"host_lineage_broad";"PC2";12;"angiosperm vs gymnosperm";"10 vs 2";0;0,0412580447574931;0,371322402817438
+"host_lineage_broad";"centroid_size";12;"angiosperm vs gymnosperm";"10 vs 2";20;0,0412580447574931;0,371322402817438
+"woody_association_broad";"PC1";10;"nonwoody vs woody";"5 vs 5";14;0,834531622710929;1
+"woody_association_broad";"PC2";10;"nonwoody vs woody";"5 vs 5";6;0,210075040786658;0,75627014683197
+"woody_association_broad";"abs_winding_angle_deg";9;"nonwoody vs woody";"5 vs 4";8;0,713303173878458;1
+"woody_association_broad";"axial_span";9;"nonwoody vs woody";"5 vs 4";9;0,902523250177679;1
+"woody_association_broad";"centroid_size";10;"nonwoody vs woody";"5 vs 5";20;0,14367208180696;0,646524368131321
+"larval_lifestyle_broad";"PC1";14;"internal vs other";"10 vs 4";28;0,288844366346485;0,805434013449738
+"larval_lifestyle_broad";"PC2";14;"internal vs other";"10 vs 4";18;0,832004028572637;1
+"larval_lifestyle_broad";"abs_winding_angle_deg";13;"internal vs other";"9 vs 4";7;0,105192505120041;0,631155030720249
+"larval_lifestyle_broad";"axial_span";13;"internal vs other";"9 vs 4";18;1;1
+"larval_lifestyle_broad";"centroid_size";14;"internal vs other";"10 vs 4";13;0,357970672644328;0,805434013449738
+"fungal_association_broad";"PC1";12;"no vs yes";"10 vs 2";10;1;1
+"fungal_association_broad";"PC2";12;"no vs yes";"10 vs 2";12;0,74726202579539;1
+"fungal_association_broad";"abs_winding_angle_deg";11;"no vs yes";"9 vs 2";9;1;1
+"fungal_association_broad";"axial_span";11;"no vs yes";"9 vs 2";12;0,555689790282795;1
+"fungal_association_broad";"centroid_size";12;"no vs yes";"10 vs 2";14;0,45209879839526;0,904197596790519

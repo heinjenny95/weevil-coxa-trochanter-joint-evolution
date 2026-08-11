@@ -42,6 +42,9 @@ excluded.
   and submission-consistency checks.
 - `data/metadata`: the specimen key and explicit specimen-to-proxy-tip mapping
   used to audit the phylogenetic analysis unit.
+- `data/supplementary_source_data`: the complete CSV payload for
+  Supplementary Tables 1-40, including morphospace, geometry, allometry,
+  coxal-wall, joint-typology, ecology and phylogenetic robustness outputs.
 - `data/screw_geometry`: all 64 robust helix fits, 12,800 bootstrap draws,
   primary 63- and strict 53-specimen analysis tables, QC figures and a compact
   interpretation audit.
@@ -106,13 +109,14 @@ visualization and is not used as the response variable for inference.
 
 ## Data availability
 
-Selected compact source and derived data needed to audit the revised
-specimen-to-proxy mapping and robust screw-geometry results are included under
-`data/`, including all specimen-level fit parameters, point residuals and
-conditional bootstrap draws. Tomographic data, processed meshes, the full
-morphometric scores and the complete supplementary source-data package are
-distributed separately as described in the manuscript's Data availability
-statement.
+Processed tomographic datasets, coxa and trochanter joint-surface meshes and
+the corresponding specimen metadata are deposited separately in RADAR4KIT
+under https://doi.org/10.35097/9p77hjk7wa656d6k. All other data supporting the
+analyses, figures and statistical results are archived in this repository,
+including the complete Supplementary Tables 1-40 source-data package, derived
+analysis tables, analysis-ready tabular inputs, quality-control outputs, all
+specimen-level helix-fit parameters, point residuals and conditional bootstrap
+draws.
 
 ## Reproducibility scope
 
@@ -123,7 +127,7 @@ Release checks were performed with R 4.5.2 and Python 3.12.8; the final
 whole-volume coxa-thickness extraction used the Python environment documented
 in `scripts/analysis/coxa_wall_analysis`, and atlas construction used
 Deformetrica 4.3.0 in its compatible Python environment. Scripts were checked
-for portable paths and release-ready repository structure for the v1.1.0
+for portable paths and release-ready repository structure for the v1.2.0
 submission release. Exact numerical
 reproduction additionally depends on the deposited study data, external
 software described in the Methods and the package versions used for the
