@@ -1,7 +1,15 @@
 # Revision source data
 
-This directory contains the compact tables needed to audit the manuscript
-corrections made during the final consistency review.
+This directory contains the complete supplementary source-data payload and
+the detailed tables needed to audit the manuscript analyses and final
+consistency corrections.
+
+## `supplementary_source_data`
+
+- Complete source-data payload for Supplementary Tables 1-40. The
+  `_manifest.csv` file maps each numbered table to its CSV file(s), caption,
+  byte size and SHA-256 checksum. These tables complement the detailed robust
+  helix-fit outputs below.
 
 ## `metadata`
 

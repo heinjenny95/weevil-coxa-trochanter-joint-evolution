@@ -1,0 +1,11 @@
+"Family";"Schraube";"Windung_Coxa";"Coxal_Socket";"Coxal_wall_hole";"combo";"n";"prop"
+"Anthribidae";FALSE;FALSE;FALSE;FALSE;"0000";2;1
+"Attelabidae";TRUE;FALSE;TRUE;TRUE;"1011";2;0,5
+"Attelabidae";TRUE;TRUE;TRUE;TRUE;"1111";2;0,5
+"Belidae";FALSE;FALSE;TRUE;TRUE;"0011";1;1
+"Brentidae";TRUE;FALSE;TRUE;FALSE;"1010";1;0,125
+"Brentidae";TRUE;TRUE;TRUE;FALSE;"1110";7;0,875
+"Caridae";TRUE;TRUE;TRUE;FALSE;"1110";1;1
+"Curculionidae";TRUE;TRUE;TRUE;FALSE;"1110";32;0,666666666666667
+"Curculionidae";TRUE;TRUE;TRUE;TRUE;"1111";16;0,333333333333333
+"Nemonychidae";FALSE;FALSE;TRUE;FALSE;"0010";2;1

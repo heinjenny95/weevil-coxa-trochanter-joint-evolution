@@ -1,0 +1,29 @@
+analysis,method,space_or_trait,metric,effect_size,F,p_value,notes
+Global morphospace,RBF-kPCA legacy gamma 0.25,all axes,Procrustes disparity,0.0003432531,,,Nearly identical to ordinary PCA
+Global morphospace,RBF-kPCA legacy gamma 0.25,all axes,Spearman correlation of pairwise distances,0.99989657,,,Nearly identical to ordinary PCA
+Global morphospace,RBF-kPCA adaptive median-distance kernel,all axes,Procrustes disparity,0.111611344,,,Moderate local rearrangement relative to ordinary PCA
+Global morphospace,RBF-kPCA adaptive median-distance kernel,all axes,Spearman correlation of pairwise distances,0.965925826,,,Broad geometry preserved
+Family structure,Ordinary PCA,first five axes,PERMANOVA R2,0.597986095,15.1226742,0.0001,
+Family structure,RBF-kPCA legacy gamma 0.25,first five matched axes,PERMANOVA R2,0.59837903,15.1474166,0.0001,
+Family structure,RBF-kPCA adaptive median-distance kernel,first five matched axes,PERMANOVA R2,0.579363862,14.0030747,0.0001,
+Family dispersion,Ordinary PCA,first five axes,PERMDISP F,,3.9611543,0.0131,
+Family dispersion,RBF-kPCA legacy gamma 0.25,first five matched axes,PERMDISP F,,3.8506245,0.0197,
+Family dispersion,RBF-kPCA adaptive median-distance kernel,first five matched axes,PERMDISP F,,3.5633919,0.321,
+Joint-type structure,Ordinary PCA,first five axes,PERMANOVA R2,0.2024911,5.1627239,0.0006,
+Joint-type structure,RBF-kPCA legacy gamma 0.25,first five matched axes,PERMANOVA R2,0.2011821,5.1209448,0.0006,
+Joint-type structure,RBF-kPCA adaptive median-distance kernel,first five matched axes,PERMANOVA R2,0.1643977,4.0004124,0.0009,
+Allometry,Ordinary PCA,full ordination,Multivariate R2,0.07015163,4.9793147,0.0002,
+Allometry,RBF-kPCA legacy gamma 0.25,full ordination,Multivariate R2,0.06906161,4.8962061,0.0001,
+Allometry,RBF-kPCA adaptive median-distance kernel,full ordination,Multivariate R2,0.05333966,3.7187755,0.0004,
+Allometry,Ordinary PCA,first five axes,Multivariate R2,0.10585204,7.8132873,0.0001,
+Allometry,RBF-kPCA legacy gamma 0.25,first five matched axes,Multivariate R2,0.10567538,7.7987064,0.0001,
+Allometry,RBF-kPCA adaptive median-distance kernel,first five matched axes,Multivariate R2,0.09627392,7.0309784,0.0002,
+Shape-geometry,Ordinary PCA,winding angle versus first two axes (>=30 deg; n=60),Regression R2,0.29777497,12.08528,4.21e-05,Threshold-aligned with the main analysis
+Shape-geometry,RBF-kPCA legacy gamma 0.25,winding angle versus first two matched axes (>=30 deg; n=60),Regression R2,0.30359985,12.42475,3.32e-05,Threshold-aligned with the main analysis
+Shape-geometry,RBF-kPCA adaptive median-distance kernel,winding angle versus first two matched axes (>=30 deg; n=60),Regression R2,0.36405828,16.31543,2.50e-06,Threshold-aligned with the main analysis
+Shape-geometry,Ordinary PCA,axial span versus first two axes (>=30 deg; n=60),Regression R2,0.14285483,4.74991,0.01236,Threshold-aligned with the main analysis
+Shape-geometry,RBF-kPCA legacy gamma 0.25,axial span versus first two matched axes (>=30 deg; n=60),Regression R2,0.13911806,4.60558,0.01399,Threshold-aligned with the main analysis
+Shape-geometry,RBF-kPCA adaptive median-distance kernel,axial span versus first two matched axes (>=30 deg; n=60),Regression R2,0.05613439,1.69498,0.19273,Threshold-aligned with the main analysis
+Shape-geometry,Ordinary PCA,endpoint-equivalent axial pitch versus first two axes (>=30 deg; n=60),Regression R2,0.04032100,1.19743,0.30945,Derived variable; threshold-aligned
+Shape-geometry,RBF-kPCA legacy gamma 0.25,endpoint-equivalent axial pitch versus first two matched axes (>=30 deg; n=60),Regression R2,0.04168940,1.23984,0.29712,Derived variable; threshold-aligned
+Shape-geometry,RBF-kPCA adaptive median-distance kernel,endpoint-equivalent axial pitch versus first two matched axes (>=30 deg; n=60),Regression R2,0.05780980,1.74867,0.18321,Derived variable; threshold-aligned

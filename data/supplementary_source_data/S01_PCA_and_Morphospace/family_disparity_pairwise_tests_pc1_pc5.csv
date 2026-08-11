@@ -1,0 +1,7 @@
+family_1,family_2,n_1,n_2,F,p_value,permutations,p_adjusted_fdr,significant_fdr_0_05
+Anthribidae,Attelabidae,4,4,12.924083504300308,1e-4,9999,6.000000000000001e-4,TRUE
+Anthribidae,Curculionidae,4,48,16.23098940384303,0.0022,9999,0.0066,TRUE
+Attelabidae,Curculionidae,4,48,6.453678702237301,0.0275,9999,0.055,FALSE
+Attelabidae,Brentidae,4,8,3.676220681587872,0.0423,9999,0.06344999999999999,FALSE
+Anthribidae,Brentidae,4,8,2.6559295455687177,0.125,9999,0.15,FALSE
+Brentidae,Curculionidae,8,48,1.1045210511214367,0.2962,9999,0.2962,FALSE

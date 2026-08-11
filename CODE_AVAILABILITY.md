@@ -25,8 +25,12 @@ axial-span, radius and fit-error measurements used for numerical legacy
 validation. Running that historical script requires a compatible Cinema 4D
 Python environment; the current robust fitter does not.
 
-Selected compact data used to audit the revised mapping and geometry analyses
-are included under `data/`; the remaining study data are distributed separately
-as described in the manuscript. Local absolute paths have been replaced by
-explicit placeholder roots or command-line arguments so that no
+All analysis data other than the processed tomograms, coxa/trochanter meshes
+and their specimen metadata are included under `data/`. This includes the
+complete source-data payload for Supplementary Tables 1-40, derived analysis
+tables, analysis-ready tabular inputs, quality-control outputs and the detailed
+robust geometry audit files. The imaging data, joint-surface meshes and specimen
+metadata are deposited in RADAR4KIT under
+https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
+replaced by explicit placeholder roots or command-line arguments so that no
 workstation-specific paths are published.

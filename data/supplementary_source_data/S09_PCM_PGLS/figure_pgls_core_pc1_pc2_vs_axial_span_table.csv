@@ -1,0 +1,3 @@
+"term";"estimate";"std_error";"statistic";"p_value";"response";"predictor";"n_taxa";"lambda";"predictor_type";"fdr_p_value"
+"axial_span";"-0,522981653035284";"0,421721398159303";"-1,240111730915137";"0,238635904961589";"PC1";"axial_span";"14";"1";"continuous";"0,580465714771433"
+"axial_span";"0,377976908194116";"0,397767254833469";"0,950246415714542";"0,360733740320136";"PC2";"axial_span";"14";"1";"continuous";"0,622220145326949"

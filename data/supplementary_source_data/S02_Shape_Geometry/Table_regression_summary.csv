@@ -1,0 +1,11 @@
+table_block;model;subset;n;r_squared;adj_r_squared;f_statistic;df1;df2;p_model;intercept_estimate;intercept_p;PC1_estimate;PC1_p;PC2_estimate;PC2_p;predictor_name;predictor_estimate;predictor_p;correlation_value
+regression_models;angle_abs ~ PC1 + PC2;full_dataset;60;0.298;0.273;12.085;2;57;4.21e-05;378.31;4.32e-37;-534.267;7.89e-06;-14.37;0.926;NA;NA;NA;NA
+regression_models;axial_pitch ~ PC1 + PC2;full_dataset;60;0.04;0.007;1.197;2;57;0.309;0.233;5.47e-06;0.611;0.141;0.279;0.633;NA;NA;NA;NA
+regression_models;angle_abs ~ PC1 + PC2;main_region_PC1_lt_0.1;56;0.096;0.061;2.8;2;53;0.0698;389.011;3.77e-30;-365.346;0.0862;-97.342;0.612;NA;NA;NA;NA
+regression_models;axial_span ~ angle_abs;full_dataset;60;0.037;0.02;2.199;1;58;0.144;0.124;0.000101;NA;NA;NA;NA;angle_abs;0.000107;0.144;NA
+regression_models;axial_pitch ~ angle_abs;full_dataset;60;0.434;0.424;44.456;1;58;1.06e-08;1.049;4.68e-11;NA;NA;NA;NA;angle_abs;-0.002122;1.06e-08;NA
+regression_models;axial_pitch ~ axial_span;full_dataset;60;0.056;0.04;3.464;1;58;0.0678;-0.014;0.916;NA;NA;NA;NA;axial_span;1.360072;0.0678;NA
+correlations;angle_abs ~ PC1;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;-0.546
+correlations;angle_abs ~ PC2;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;0.0155
+correlations;axial_pitch ~ PC1;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;0.191
+correlations;axial_pitch ~ PC2;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;NA;0.0532
