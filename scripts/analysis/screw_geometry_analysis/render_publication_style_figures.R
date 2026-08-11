@@ -27,6 +27,9 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 source_dir <- file.path(repo_root, "data", "screw_geometry", "figure_source_data")
 screw_dir <- file.path(repo_root, "data", "screw_geometry")
 tree_file <- file.path(repo_root, "data", "phylogeny", "P01_Trees", "01_primary_tree_calibrated_grafen.tre")
+style_file <- file.path(repo_root, "scripts", "analysis", "figure_rendering", "publication_style.R")
+source(style_file)
+set.seed(20260811)
 
 required <- c(
   file.path(source_dir, "Figure_5_geometry_schematic.png"),
@@ -60,45 +63,6 @@ read_mixed <- function(path) {
   ))
 }
 
-family_cols <- c(
-  Anthribidae = "#82589C",
-  Attelabidae = "#D86B5B",
-  Belidae = "#7D9DCF",
-  Brentidae = "#BA992E",
-  Caridae = "#E58A28",
-  Curculionidae = "#59AE91",
-  Nemonychidae = "#79B547"
-)
-ink <- "#304252"
-teal <- "#2A7891"
-teal_light <- "#D5E8EE"
-coral <- "#D77560"
-bluegrey <- "#7E99A9"
-gold <- "#C5A23A"
-grid_col <- "#DCE6EC"
-continuous_cols <- c("#1F5A85", "#5FA0BD", "#F0D56C", "#E67B4A", "#C83D3B")
-
-theme_pub <- function(base_size = 9) {
-  theme_minimal(base_size = base_size, base_family = "sans") +
-    theme(
-      plot.background = element_rect(fill = "white", colour = NA),
-      panel.background = element_rect(fill = "white", colour = NA),
-      panel.grid.major = element_line(colour = grid_col, linewidth = 0.35),
-      panel.grid.minor = element_blank(),
-      axis.title = element_text(colour = ink, face = "plain"),
-      axis.text = element_text(colour = "#52687A"),
-      plot.title = element_text(colour = ink, face = "bold", size = rel(1.02), hjust = 0),
-      plot.subtitle = element_text(colour = "#627687", size = rel(0.85), hjust = 0),
-      legend.title = element_text(colour = ink),
-      legend.text = element_text(colour = ink),
-      strip.text = element_text(colour = ink, face = "bold"),
-      strip.background = element_rect(fill = "#F2F5F7", colour = grid_col),
-      plot.tag = element_text(face = "bold", colour = ink, size = rel(1.25)),
-      plot.tag.position = c(0, 1),
-      plot.margin = margin(7, 8, 7, 8)
-    )
-}
-
 fmt_p <- function(x) {
   if (is.na(x)) return("NA")
   if (x < 0.001) return(format(x, scientific = TRUE, digits = 2))
@@ -126,11 +90,14 @@ add_stat <- function(p, label) {
   p + annotate("text", x = -Inf, y = Inf, label = label, hjust = -0.05, vjust = 1.3, size = 2.7, colour = "#607487")
 }
 
-lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE, stats = "", log_y = FALSE, stats_outside = FALSE) {
-  aes_points <- if (colour_family && "Family" %in% names(data)) aes(x = .data[[x]], y = .data[[y]], colour = Family) else aes(x = .data[[x]], y = .data[[y]])
+lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE, stats = "", log_y = FALSE, stats_outside = TRUE) {
+  aes_points <- if (colour_family && "Family" %in% names(data)) aes(x = .data[[x]], y = .data[[y]], fill = Family) else aes(x = .data[[x]], y = .data[[y]])
   p <- ggplot(data, aes_points) +
-    geom_smooth(aes(x = .data[[x]], y = .data[[y]]), method = "lm", se = TRUE, inherit.aes = FALSE, colour = teal, fill = teal_light, linewidth = 0.85, alpha = 0.75) +
-    geom_point(size = 2.1, alpha = 0.9, stroke = 0.25) +
+    geom_smooth(aes(x = .data[[x]], y = .data[[y]]), method = "lm", se = TRUE, inherit.aes = FALSE, colour = teal, fill = teal_light, linewidth = 1.0, alpha = 0.48) +
+    {
+      if (colour_family && "Family" %in% names(data)) family_point(2.35)
+      else geom_point(size = 2.15, alpha = 1, colour = ink)
+    } +
     labs(
       x = xlab,
       y = ylab,
@@ -138,7 +105,7 @@ lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE,
       subtitle = if (stats_outside && nzchar(stats)) stats else NULL
     ) +
     theme_pub()
-  if (colour_family && "Family" %in% names(data)) p <- p + scale_colour_manual(values = family_cols, drop = FALSE)
+  if (colour_family && "Family" %in% names(data)) p <- p + scale_family_fill(drop = FALSE)
   if (log_y) p <- p + scale_y_log10()
   if (stats_outside) {
     return(
@@ -167,7 +134,7 @@ save_canonical <- function(plot, rel_base, width, height, tiff = FALSE) {
   base <- file.path(manuscript_root, rel_base)
   dir.create(dirname(base), recursive = TRUE, showWarnings = FALSE)
   ggsave(paste0(base, ".png"), plot = plot, width = width, height = height, units = "in", dpi = 500, bg = "white", limitsize = FALSE)
-  ggsave(paste0(base, ".pdf"), plot = plot, width = width, height = height, units = "in", bg = "white", limitsize = FALSE)
+  ggsave(paste0(base, ".pdf"), plot = plot, width = width, height = height, units = "in", device = cairo_pdf, bg = "white", limitsize = FALSE)
   if (tiff) {
     ggsave(paste0(base, ".tif"), plot = plot, width = width, height = height, units = "in", dpi = 600, bg = "white", compression = "lzw", limitsize = FALSE)
   }
@@ -213,11 +180,11 @@ p5a <- ggplot() +
   coord_cartesian(xlim = c(0, 1), ylim = c(0, 1), expand = FALSE, clip = "off") +
   theme_void() +
   theme(plot.margin = margin(7, 4, 4, 6))
-p5b <- ggplot(shape, aes(PC1, PC2, colour = angle_abs, size = axial_pitch)) +
-  geom_point(alpha = 0.9) +
-  scale_colour_viridis_c(option = "plasma", name = "Winding angle (degrees)") +
+p5b <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = axial_pitch)) +
+  geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
+  scale_fill_viridis_c(option = "plasma", name = "Winding angle (degrees)") +
   scale_size_continuous(range = c(1.7, 5.0), guide = "none") +
-  guides(colour = guide_colourbar(title.position = "top", title.hjust = 0.5, barwidth = grid::unit(3.0, "cm"), barheight = grid::unit(0.22, "cm"))) +
+  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, barwidth = grid::unit(3.0, "cm"), barheight = grid::unit(0.22, "cm"))) +
   labs(x = "PC1", y = "PC2") +
   theme_pub() +
   theme(
@@ -248,7 +215,7 @@ ed3d <- lm_panel(allom %>% filter(!is.na(abs_winding_angle_deg)), "logCS", "abs_
 ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Fitted axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")), stats_outside = TRUE)
 ed3_legend <- get_legend(
   ed3b +
-    guides(colour = guide_legend(title = "Family", ncol = 2, byrow = TRUE)) +
+    guides(fill = guide_legend(title = "Family", ncol = 2, byrow = TRUE, override.aes = list(shape = 21, colour = "white", size = 3))) +
     theme(
       legend.position = "right",
       legend.direction = "vertical",
@@ -280,7 +247,7 @@ ed4 <- ggplot(signal_df, aes(estimate, trait_label, fill = method, alpha = signa
   geom_vline(xintercept = 1, linetype = "dashed", colour = bluegrey, linewidth = 0.65) +
   geom_text(data = signal_df %>% filter(!is.na(sig_label), sig_label != ""), aes(label = sig_label), position = position_dodge(width = 0.72), hjust = -0.45, colour = ink, size = 3.2) +
   scale_fill_manual(values = c("Blomberg's K" = bluegrey, "Pagel's lambda" = coral)) +
-  scale_alpha_manual(values = c("No signal detected" = 0.38, "Signal detected" = 1), guide = "none") +
+  scale_alpha_manual(values = c("No signal detected" = 0.72, "Signal detected" = 1), guide = "none") +
   scale_x_continuous(expand = expansion(mult = c(0, 0.09))) +
   labs(x = "Signal estimate", y = NULL, fill = NULL) +
   theme_pub(10) + theme(legend.position = "top")
@@ -370,21 +337,39 @@ save_repo(ed6, "Extended_Data_Fig_6_robust_models.jpg", 12.2, 8.2)
 save_canonical(ed6, "03_Extended_Data_Figures/Extended_Data_Figure_6_evolutionary_model_support_180mm", 7.09, 4.85)
 
 # Supplementary Figure 10 ------------------------------------------------------
-s10a <- ggplot(shape, aes(angle_abs)) + geom_histogram(bins = 14, fill = bluegrey, colour = "white") + labs(x = "Absolute winding angle (degrees)", y = "Count") + theme_pub()
-s10b <- lm_panel(shape, "fit_rms", "angle_abs", "Helix RMS", "Absolute winding angle (degrees)", colour_family = FALSE)
-s10c <- ggplot(shape, aes(PC1, PC2, colour = fit_rms)) + geom_point(size = 2.2) + scale_colour_gradient(low = teal_light, high = teal, name = "Helix RMS") + labs(x = "PC1", y = "PC2") + theme_pub()
-s10d <- ggplot(shape, aes(PC1, PC2, colour = angle_abs, size = fit_rms)) + geom_point(alpha = 0.9) + scale_colour_gradientn(colours = continuous_cols, name = "Winding angle (degrees)") + scale_size_continuous(range = c(1.4, 4.5), name = "Helix RMS") + labs(x = "PC1", y = "PC2") + theme_pub()
-s10e <- lm_panel(shape, "fit_rms_rel", "angle_abs", "Helix RMS / radius", "Absolute winding angle (degrees)", colour_family = FALSE)
-s10f <- lm_panel(shape %>% filter(shape_regime == "main_region"), "PC1", "angle_abs", "PC1", "Absolute winding angle (degrees)", colour_family = FALSE)
-s10 <- wrap_plots(s10a,s10b,s10c,s10d,s10e,s10f,ncol=2,guides="collect") + plot_annotation(tag_levels="a") & theme(legend.position="bottom")
+s10a <- ggplot(shape, aes(angle_abs)) + geom_histogram(bins = 14, fill = bluegrey, colour = ink, linewidth = 0.3) + labs(title = "a", x = "Absolute winding angle (degrees)", y = "Count") + theme_pub()
+s10b <- lm_panel(shape, "fit_rms", "angle_abs", "Helix RMS", "Winding angle (degrees)", title = "b", colour_family = FALSE)
+s10c <- ggplot(shape, aes(PC1, PC2, fill = fit_rms)) +
+  geom_point(shape = 21, size = 2.4, colour = "white", stroke = 0.45) +
+  scale_fill_gradient(low = "#55BED0", high = teal, name = "Helix RMS") +
+  guides(fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm"))) +
+  labs(title = "c", x = "PC1", y = "PC2") + theme_pub() +
+  theme(legend.position = "bottom", legend.box = "vertical")
+s10d <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = fit_rms)) +
+  geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
+  scale_fill_gradientn(colours = continuous_cols, name = "Winding angle (degrees)") +
+  scale_size_continuous(range = c(1.4, 4.5), name = "Helix RMS") +
+  guides(
+    fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm")),
+    size = guide_legend(title.position = "top", nrow = 1)
+  ) +
+  labs(title = "d", x = "PC1", y = "PC2") + theme_pub() +
+  theme(legend.position = "bottom", legend.box = "vertical")
+s10e <- lm_panel(shape, "fit_rms_rel", "angle_abs", "Helix RMS / radius", "Winding angle (degrees)", title = "e", colour_family = FALSE)
+s10f <- lm_panel(shape %>% filter(shape_regime == "main_region"), "PC1", "angle_abs", "PC1", "Winding angle (degrees)", title = "f", colour_family = FALSE)
+s10 <- wrap_plots(s10a,s10b,s10c,s10d,s10e,s10f,ncol=2,guides="keep") &
+  theme(
+    legend.margin = margin(t = 3, b = 5),
+    plot.margin = margin(9, 9, 10, 10)
+  )
 save_repo(s10, "Supplementary_Fig_10_robust_geometry_QC.png", 11.8, 13.2)
-save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_winding_angle_180mm", 7.09, 7.9)
+save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_winding_angle_180mm", 7.09, 8.3)
 
 # Supplementary Figure 11 ------------------------------------------------------
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
-s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
-s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per 360-degree turn (log10 scale)", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
-s11 <- (s11a | s11b) + plot_annotation(tag_levels="a") + plot_layout(guides="collect") & theme(legend.position="bottom")
+s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
+s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per 360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
+s11 <- (s11a | s11b) + plot_layout(guides="collect") & theme(legend.position="bottom")
 save_repo(s11, "Supplementary_Fig_11_robust_axial_relationships.png", 11.8, 5.7)
 save_canonical(s11, "04_Supplementary_Figures/Supplementary_Fig_11_axial_screw_geometry_relationships_180mm", 7.09, 3.6)
 
@@ -394,25 +379,27 @@ pgls_span <- read_mixed(file.path(source_dir, "pgls_core_axial_span.csv"))
 pgls_label <- function(response, predictor) {
   r <- pgls_span %>% filter(.data$response == .env$response, .data$predictor == .env$predictor) %>% slice(1)
   if (nrow(r) == 0) return("")
-  sprintf("PGLS beta = %.3f; P = %s; FDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
+  sprintf("PGLS beta = %.3f; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s12a <- lm_panel(tip_df, "axial_span", "PC1", "Fitted axial span", "PC1", stats = pgls_label("PC1", "axial_span"))
-s12b <- lm_panel(tip_df, "axial_span", "PC2", "Fitted axial span", "PC2", stats = pgls_label("PC2", "axial_span"))
-s12 <- (s12a | s12b) + plot_annotation(tag_levels="a") + plot_layout(guides="collect") & theme(legend.position="bottom")
+s12a <- lm_panel(tip_df, "axial_span", "PC1", "Fitted axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
+s12b <- lm_panel(tip_df, "axial_span", "PC2", "Fitted axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
+s12 <- (s12a | s12b) + plot_layout(guides="collect") & theme(legend.position="bottom")
 save_repo(s12, "Supplementary_Fig_12_robust_PGLS.jpg", 11.8, 5.7)
 save_canonical(s12, "04_Supplementary_Figures/Supplementary_Fig_12_PGLS_shape_vs_axial_span_180mm", 7.09, 3.6)
 
 # Supplementary Figure 13 ------------------------------------------------------
 jt <- read_mixed(file.path(source_dir, "joint_type_plot_data.csv")) %>% filter(joint_type_strict %in% c("True screw-nut joint", "Unopposed screw configuration"))
-jt_cols <- c("True screw-nut joint" = bluegrey, "Unopposed screw configuration" = "#E6A477")
-box_panel <- function(y, label) {
+jt_cols <- c("True screw-nut joint" = "#527F9A", "Unopposed screw configuration" = "#E47B3F")
+box_panel <- function(y, label, panel_label) {
   ggplot(jt, aes(joint_type_strict, .data[[y]], fill = joint_type_strict)) +
-    geom_boxplot(width = 0.62, outlier.shape = NA, alpha = 0.72, colour = ink) +
-    geom_jitter(width = 0.12, size = 1.45, alpha = 0.72, colour = ink) +
-    scale_fill_manual(values = jt_cols) + labs(x = NULL, y = label) + theme_pub() +
+    geom_boxplot(width = 0.62, outlier.shape = NA, alpha = 0.88, colour = ink, linewidth = 0.55) +
+    geom_point(position = position_jitter(width = 0.12, height = 0, seed = 20260811), size = 1.55, alpha = 1, colour = ink) +
+    scale_fill_manual(values = jt_cols) + labs(title = panel_label, x = NULL, y = label) + theme_pub() +
     theme(legend.position = "none", axis.text.x = element_text(angle = 20, hjust = 1, size = 7.5))
 }
-s13 <- (box_panel("abs_winding_angle_deg", "Absolute winding angle (degrees)") | box_panel("axial_pitch_360", "Fitted axial pitch per 360-degree turn") | box_panel("axial_span", "Fitted axial span")) + plot_annotation(tag_levels="a")
+s13 <- box_panel("abs_winding_angle_deg", "Absolute winding angle\n(degrees)", "a") |
+  box_panel("axial_pitch_360", "Fitted axial pitch\nper 360-degree turn", "b") |
+  box_panel("axial_span", "Fitted axial span", "c")
 save_repo(s13, "Supplementary_Fig_13_robust_joint_type.png", 13.2, 4.8)
 save_canonical(s13, "04_Supplementary_Figures/Supplementary_Fig_13_screw_geometry_by_joint_type_180mm", 7.09, 2.9)
 
@@ -435,9 +422,15 @@ supp14_specs <- tribble(
 s14_plots <- lapply(seq_len(nrow(supp14_specs)), function(i) {
   spec <- supp14_specs[i,]
   st <- if (startsWith(spec$var, "PC")) uni_stats %>% filter(trait == spec$var) else geom_stats %>% filter(trait == spec$var)
-  lm_panel(allom %>% filter(!is.na(.data[[spec$var]])), "logCS", spec$var, "log centroid size", spec$label, stats = stat_line(st), log_y = spec$log_y) + theme(legend.position="none")
+  lm_panel(
+    allom %>% filter(!is.na(.data[[spec$var]])),
+    "logCS", spec$var, "log centroid size", spec$label,
+    title = letters[[i]],
+    stats = sub("; Holm", "\nHolm", stat_line(st), fixed = TRUE),
+    log_y = spec$log_y
+  ) + theme(legend.position="none", plot.subtitle = element_text(size = rel(0.72)))
 })
-s14 <- wrap_plots(s14_plots, ncol = 3) + plot_annotation(tag_levels = "a")
+s14 <- wrap_plots(s14_plots, ncol = 3)
 save_repo(s14, "Supplementary_Fig_14_robust_allometry.png", 13.2, 15.5)
 save_canonical(s14, "04_Supplementary_Figures/Supplementary_Fig_14_additional_specimen_allometry_180mm", 7.09, 8.3)
 
@@ -446,7 +439,7 @@ pgls_all <- read_mixed(file.path(screw_dir, "sensitivity", "pgls_primary_adequat
 pgls_stat <- function(response, predictor) {
   r <- pgls_all %>% filter(.data$response == .env$response, .data$predictor == .env$predictor, term == .env$predictor) %>% slice(1)
   if (nrow(r) == 0) return("")
-  sprintf("PGLS beta = %.3g; P = %s; FDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
+  sprintf("PGLS beta = %.3g; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
 s16 <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", stats = pgls_stat("PC1","abs_winding_angle_deg")) + theme(legend.position="bottom")
 s17 <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", stats = pgls_stat("PC1","axial_pitch_360")) + theme(legend.position="bottom")
@@ -466,7 +459,7 @@ tree_detail <- read_mixed(file.path(source_dir, "pgls_tree_variant_detail.csv"))
 tree_class_cols <- c("Working tree" = teal, "Existing tree" = bluegrey, "Generated branch lengths" = coral)
 s18 <- ggplot(tree_detail, aes(estimate, tree_label, colour = tree_class)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = bluegrey) +
-  geom_point(size = 2.3, alpha = 0.9) +
+  geom_point(size = 2.45, alpha = 1) +
   facet_wrap(~predictor_label, scales = "free", ncol = 2) +
   scale_colour_manual(values = tree_class_cols, na.value = "#8B9AA5") +
   labs(x = "PGLS slope estimate", y = NULL, colour = "Tree class") + theme_pub() +
@@ -501,15 +494,15 @@ eco <- read_mixed(file.path(source_dir, "ecology_tip_level_data.csv"))
 eco_panel <- function(response, predictor, title, ylab, fill_cols) {
   dat <- eco %>% filter(!is.na(.data[[response]]), !is.na(.data[[predictor]]))
   ggplot(dat, aes(.data[[predictor]], .data[[response]], fill = .data[[predictor]])) +
-    geom_boxplot(width = 0.62, alpha = 0.55, outlier.shape = NA, colour = ink) +
-    geom_jitter(width = 0.08, size = 2.0, colour = ink, alpha = 0.88) +
+    geom_boxplot(width = 0.62, alpha = 0.88, outlier.shape = NA, colour = ink, linewidth = 0.6) +
+    geom_point(position = position_jitter(width = 0.08, height = 0, seed = 20260811), size = 2.05, colour = ink, alpha = 1) +
     scale_fill_manual(values = fill_cols) + labs(x = NULL, y = ylab, title = title) + theme_pub() +
     theme(legend.position="none", axis.text.x = element_text(angle = 12, hjust = 1))
 }
 eco_figure <- function(response, ylab) {
-  p1 <- eco_panel(response,"woody_association_broad","Woody association",ylab,c(nonwoody="#9ECBAE",woody="#AFC8EA"))
-  p2 <- eco_panel(response,"larval_lifestyle_broad","Larval lifestyle",ylab,c(internal="#E7B2AE",other="#96D0D0"))
-  p3 <- eco_panel(response,"fungal_association_broad","Fungal association",ylab,c(no="#DCCB80",yes="#DEA5D6"))
+  p1 <- eco_panel(response,"woody_association_broad","Woody association",ylab,ecology_palettes$woody_association_broad)
+  p2 <- eco_panel(response,"larval_lifestyle_broad","Larval lifestyle",ylab,ecology_palettes$larval_lifestyle_broad)
+  p3 <- eco_panel(response,"fungal_association_broad","Fungal association",ylab,ecology_palettes$fungal_association_broad)
   (p1 | p2) / (p3 | plot_spacer()) + plot_annotation(tag_levels="a")
 }
 s24 <- eco_figure("abs_winding_angle_deg", "Absolute winding angle (degrees)")
@@ -525,29 +518,59 @@ short_specimen <- function(x) {
   z <- sub("_trochanter_aligned$", "", z)
   gsub("_", " ", z)
 }
-metrics <- metrics %>% mutate(label = short_specimen(specimen_id))
+metrics <- metrics %>% mutate(
+  label = short_specimen(specimen_id),
+  quality_class = factor(
+    recode(quality_class,
+      good = "Good",
+      caution = "Caution",
+      limited_identifiability = "Limited identifiability"
+    ),
+    levels = c("Good", "Caution", "Limited identifiability")
+  )
+)
 label_angle <- metrics %>% slice_max(abs(robust_minus_released_angle_deg), n = 5, with_ties = FALSE)
 label_pitch <- metrics %>% filter(is.finite(released_endpoint_equivalent_pitch_360), is.finite(fitted_pitch_360), released_endpoint_equivalent_pitch_360 > 0, fitted_pitch_360 > 0) %>% slice_max(abs(log10(fitted_pitch_360 / released_endpoint_equivalent_pitch_360)), n = 5, with_ties = FALSE)
 label_quality <- metrics %>% slice_min(axial_angle_r_squared, n = 4, with_ties = FALSE)
 label_rms <- metrics %>% slice_max(helix_rms_relative_to_radius, n = 4, with_ties = FALSE)
-qcols <- c(good = teal, acceptable = gold, poor = coral)
+qcols <- c("Good" = teal, "Caution" = gold, "Limited identifiability" = coral)
 s28a <- ggplot(metrics, aes(released_abs_winding_angle_deg, abs_winding_angle_deg, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
-  geom_text_repel(data=label_angle,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25) +
-  scale_colour_manual(values=qcols) + labs(x="Released winding angle (degrees)",y="Robust fitted angle (degrees)") + theme_pub()
+  geom_text_repel(data=label_angle,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="a", x="Released winding angle (degrees)",y="Robust fitted angle (degrees)") + theme_pub() + theme(legend.position="none")
 s28b <- ggplot(metrics, aes(released_endpoint_equivalent_pitch_360, fitted_pitch_360, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
-  geom_text_repel(data=label_pitch,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25) +
-  scale_x_log10() + scale_y_log10() + scale_colour_manual(values=qcols) +
-  labs(x="Released endpoint-equivalent pitch",y="Robust fitted pitch") + theme_pub()
+  geom_text_repel(data=label_pitch,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  scale_x_log10() + scale_y_log10() + scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) +
+  labs(title="b", x="Released endpoint-equivalent pitch",y="Robust fitted pitch") + theme_pub() + theme(legend.position="none")
 s28c <- ggplot(metrics, aes(abs_winding_angle_deg, axial_angle_r_squared, colour = quality_class)) + geom_point(size=2) +
-  geom_text_repel(data=label_quality,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25) +
-  scale_colour_manual(values=qcols) + labs(x="Robust fitted angle (degrees)",y="Axial-angular R2") + theme_pub()
+  geom_text_repel(data=label_quality,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="c", x="Robust fitted angle (degrees)",y="Axial-angular R2") + theme_pub() + theme(legend.position="none")
 s28d <- ggplot(metrics, aes(abs_winding_angle_deg, helix_rms_relative_to_radius, colour = quality_class)) + geom_point(size=2) +
   geom_hline(yintercept=.10,linetype="dashed",colour=coral) +
-  geom_text_repel(data=label_rms,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25) +
-  scale_colour_manual(values=qcols) + labs(x="Robust fitted angle (degrees)",y="Helix RMS / fitted radius") + theme_pub()
-s28 <- ((s28a | s28b) / (s28c | s28d)) + plot_annotation(tag_levels="a") + plot_layout(guides="collect") & theme(legend.position="bottom")
+  geom_text_repel(data=label_rms,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="d", x="Robust fitted angle (degrees)",y="Helix RMS / fitted radius") + theme_pub() + theme(legend.position="none")
+s28_legend_plot <- ggplot(
+  data.frame(
+    x = seq_along(qcols),
+    y = 1,
+    quality_class = factor(names(qcols), levels = names(qcols))
+  ),
+  aes(x, y, colour = quality_class)
+) +
+  geom_point(size = 2.7) +
+  scale_colour_manual(values = qcols, name = "Fit quality", drop = FALSE) +
+  guides(colour = guide_legend(nrow = 1)) +
+  theme_void(base_family = "Arial") +
+  theme(
+    legend.position = "bottom",
+    legend.title = element_text(face = "bold", colour = ink, size = 9),
+    legend.text = element_text(colour = ink, size = 8.5),
+    legend.margin = margin(0, 0, 0, 0)
+  )
+s28_legend <- cowplot::get_legend(s28_legend_plot)
+s28 <- ((s28a | s28b) / (s28c | s28d) / wrap_elements(full = s28_legend)) +
+  plot_layout(heights = c(1, 1, 0.075))
 save_repo(s28, "Supplementary_Fig_28_robust_fit_audit.png", 12.2, 10.4)
 save_canonical(s28, "04_Supplementary_Figures/Supplementary_Fig_28_screw_geometry_quality_control_180mm", 7.09, 6.0)
 
