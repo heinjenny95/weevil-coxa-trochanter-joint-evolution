@@ -355,29 +355,72 @@ s10a <- ggplot(shape, aes(angle_abs)) + geom_histogram(bins = 14, fill = bluegre
 s10b <- lm_panel(shape, "fit_rms", "angle_abs", "Helix RMS", "Winding angle (degrees)", title = "b", colour_family = FALSE)
 s10c <- ggplot(shape, aes(PC1, PC2, fill = fit_rms)) +
   geom_point(shape = 21, size = 2.4, colour = "white", stroke = 0.45) +
-  scale_fill_gradient(low = "#55BED0", high = teal, name = "Helix RMS") +
-  guides(fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm"))) +
+  scale_fill_gradient(low = "#55BED0", high = teal, name = "Helix RMS (colour)") +
+  guides(fill = guide_colourbar(title.position = "top", barwidth = grid::unit(34, "mm"), barheight = grid::unit(3, "mm"))) +
   labs(tag = "c", x = "PC1", y = "PC2") + theme_pub() +
-  theme(legend.position = "bottom", legend.box = "vertical")
+  theme(legend.position = "bottom")
 s10d <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = fit_rms)) +
   geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
   scale_fill_gradientn(colours = continuous_cols, name = "Winding angle (degrees)") +
-  scale_size_continuous(range = c(1.4, 4.5), name = "Helix RMS") +
+  scale_size_continuous(
+    range = c(1.4, 4.5),
+    breaks = c(0.005, 0.010, 0.020),
+    name = "Helix RMS (size)"
+  ) +
   guides(
-    fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm")),
-    size = guide_legend(title.position = "top", nrow = 1)
+    fill = guide_colourbar(title.position = "top", barwidth = grid::unit(32, "mm"), barheight = grid::unit(3, "mm")),
+    size = guide_legend(
+      title.position = "top",
+      nrow = 1,
+      override.aes = list(fill = ink, colour = ink, alpha = 1)
+    )
   ) +
   labs(tag = "d", x = "PC1", y = "PC2") + theme_pub() +
-  theme(legend.position = "bottom", legend.box = "vertical")
+  theme(legend.position = "bottom", legend.box = "horizontal")
 s10e <- lm_panel(shape, "fit_rms_rel", "angle_abs", "Helix RMS / radius", "Winding angle (degrees)", title = "e", colour_family = FALSE)
 s10f <- lm_panel(shape %>% filter(shape_regime == "main_region"), "PC1", "angle_abs", "PC1", "Winding angle (degrees)", title = "f", colour_family = FALSE)
-s10 <- wrap_plots(s10a,s10b,s10c,s10d,s10e,s10f,ncol=2,guides="keep") &
+s10a <- s10a + labs(title = " ")
+s10b <- s10b + labs(title = " ")
+s10c <- s10c + labs(title = " ")
+s10d <- s10d + labs(title = " ")
+s10e <- s10e + labs(title = " ")
+s10f <- s10f + labs(title = " ")
+s10_legend_theme <- theme(
+  legend.position = "bottom",
+  legend.box = "horizontal",
+  legend.box.just = "center",
+  legend.title = element_text(size = 7.6),
+  legend.text = element_text(size = 7.1),
+  legend.key.height = grid::unit(3.5, "mm"),
+  legend.margin = margin(0, 0, 0, 0),
+  legend.box.margin = margin(0, 0, 0, 0),
+  legend.spacing.x = grid::unit(1.5, "mm"),
+  plot.margin = margin(0, 0, 0, 0)
+)
+s10_rms_colour_legend <- cowplot::get_legend(s10c + s10_legend_theme)
+s10_angle_size_legend <- cowplot::get_legend(s10d + s10_legend_theme)
+s10_legend <- cowplot::plot_grid(
+  s10_rms_colour_legend,
+  s10_angle_size_legend,
+  nrow = 1,
+  rel_widths = c(0.78, 1.45),
+  align = "h"
+)
+s10 <- (
+  (s10a | s10b) /
+    ((s10c + theme(legend.position = "none")) | (s10d + theme(legend.position = "none"))) /
+    wrap_elements(full = s10_legend) /
+    (s10e | s10f)
+) +
+  plot_layout(heights = c(1, 1, 0.30, 1)) &
   theme(
-    legend.margin = margin(t = 3, b = 5),
-    plot.margin = margin(9, 9, 10, 10)
+    plot.tag = element_text(face = "bold", colour = ink, size = rel(1.18), hjust = 0, vjust = 1),
+    plot.tag.position = c(0, 1),
+    plot.title = element_text(colour = "transparent", size = 6, lineheight = 0.65, margin = margin(b = 1)),
+    plot.margin = margin(8, 9, 7, 10)
   )
 save_repo(s10, "Supplementary_Fig_10_robust_geometry_QC.png", 11.8, 13.2)
-save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_winding_angle_180mm", 7.09, 8.3)
+save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_winding_angle_180mm", 7.09, 8.0)
 
 # Supplementary Figure 11 ------------------------------------------------------
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
