@@ -105,7 +105,16 @@ lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE,
       subtitle = if (stats_outside && nzchar(stats)) stats else NULL
     ) +
     theme_pub()
-  if (colour_family && "Family" %in% names(data)) p <- p + scale_family_fill(drop = FALSE)
+  if (colour_family && "Family" %in% names(data)) {
+    present_families <- family_order[family_order %in% unique(as.character(data$Family))]
+    p <- p + scale_fill_manual(
+      values = family_cols,
+      limits = family_order,
+      breaks = present_families,
+      drop = TRUE,
+      name = "Family"
+    )
+  }
   if (log_y) p <- p + scale_y_log10()
   if (stats_outside) {
     return(
@@ -372,7 +381,7 @@ save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_wi
 # Supplementary Figure 11 ------------------------------------------------------
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
 s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
-s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per 360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
+s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per\n360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
 s11 <- (s11a | s11b) + plot_layout(guides="collect") & theme(legend.position="bottom")
 save_repo(s11, "Supplementary_Fig_11_robust_axial_relationships.png", 11.8, 5.7)
 save_canonical(s11, "04_Supplementary_Figures/Supplementary_Fig_11_axial_screw_geometry_relationships_180mm", 7.09, 3.6)
@@ -413,15 +422,15 @@ supp14_specs <- tribble(
   "PC3", "PC3", FALSE,
   "PC4", "PC4", FALSE,
   "PC5", "PC5", FALSE,
-  "n_turns_abs", "Absolute number of turns", FALSE,
-  "axial_pitch_360", "Fitted axial pitch per 360-degree turn", FALSE,
-  "start_end_dist", "Start-to-end distance", FALSE,
+  "n_turns_abs", "Absolute number\nof turns", FALSE,
+  "axial_pitch_360", "Fitted axial pitch\nper 360-degree turn", FALSE,
+  "start_end_dist", "Start-to-end\ndistance", FALSE,
   "fit_radius", "Fitted radius", FALSE,
   "fit_rms", "Helix RMS", TRUE,
   "axial_span", "Fitted axial span", FALSE,
-  "ratio_axial_span_fit_radius", "Axial span / fitted radius", FALSE,
-  "ratio_start_end_fit_radius", "Start-to-end distance / radius", FALSE,
-  "ratio_fit_rms_fit_radius", "Helix RMS / fitted radius", TRUE
+  "ratio_axial_span_fit_radius", "Axial span /\nfitted radius", FALSE,
+  "ratio_start_end_fit_radius", "Start-to-end distance\n/ radius", FALSE,
+  "ratio_fit_rms_fit_radius", "Helix RMS /\nfitted radius", TRUE
 )
 s14_plots <- lapply(seq_len(nrow(supp14_specs)), function(i) {
   spec <- supp14_specs[i,]
@@ -429,10 +438,30 @@ s14_plots <- lapply(seq_len(nrow(supp14_specs)), function(i) {
   lm_panel(
     allom %>% filter(!is.na(.data[[spec$var]])),
     "logCS", spec$var, "log centroid size", spec$label,
-    title = letters[[i]],
+    title = NULL,
     stats = sub("; Holm", "\nHolm", stat_line(st), fixed = TRUE),
     log_y = spec$log_y
-  ) + theme(legend.position="none", plot.subtitle = element_text(size = rel(0.72)))
+  ) +
+    labs(tag = letters[[i]]) +
+    theme(
+      legend.position = "none",
+      plot.tag = element_text(
+        colour = ink,
+        face = "bold",
+        size = rel(1.05),
+        hjust = 0,
+        vjust = 1
+      ),
+      plot.tag.position = c(0, 1),
+      plot.subtitle = element_text(
+        colour = "#607487",
+        size = rel(0.72),
+        hjust = 0,
+        lineheight = 0.92,
+        margin = margin(l = 18, b = 0)
+      ),
+      plot.margin = margin(8, 8, 7, 11)
+    )
 })
 s14 <- wrap_plots(s14_plots, ncol = 3)
 save_repo(s14, "Supplementary_Fig_14_robust_allometry.png", 13.2, 15.5)
