@@ -503,6 +503,26 @@ def scatter_panel(
     ax.set_ylabel(y_label)
 
 
+def add_panel_labels_at_ytitle_edge(
+    fig: plt.Figure,
+    axes: list[plt.Axes] | np.ndarray,
+    labels: str,
+) -> None:
+    """Place panel labels at the outer left edge of each y-axis title."""
+    flat_axes = list(np.asarray(axes, dtype=object).ravel())
+    if len(flat_axes) != len(labels):
+        raise ValueError("Panel-label count must match the number of axes")
+    fig.canvas.draw()
+    renderer = fig.canvas.get_renderer()
+    inverse = fig.transFigure.inverted()
+    for ax, label in zip(flat_axes, labels, strict=True):
+        ytitle_box = ax.yaxis.label.get_window_extent(renderer=renderer)
+        title_box = ax.title.get_window_extent(renderer=renderer)
+        x = inverse.transform((ytitle_box.x0, 0))[0]
+        y = inverse.transform((0, title_box.y1))[1]
+        fig.text(x, y, label, fontweight="bold", va="top", ha="left")
+
+
 def make_figures(
     linear: np.ndarray,
     legacy_aligned: np.ndarray,
@@ -531,7 +551,6 @@ def make_figures(
         (legacy_aligned, "RBF-kPCA, legacy gamma = 0.25", legacy_fraction, "matched kPC"),
         (adaptive_aligned, "RBF-kPCA, median-distance gamma", adaptive_fraction, "matched kPC"),
     ]
-    panel_letters = iter("abcdef")
     for row, (values, title, fractions, label_prefix) in enumerate(datasets):
         x1 = f"{label_prefix}1 ({100 * fractions[0]:.1f}%)"
         y1 = f"{label_prefix}2 ({100 * fractions[1]:.1f}%)"
@@ -541,14 +560,6 @@ def make_figures(
         scatter_panel(axes[row, 1], values, families, 1, 2, f"{title}: axes 2-3", x2, y2)
         for column in range(2):
             axes[row, column].set_box_aspect(0.72)
-            axes[row, column].text(
-                -0.15,
-                1.08,
-                next(panel_letters),
-                transform=axes[row, column].transAxes,
-                fontweight="bold",
-                va="top",
-            )
     handles, labels = axes[0, 0].get_legend_handles_labels()
     fig.legend(
         handles,
@@ -560,6 +571,7 @@ def make_figures(
         columnspacing=1.15,
         handletextpad=0.35,
     )
+    add_panel_labels_at_ytitle_edge(fig, axes, "abcdef")
     save_figure(fig, "kPCA_morphospace_comparison_180mm")
 
     fig, axes = plt.subplots(1, 2, figsize=(7.0866, 3.15), constrained_layout=True)
@@ -585,7 +597,7 @@ def make_figures(
         ax.set_ylabel("Linear PC")
         ax.set_xticklabels([f"kPC{i}" for i in range(1, matrix.shape[1] + 1)], rotation=45, ha="right")
         ax.set_yticklabels([f"PC{i}" for i in range(1, matrix.shape[0] + 1)], rotation=0)
-        ax.text(-0.17, 1.04, letter, transform=ax.transAxes, fontweight="bold", va="top")
+    add_panel_labels_at_ytitle_edge(fig, axes, "ab")
     save_figure(fig, "kPCA_axis_correlations_180mm")
 
     fig, ax = plt.subplots(figsize=(7.0866, 3.25), constrained_layout=True)

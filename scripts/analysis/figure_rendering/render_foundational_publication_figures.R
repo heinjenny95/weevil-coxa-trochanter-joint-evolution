@@ -51,6 +51,68 @@ save_plot_set <- function(plot, repo_name, canonical_base, width, height, dpi = 
 
 source_root <- file.path(repo_root, "data", "supplementary_source_data")
 
+# Extended Data Figure 1: observed and rarefied family disparity. Panel tags
+# use the shared plot-tag coordinate system so their left edge follows the
+# outer edge of the y-axis title rather than the plotting rectangle.
+disparity_order <- c("Anthribidae", "Brentidae", "Curculionidae", "Attelabidae")
+disparity_observed <- read_mixed(file.path(
+  source_root, "S01_PCA_and_Morphospace", "family_disparity_summary_pc1_pc5.csv"
+)) %>%
+  mutate(Family = factor(Family, levels = disparity_order)) %>%
+  arrange(Family)
+disparity_rarefied <- read_mixed(file.path(
+  source_root, "S01_PCA_and_Morphospace", "family_disparity_rarefied_n4_pc1_pc5.csv"
+)) %>%
+  mutate(Family = factor(Family, levels = disparity_order)) %>%
+  arrange(Family)
+disparity_global <- read_mixed(file.path(
+  source_root, "S01_PCA_and_Morphospace", "family_disparity_global_test_pc1_pc5.csv"
+)) %>% slice(1)
+
+ed1a <- ggplot(disparity_observed, aes(Family, disparity, fill = Family)) +
+  geom_col(width = 0.68, alpha = 0.95) +
+  geom_errorbar(aes(ymin = ci_low, ymax = ci_high), width = 0.16, colour = ink, linewidth = 0.65) +
+  geom_text(aes(y = ci_high + 0.0014, label = paste0("n = ", n)), colour = muted_ink, size = 2.7) +
+  scale_fill_manual(values = family_cols, guide = "none") +
+  scale_y_continuous(limits = c(0, 0.071), expand = expansion(mult = c(0, 0))) +
+  labs(
+    tag = "a",
+    title = "Observed sample",
+    subtitle = sprintf("PERMDISP: F = %.2f, P = %.4f", disparity_global$F, disparity_global$p_value),
+    x = NULL,
+    y = "Family-level disparity"
+  ) +
+  theme_pub(base_size = 9) +
+  theme(axis.text.x = element_text(angle = 15, hjust = 1))
+
+ed1b <- ggplot(disparity_rarefied, aes(Family, rarefied_disparity_mean, fill = Family)) +
+  geom_col(width = 0.68, alpha = 0.95) +
+  geom_errorbar(aes(ymin = rarefied_ci_low, ymax = rarefied_ci_high), width = 0.16, colour = ink, linewidth = 0.65) +
+  scale_fill_manual(values = family_cols, guide = "none") +
+  scale_y_continuous(limits = c(0, 0.071), expand = expansion(mult = c(0, 0))) +
+  labs(
+    tag = "b",
+    title = "Rarefied to n = 4",
+    subtitle = " ",
+    x = NULL,
+    y = "Family-level disparity"
+  ) +
+  theme_pub(base_size = 9) +
+  theme(
+    axis.text.x = element_text(angle = 15, hjust = 1),
+    axis.text.y = element_blank(),
+    axis.ticks.y = element_blank(),
+    axis.title.y = element_text(colour = "transparent")
+  )
+
+ed1 <- (ed1a | ed1b) + plot_layout(widths = c(1, 1))
+save_plot_set(
+  ed1,
+  "Extended_Data_Fig_1_family_disparity",
+  "03_Extended_Data_Figures/Extended_Data_Figure_1_family_disparity_180mm",
+  7.09, 3.25
+)
+
 # Supplementary Figure 4: method-dependent clustering outcomes.
 cluster_data <- read_mixed(file.path(source_root, "S01_PCA_and_Morphospace", "clusters_all_methods.csv")) %>%
   mutate(across(c(PC1, PC2), as.numeric)) %>%
@@ -145,7 +207,7 @@ s6 <- (s6a | s6b | s6c) +
     plot.subtitle = element_text(size = 6.2),
     legend.title = element_text(size = 6.5),
     legend.text = element_text(size = 6.3),
-    plot.tag.position = c(0.035, 0.965),
+    plot.tag.position = c(0, 0.965),
     plot.margin = margin(11, 7, 8, 10)
   )
 

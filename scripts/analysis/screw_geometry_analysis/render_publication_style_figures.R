@@ -101,7 +101,8 @@ lm_panel <- function(data, x, y, xlab, ylab, title = NULL, colour_family = TRUE,
     labs(
       x = xlab,
       y = ylab,
-      title = title,
+      title = NULL,
+      tag = title,
       subtitle = if (stats_outside && nzchar(stats)) stats else NULL
     ) +
     theme_pub()
@@ -190,7 +191,7 @@ figure5_tag_theme <- theme(
     hjust = 0,
     vjust = 1
   ),
-  plot.tag.position = c(0.015, 0.985)
+  plot.tag.position = c(0, 0.985)
 )
 p5a <- ggplot() +
   annotation_custom(
@@ -350,13 +351,13 @@ save_repo(ed6, "Extended_Data_Fig_6_robust_models.jpg", 12.2, 8.2)
 save_canonical(ed6, "03_Extended_Data_Figures/Extended_Data_Figure_6_evolutionary_model_support_180mm", 7.09, 4.85)
 
 # Supplementary Figure 10 ------------------------------------------------------
-s10a <- ggplot(shape, aes(angle_abs)) + geom_histogram(bins = 14, fill = bluegrey, colour = ink, linewidth = 0.3) + labs(title = "a", x = "Absolute winding angle (degrees)", y = "Count") + theme_pub()
+s10a <- ggplot(shape, aes(angle_abs)) + geom_histogram(bins = 14, fill = bluegrey, colour = ink, linewidth = 0.3) + labs(tag = "a", x = "Absolute winding angle (degrees)", y = "Count") + theme_pub()
 s10b <- lm_panel(shape, "fit_rms", "angle_abs", "Helix RMS", "Winding angle (degrees)", title = "b", colour_family = FALSE)
 s10c <- ggplot(shape, aes(PC1, PC2, fill = fit_rms)) +
   geom_point(shape = 21, size = 2.4, colour = "white", stroke = 0.45) +
   scale_fill_gradient(low = "#55BED0", high = teal, name = "Helix RMS") +
   guides(fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm"))) +
-  labs(title = "c", x = "PC1", y = "PC2") + theme_pub() +
+  labs(tag = "c", x = "PC1", y = "PC2") + theme_pub() +
   theme(legend.position = "bottom", legend.box = "vertical")
 s10d <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = fit_rms)) +
   geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
@@ -366,7 +367,7 @@ s10d <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = fit_rms)) +
     fill = guide_colourbar(title.position = "top", barwidth = grid::unit(28, "mm"), barheight = grid::unit(3, "mm")),
     size = guide_legend(title.position = "top", nrow = 1)
   ) +
-  labs(title = "d", x = "PC1", y = "PC2") + theme_pub() +
+  labs(tag = "d", x = "PC1", y = "PC2") + theme_pub() +
   theme(legend.position = "bottom", legend.box = "vertical")
 s10e <- lm_panel(shape, "fit_rms_rel", "angle_abs", "Helix RMS / radius", "Winding angle (degrees)", title = "e", colour_family = FALSE)
 s10f <- lm_panel(shape %>% filter(shape_regime == "main_region"), "PC1", "angle_abs", "PC1", "Winding angle (degrees)", title = "f", colour_family = FALSE)
@@ -407,7 +408,7 @@ box_panel <- function(y, label, panel_label) {
   ggplot(jt, aes(joint_type_strict, .data[[y]], fill = joint_type_strict)) +
     geom_boxplot(width = 0.62, outlier.shape = NA, alpha = 0.88, colour = ink, linewidth = 0.55) +
     geom_point(position = position_jitter(width = 0.12, height = 0, seed = 20260811), size = 1.55, alpha = 1, colour = ink) +
-    scale_fill_manual(values = jt_cols) + labs(title = panel_label, x = NULL, y = label) + theme_pub() +
+    scale_fill_manual(values = jt_cols) + labs(tag = panel_label, x = NULL, y = label) + theme_pub() +
     theme(legend.position = "none", axis.text.x = element_text(angle = 20, hjust = 1, size = 7.5))
 }
 s13 <- box_panel("abs_winding_angle_deg", "Absolute winding angle\n(degrees)", "a") |
@@ -570,19 +571,19 @@ qcols <- c("Good" = teal, "Caution" = gold, "Limited identifiability" = coral)
 s28a <- ggplot(metrics, aes(released_abs_winding_angle_deg, abs_winding_angle_deg, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
   geom_text_repel(data=label_angle,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
-  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="a", x="Released winding angle (degrees)",y="Robust fitted angle (degrees)") + theme_pub() + theme(legend.position="none")
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="a", x="Released winding angle (degrees)",y="Robust fitted angle (degrees)") + theme_pub() + theme(legend.position="none")
 s28b <- ggplot(metrics, aes(released_endpoint_equivalent_pitch_360, fitted_pitch_360, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
   geom_text_repel(data=label_pitch,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
   scale_x_log10() + scale_y_log10() + scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) +
-  labs(title="b", x="Released endpoint-equivalent pitch",y="Robust fitted pitch") + theme_pub() + theme(legend.position="none")
+  labs(tag="b", x="Released endpoint-equivalent pitch",y="Robust fitted pitch") + theme_pub() + theme(legend.position="none")
 s28c <- ggplot(metrics, aes(abs_winding_angle_deg, axial_angle_r_squared, colour = quality_class)) + geom_point(size=2) +
   geom_text_repel(data=label_quality,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
-  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="c", x="Robust fitted angle (degrees)",y="Axial-angular R2") + theme_pub() + theme(legend.position="none")
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="c", x="Robust fitted angle (degrees)",y="Axial-angular R2") + theme_pub() + theme(legend.position="none")
 s28d <- ggplot(metrics, aes(abs_winding_angle_deg, helix_rms_relative_to_radius, colour = quality_class)) + geom_point(size=2) +
   geom_hline(yintercept=.10,linetype="dashed",colour=coral) +
   geom_text_repel(data=label_rms,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
-  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(title="d", x="Robust fitted angle (degrees)",y="Helix RMS / fitted radius") + theme_pub() + theme(legend.position="none")
+  scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="d", x="Robust fitted angle (degrees)",y="Helix RMS / fitted radius") + theme_pub() + theme(legend.position="none")
 s28_legend_plot <- ggplot(
   data.frame(
     x = seq_along(qcols),
