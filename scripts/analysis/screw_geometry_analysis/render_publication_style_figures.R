@@ -426,7 +426,26 @@ save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_wi
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
 s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
 s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per\n360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
-s11 <- (s11a | s11b) + plot_layout(guides="collect") & theme(legend.position="bottom")
+s11_legend <- cowplot::get_legend(
+  s11a +
+    guides(fill = guide_legend(nrow = 1, byrow = TRUE, title.position = "left", title.vjust = 0.5)) +
+    theme(
+      legend.position = "bottom",
+      legend.direction = "horizontal",
+      legend.box = "horizontal",
+      legend.title = element_text(face = "bold", colour = ink, size = 7.4),
+      legend.text = element_text(colour = ink, size = 7.2),
+      legend.key.width = grid::unit(3.4, "mm"),
+      legend.key.height = grid::unit(3.4, "mm"),
+      legend.spacing.x = grid::unit(1.0, "mm"),
+      legend.margin = margin(0, 0, 0, 0),
+      legend.box.margin = margin(0, 0, 0, 0)
+    )
+)
+s11 <- (
+  ((s11a + theme(legend.position = "none")) | (s11b + theme(legend.position = "none"))) /
+    wrap_elements(full = s11_legend)
+) + plot_layout(heights = c(1, 0.10))
 save_repo(s11, "Supplementary_Fig_11_robust_axial_relationships.png", 11.8, 5.7)
 save_canonical(s11, "04_Supplementary_Figures/Supplementary_Fig_11_axial_screw_geometry_relationships_180mm", 7.09, 3.6)
 
