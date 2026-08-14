@@ -424,28 +424,36 @@ save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_wi
 
 # Supplementary Figure 11 ------------------------------------------------------
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
+single_line_family_legend <- function(plot) {
+  cowplot::get_legend(
+    plot +
+      guides(fill = guide_legend(nrow = 1, byrow = TRUE, title.position = "left", title.vjust = 0.5)) +
+      theme(
+        legend.position = "bottom",
+        legend.direction = "horizontal",
+        legend.box = "horizontal",
+        legend.title = element_text(face = "bold", colour = ink, size = 7.4),
+        legend.text = element_text(colour = ink, size = 7.2),
+        legend.key.width = grid::unit(3.4, "mm"),
+        legend.key.height = grid::unit(3.4, "mm"),
+        legend.spacing.x = grid::unit(1.0, "mm"),
+        legend.margin = margin(0, 0, 0, 0),
+        legend.box.margin = margin(0, 0, 0, 0)
+      )
+  )
+}
+with_single_line_family_legend <- function(main_plot, legend_source, legend_height = 0.10) {
+  (
+    main_plot /
+      wrap_elements(full = single_line_family_legend(legend_source))
+  ) + plot_layout(heights = c(1, legend_height))
+}
 s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
 s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per\n360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
-s11_legend <- cowplot::get_legend(
-  s11a +
-    guides(fill = guide_legend(nrow = 1, byrow = TRUE, title.position = "left", title.vjust = 0.5)) +
-    theme(
-      legend.position = "bottom",
-      legend.direction = "horizontal",
-      legend.box = "horizontal",
-      legend.title = element_text(face = "bold", colour = ink, size = 7.4),
-      legend.text = element_text(colour = ink, size = 7.2),
-      legend.key.width = grid::unit(3.4, "mm"),
-      legend.key.height = grid::unit(3.4, "mm"),
-      legend.spacing.x = grid::unit(1.0, "mm"),
-      legend.margin = margin(0, 0, 0, 0),
-      legend.box.margin = margin(0, 0, 0, 0)
-    )
+s11 <- with_single_line_family_legend(
+  (s11a + theme(legend.position = "none")) | (s11b + theme(legend.position = "none")),
+  s11a
 )
-s11 <- (
-  ((s11a + theme(legend.position = "none")) | (s11b + theme(legend.position = "none"))) /
-    wrap_elements(full = s11_legend)
-) + plot_layout(heights = c(1, 0.10))
 save_repo(s11, "Supplementary_Fig_11_robust_axial_relationships.png", 11.8, 5.7)
 save_canonical(s11, "04_Supplementary_Figures/Supplementary_Fig_11_axial_screw_geometry_relationships_180mm", 7.09, 3.6)
 
@@ -459,7 +467,10 @@ pgls_label <- function(response, predictor) {
 }
 s12a <- lm_panel(tip_df, "axial_span", "PC1", "Fitted axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
 s12b <- lm_panel(tip_df, "axial_span", "PC2", "Fitted axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
-s12 <- (s12a | s12b) + plot_layout(guides="collect") & theme(legend.position="bottom")
+s12 <- with_single_line_family_legend(
+  (s12a + theme(legend.position = "none")) | (s12b + theme(legend.position = "none")),
+  s12a
+)
 save_repo(s12, "Supplementary_Fig_12_robust_PGLS.jpg", 11.8, 5.7)
 save_canonical(s12, "04_Supplementary_Figures/Supplementary_Fig_12_PGLS_shape_vs_axial_span_180mm", 7.09, 3.6)
 
@@ -537,8 +548,12 @@ pgls_stat <- function(response, predictor) {
   if (nrow(r) == 0) return("")
   sprintf("PGLS beta = %.3g; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s16 <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", stats = pgls_stat("PC1","abs_winding_angle_deg")) + theme(legend.position="bottom")
-s17 <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", stats = pgls_stat("PC1","axial_pitch_360")) + theme(legend.position="bottom")
+s16_base <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", stats = pgls_stat("PC1","abs_winding_angle_deg")) +
+  theme(plot.margin = margin(18, 8, 9, 8))
+s17_base <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", stats = pgls_stat("PC1","axial_pitch_360")) +
+  theme(plot.margin = margin(18, 8, 9, 8))
+s16 <- with_single_line_family_legend(s16_base + theme(legend.position = "none"), s16_base, legend_height = 0.075)
+s17 <- with_single_line_family_legend(s17_base + theme(legend.position = "none"), s17_base, legend_height = 0.075)
 save_repo(s16, "Supplementary_Fig_16_robust_PGLS_angle.jpg", 7.0, 5.4)
 save_repo(s17, "Supplementary_Fig_17_robust_PGLS_pitch.jpg", 7.0, 5.4)
 save_canonical(s16, "04_Supplementary_Figures/Supplementary_Fig_16_additional_PGLS_traits_I_180mm", 7.09, 5.1)
