@@ -1,4 +1,0 @@
-"model","subset","n","r_squared","adj_r_squared","f_statistic","df1","df2","p_model","PC1_estimate","PC1_p","PC2_estimate","PC2_p","quantity_note"
-"angle_abs ~ PC1 + PC2","full_dataset",60,0.298,0.273,12.085,2,57,4.21e-05,-534.267,7.89e-06,-14.37,0.926,"measured winding angle"
-"axial_pitch ~ PC1 + PC2","full_dataset",60,0.04,0.007,1.197,2,57,0.309,0.611,0.141,0.279,0.633,"endpoint-equivalent pitch is algebraically derived from angle and span"
-"angle_abs ~ PC1 + PC2","main_region_PC1_lt_0.1",56,0.096,0.061,2.8,2,53,0.0698,-365.346,0.0862,-97.342,0.612,"measured winding angle"

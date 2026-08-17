@@ -1,3 +1,5 @@
-"term";"estimate";"std_error";"statistic";"p_value";"response";"predictor";"n_taxa";"lambda";"predictor_type";"fdr_p_value"
-"axial_span";"-0,522981653035284";"0,421721398159303";"-1,240111730915137";"0,238635904961589";"PC1";"axial_span";"14";"1";"continuous";"0,580465714771433"
-"axial_span";"0,377976908194116";"0,397767254833469";"0,950246415714542";"0,360733740320136";"PC2";"axial_span";"14";"1";"continuous";"0,622220145326949"
+quality_set,term,estimate,std_error,statistic,p_value,response,predictor,n_taxa,lambda,predictor_type,fdr_p_value
+primary_adequate,axial_span,-0.7550428533834758,0.326630999980135,-2.3116080636234613,0.0393613576518326,PC1,axial_span,14,1,continuous,0.149301701437986
+primary_adequate,axial_span,-0.0357653406602427,0.391829065924888,-0.0912779162409018,0.9287777693868099,PC2,axial_span,14,1,continuous,0.954711370433152
+strict_good,axial_span,-0.434297918722732,0.268573301805037,-1.617055440000502,0.136937804667466,PC1,axial_span,12,1,continuous,0.313815802362942
+strict_good,axial_span,-0.209036748002293,0.507563455248229,-0.411843575105426,0.689142910555271,PC2,axial_span,12,1,continuous,0.840591915743720

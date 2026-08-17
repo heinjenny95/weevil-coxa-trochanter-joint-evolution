@@ -120,8 +120,9 @@ visualization and is not used as the response variable for inference.
 ## Data availability
 
 Processed tomographic datasets, coxa and trochanter joint-surface meshes and
-the corresponding specimen metadata are deposited separately in RADAR4KIT
-under https://doi.org/10.35097/9p77hjk7wa656d6k. All other data supporting the
+the corresponding specimen metadata will be made publicly accessible through
+RADAR4KIT upon publication under https://doi.org/10.35097/9p77hjk7wa656d6k.
+All other data supporting the
 analyses, figures and statistical results are archived in this repository,
 including the complete Supplementary Tables 1-40 source-data package, derived
 analysis tables, analysis-ready tabular inputs, quality-control outputs, all
@@ -137,7 +138,7 @@ Release checks were performed with R 4.5.2 and Python 3.12.8; the final
 whole-volume coxa-thickness extraction used the Python environment documented
 in `scripts/analysis/coxa_wall_analysis`, and atlas construction used
 Deformetrica 4.3.0 in its compatible Python environment. Scripts were checked
-for portable paths and release-ready repository structure for the v1.2.0
+for portable paths and release-ready repository structure for the v1.2.1
 submission release. Exact numerical
 reproduction additionally depends on the deposited study data, external
 software described in the Methods and the package versions used for the

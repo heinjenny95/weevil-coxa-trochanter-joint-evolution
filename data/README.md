@@ -66,10 +66,12 @@ consistency corrections.
 
 - `kPCA_sensitivity_summary.csv` and
   `kPCA_shape_geometry_regressions.csv`: legacy threshold-aligned ordinary-PCA
-  and kernel-PCA sensitivity results using the >=30-degree, n = 60 subset. The
-  code now accepts robust fitted pitch and an upstream-filtered zero-degree
-  cutoff, but numerical regeneration requires the source `Atlas_Momentas.txt`,
-  which is not included in this compact repository.
+  and kernel-PCA sensitivity results using the >=30-degree, n = 60 subset.
+  These tables audit the historical atlas-momenta ordination and are not used
+  to support the robust helix-fit results. The repository includes the kPCA
+  workflow, ordered atlas dataset and exact Deformetrica configuration;
+  regenerated momenta can be produced by rerunning that atlas workflow on the
+  deposited meshes.
 
 ## `phylogeny`
 

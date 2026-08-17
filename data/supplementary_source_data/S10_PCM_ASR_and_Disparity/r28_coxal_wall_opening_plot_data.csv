@@ -1,52 +1,52 @@
-"tree_label";"Family";"coxal_wall_opening";"trait";"trait_label";"value"
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"PC1";"PC1";-0,0445675533991518
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"PC1";"PC1";-0,0393689934749423
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"PC1";"PC1";-0,0975800611468749
-"Brentidae___Nanophyes";"Brentidae";"absent";"PC1";"PC1";0,29491134540487
-"Brentidae___Arrhenodes";"Brentidae";"absent";"PC1";"PC1";0,267904544705844
-"Caridae___Car";"Caridae";"absent";"PC1";"PC1";-0,0163459772431715
-"Attelabidae___Synolabus";"Attelabidae";"present";"PC1";"PC1";0,0590264612445578
-"Belidae___Agnesiotis";"Belidae";"present";"PC1";"PC1";0,014880177258265
-"Nemonychidae___Rhynchitomacerinus";"Nemonychidae";"absent";"PC1";"PC1";0,149003935455337
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"PC2";"PC2";0,00869959195241613
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"PC2";"PC2";-0,0262890418285976
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"PC2";"PC2";-0,00719563136849981
-"Brentidae___Nanophyes";"Brentidae";"absent";"PC2";"PC2";-0,122287184474699
-"Brentidae___Arrhenodes";"Brentidae";"absent";"PC2";"PC2";-0,110473779862832
-"Caridae___Car";"Caridae";"absent";"PC2";"PC2";0,205849960175507
-"Attelabidae___Synolabus";"Attelabidae";"present";"PC2";"PC2";0,0411855870200834
-"Belidae___Agnesiotis";"Belidae";"present";"PC2";"PC2";0,0715334967448723
-"Nemonychidae___Rhynchitomacerinus";"Nemonychidae";"absent";"PC2";"PC2";0,168797455760859
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"abs_winding_angle_deg";"Absolute winding angle (deg)";425,409113666667
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"abs_winding_angle_deg";"Absolute winding angle (deg)";311,19565
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"abs_winding_angle_deg";"Absolute winding angle (deg)";251,841234
-"Brentidae___Nanophyes";"Brentidae";"absent";"abs_winding_angle_deg";"Absolute winding angle (deg)";244,910097
-"Brentidae___Arrhenodes";"Brentidae";"absent";"abs_winding_angle_deg";"Absolute winding angle (deg)";133,9720655
-"Caridae___Car";"Caridae";"absent";"abs_winding_angle_deg";"Absolute winding angle (deg)";340,827121
-"Attelabidae___Synolabus";"Attelabidae";"present";"abs_winding_angle_deg";"Absolute winding angle (deg)";283,2336115
-"Belidae___Agnesiotis";"Belidae";"present";"abs_winding_angle_deg";"Absolute winding angle (deg)";94,866261
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"n_turns_abs";"Absolute number of turns";1,181692
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"n_turns_abs";"Absolute number of turns";0,864432
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"n_turns_abs";"Absolute number of turns";0,699559
-"Brentidae___Nanophyes";"Brentidae";"absent";"n_turns_abs";"Absolute number of turns";0,680306
-"Brentidae___Arrhenodes";"Brentidae";"absent";"n_turns_abs";"Absolute number of turns";0,372144666666667
-"Caridae___Car";"Caridae";"absent";"n_turns_abs";"Absolute number of turns";0,946742
-"Attelabidae___Synolabus";"Attelabidae";"present";"n_turns_abs";"Absolute number of turns";0,78675975
-"Belidae___Agnesiotis";"Belidae";"present";"n_turns_abs";"Absolute number of turns";0,263517
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"axial_span";"Axial span";0,131489
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"axial_span";"Axial span";0,10678
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"axial_span";"Axial span";0,2085585
-"Brentidae___Nanophyes";"Brentidae";"absent";"axial_span";"Axial span";0,051194
-"Brentidae___Arrhenodes";"Brentidae";"absent";"axial_span";"Axial span";0,1523425
-"Caridae___Car";"Caridae";"absent";"axial_span";"Axial span";0,234019
-"Attelabidae___Synolabus";"Attelabidae";"present";"axial_span";"Axial span";0,19859525
-"Belidae___Agnesiotis";"Belidae";"present";"axial_span";"Axial span";0,058936
-"Curculionidae___Dendroctonus";"Curculionidae";"absent";"centroid_size";"Centroid size";150,073767157309
-"Curculionidae___Oxoplatypus";"Curculionidae";"present";"centroid_size";"Centroid size";170,68741761632
-"Curculionidae___Sitophilus";"Curculionidae";"absent";"centroid_size";"Centroid size";188,321292376377
-"Brentidae___Nanophyes";"Brentidae";"absent";"centroid_size";"Centroid size";137,420208481439
-"Brentidae___Arrhenodes";"Brentidae";"absent";"centroid_size";"Centroid size";221,106802188611
-"Caridae___Car";"Caridae";"absent";"centroid_size";"Centroid size";105,723538499809
-"Attelabidae___Synolabus";"Attelabidae";"present";"centroid_size";"Centroid size";168,20350445042
-"Belidae___Agnesiotis";"Belidae";"present";"centroid_size";"Centroid size";69,9411773551498
-"Nemonychidae___Rhynchitomacerinus";"Nemonychidae";"absent";"centroid_size";"Centroid size";72,8173118719282
+tree_label,Family,coxal_wall_opening,trait,trait_label,value
+Curculionidae___Dendroctonus,Curculionidae,absent,PC1,PC1,-0.0445675533991518
+Curculionidae___Oxoplatypus,Curculionidae,present,PC1,PC1,-0.0393689934749423
+Curculionidae___Sitophilus,Curculionidae,absent,PC1,PC1,-0.0975800611468749
+Brentidae___Nanophyes,Brentidae,absent,PC1,PC1,0.29491134540487
+Brentidae___Arrhenodes,Brentidae,absent,PC1,PC1,0.267904544705844
+Caridae___Car,Caridae,absent,PC1,PC1,-0.0163459772431715
+Attelabidae___Synolabus,Attelabidae,present,PC1,PC1,0.0590264612445578
+Belidae___Agnesiotis,Belidae,present,PC1,PC1,0.014880177258265
+Nemonychidae___Rhynchitomacerinus,Nemonychidae,absent,PC1,PC1,0.149003935455337
+Curculionidae___Dendroctonus,Curculionidae,absent,PC2,PC2,0.00869959195241613
+Curculionidae___Oxoplatypus,Curculionidae,present,PC2,PC2,-0.0262890418285976
+Curculionidae___Sitophilus,Curculionidae,absent,PC2,PC2,-0.00719563136849981
+Brentidae___Nanophyes,Brentidae,absent,PC2,PC2,-0.122287184474699
+Brentidae___Arrhenodes,Brentidae,absent,PC2,PC2,-0.110473779862832
+Caridae___Car,Caridae,absent,PC2,PC2,0.205849960175507
+Attelabidae___Synolabus,Attelabidae,present,PC2,PC2,0.0411855870200834
+Belidae___Agnesiotis,Belidae,present,PC2,PC2,0.0715334967448723
+Nemonychidae___Rhynchitomacerinus,Nemonychidae,absent,PC2,PC2,0.168797455760859
+Curculionidae___Dendroctonus,Curculionidae,absent,abs_winding_angle_deg,Absolute winding angle (deg),425.409113666667
+Curculionidae___Oxoplatypus,Curculionidae,present,abs_winding_angle_deg,Absolute winding angle (deg),311.19565
+Curculionidae___Sitophilus,Curculionidae,absent,abs_winding_angle_deg,Absolute winding angle (deg),251.841234
+Brentidae___Nanophyes,Brentidae,absent,abs_winding_angle_deg,Absolute winding angle (deg),244.910097
+Brentidae___Arrhenodes,Brentidae,absent,abs_winding_angle_deg,Absolute winding angle (deg),133.9720655
+Caridae___Car,Caridae,absent,abs_winding_angle_deg,Absolute winding angle (deg),340.827121
+Attelabidae___Synolabus,Attelabidae,present,abs_winding_angle_deg,Absolute winding angle (deg),283.2336115
+Belidae___Agnesiotis,Belidae,present,abs_winding_angle_deg,Absolute winding angle (deg),94.866261
+Curculionidae___Dendroctonus,Curculionidae,absent,n_turns_abs,Absolute number of turns,1.181692
+Curculionidae___Oxoplatypus,Curculionidae,present,n_turns_abs,Absolute number of turns,0.864432
+Curculionidae___Sitophilus,Curculionidae,absent,n_turns_abs,Absolute number of turns,0.699559
+Brentidae___Nanophyes,Brentidae,absent,n_turns_abs,Absolute number of turns,0.680306
+Brentidae___Arrhenodes,Brentidae,absent,n_turns_abs,Absolute number of turns,0.372144666666667
+Caridae___Car,Caridae,absent,n_turns_abs,Absolute number of turns,0.946742
+Attelabidae___Synolabus,Attelabidae,present,n_turns_abs,Absolute number of turns,0.78675975
+Belidae___Agnesiotis,Belidae,present,n_turns_abs,Absolute number of turns,0.263517
+Curculionidae___Dendroctonus,Curculionidae,absent,axial_span,Axial span,0.131489
+Curculionidae___Oxoplatypus,Curculionidae,present,axial_span,Axial span,0.10678
+Curculionidae___Sitophilus,Curculionidae,absent,axial_span,Axial span,0.2085585
+Brentidae___Nanophyes,Brentidae,absent,axial_span,Axial span,0.051194
+Brentidae___Arrhenodes,Brentidae,absent,axial_span,Axial span,0.1523425
+Caridae___Car,Caridae,absent,axial_span,Axial span,0.234019
+Attelabidae___Synolabus,Attelabidae,present,axial_span,Axial span,0.19859525
+Belidae___Agnesiotis,Belidae,present,axial_span,Axial span,0.058936
+Curculionidae___Dendroctonus,Curculionidae,absent,centroid_size,Centroid size,150.073767157309
+Curculionidae___Oxoplatypus,Curculionidae,present,centroid_size,Centroid size,170.68741761632
+Curculionidae___Sitophilus,Curculionidae,absent,centroid_size,Centroid size,188.321292376377
+Brentidae___Nanophyes,Brentidae,absent,centroid_size,Centroid size,137.420208481439
+Brentidae___Arrhenodes,Brentidae,absent,centroid_size,Centroid size,221.106802188611
+Caridae___Car,Caridae,absent,centroid_size,Centroid size,105.723538499809
+Attelabidae___Synolabus,Attelabidae,present,centroid_size,Centroid size,168.20350445042
+Belidae___Agnesiotis,Belidae,present,centroid_size,Centroid size,69.9411773551498
+Nemonychidae___Rhynchitomacerinus,Nemonychidae,absent,centroid_size,Centroid size,72.8173118719282

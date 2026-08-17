@@ -8,10 +8,10 @@ The release includes mesh alignment, the exact Deformetrica atlas
 configuration and ordered study dataset, morphometric and allometric analyses,
 robust 3D helix fitting and downstream joint-geometry analysis, coxal-wall
 measurements, ecological tests, and phylogenetic comparative analyses. It also
-includes the script used to generate the revised Supplementary Figure 11.
-Final journal-figure layout, colour adjustment, panel assembly and visual
-polishing scripts are otherwise excluded; some analysis scripts still create
-diagnostic plots as workflow byproducts.
+includes the publication-figure renderers, shared visual style, panel assembly
+code and compact figure-source tables used for the final main, Extended Data
+and Supplementary figures. Image-only descriptive panels are retained as
+source assets alongside the corresponding scripted assembly workflows.
 
 The current standard-Python circular 3D helix fitter, conditional bootstrap and
 quality-set export are included in
@@ -30,7 +30,7 @@ and their specimen metadata are included under `data/`. This includes the
 complete source-data payload for Supplementary Tables 1-40, derived analysis
 tables, analysis-ready tabular inputs, quality-control outputs and the detailed
 robust geometry audit files. The imaging data, joint-surface meshes and specimen
-metadata are deposited in RADAR4KIT under
-https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
+metadata will be made publicly accessible through RADAR4KIT upon publication
+under https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
 replaced by explicit placeholder roots or command-line arguments so that no
 workstation-specific paths are published.

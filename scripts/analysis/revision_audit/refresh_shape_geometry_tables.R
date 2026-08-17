@@ -1,62 +1,64 @@
 #!/usr/bin/env Rscript
 
-# Build the two concise supplementary tables from the corrected 60-specimen
-# geometry analysis. This prevents stale 59-specimen summaries from surviving
-# in the submission package.
+# Rebuild the concise robust shape--geometry result tables from the canonical
+# primary (n = 63) and strict (n = 53) regression summaries. Model-level
+# P values are kept distinct from the PC1 coefficient P values.
 
 args <- commandArgs(trailingOnly = TRUE)
-if (length(args) < 6) stop(
-  "Usage: refresh_shape_geometry_tables.R <shape-data.csv> <winding.csv> <joint-types.csv> <regression-summary.csv> <specimen-output.csv> <main-results-output.csv>"
-)
+if (length(args) != 1) {
+  stop("Usage: refresh_shape_geometry_tables.R <repository-root>")
+}
 
-read_sc <- function(path, dec = ".") {
-  first <- readLines(path, n = 1, warn = FALSE, encoding = "UTF-8")
+repo_root <- normalizePath(args[[1]], mustWork = TRUE)
+data_dir <- file.path(repo_root, "data", "screw_geometry")
+
+read_sc <- function(path) {
   read.table(
     path, header = TRUE, sep = ";", quote = "\"", comment.char = "",
-    stringsAsFactors = FALSE, check.names = FALSE, dec = dec,
-    fileEncoding = "UTF-8", skip = ifelse(grepl("^sep=", first), 1, 0)
+    stringsAsFactors = FALSE, check.names = FALSE, fileEncoding = "UTF-8"
   )
 }
 
-shape <- read_sc(args[[1]])
-winding <- read_sc(args[[2]], dec = ",")
-joint <- read_sc(args[[3]])
-reg <- read_sc(args[[4]])
+build_main <- function(regression_path, expected_full_n, expected_main_n) {
+  reg <- read_sc(regression_path)
+  keep <- reg$table_block == "regression_models" &
+    reg$model %in% c("angle_abs ~ PC1 + PC2", "axial_pitch ~ PC1 + PC2") &
+    reg$subset %in% c("full_dataset", "main_region_PC1_lt_0.1")
+  out <- reg[keep, c(
+    "model", "subset", "n", "r_squared", "p_model", "PC1_estimate", "PC1_p"
+  )]
+  names(out) <- c(
+    "model", "subset", "n", "r_squared", "p_value", "PC1_effect", "PC1_p"
+  )
+  out$model <- sub("angle_abs", "Winding angle", out$model, fixed = TRUE)
+  out$model <- sub("axial_pitch", "Axial pitch", out$model, fixed = TRUE)
+  out$model <- sub("PC1 + PC2", "shape", out$model, fixed = TRUE)
+  out$subset <- sub("full_dataset", "Full dataset", out$subset, fixed = TRUE)
+  out$subset <- sub(
+    "main_region_PC1_lt_0.1", "Main region (PC1 < 0.1)", out$subset,
+    fixed = TRUE
+  )
+  expected_n <- ifelse(
+    out$subset == "Main region (PC1 < 0.1)", expected_main_n, expected_full_n
+  )
+  if (!all(out$n == expected_n)) {
+    stop("Unexpected sample size in ", regression_path, ": ",
+         paste(unique(out$n), collapse = ", "))
+  }
+  out
+}
 
-alias <- c("308_lisshorhoptrus_oryzophilus_aligned" = "308_lisshorhoptrus_oryzophilus_trochanter_aligned")
-hit <- winding$specimen_id %in% names(alias)
-winding$specimen_id[hit] <- unname(alias[winding$specimen_id[hit]])
+primary <- build_main(file.path(data_dir, "regression_summary.csv"), 63, 55)
+strict <- build_main(file.path(data_dir, "regression_summary_strict_good.csv"), 53, 53)
 
-specimen <- merge(shape, winding[, c("specimen_id", "start_end_dist")], by = "specimen_id", all.x = TRUE, sort = FALSE)
-specimen <- merge(specimen, joint[, c("specimen_id", "joint_type", "joint_type_strict", "screw_state")], by = "specimen_id", all.x = TRUE, sort = FALSE)
-specimen <- specimen[, c(
-  "specimen_id", "joint_type", "joint_type_strict", "screw_state",
-  "angle_abs", "angle_signed", "axial_metric", "axial_pitch",
-  "start_end_dist", "fit_radius", "fit_rms"
-)]
-names(specimen) <- c(
-  "specimen_id", "joint_type", "joint_type_strict", "screw_state",
-  "abs_winding_angle_deg", "signed_winding_angle_deg", "axial_span",
-  "endpoint_equivalent_axial_pitch_360", "start_end_dist", "fit_radius", "radial_circle_fit_rms"
+write.csv(
+  primary, file.path(data_dir, "main_results.csv"),
+  row.names = FALSE, na = "NA", fileEncoding = "UTF-8"
+)
+write.csv(
+  strict, file.path(data_dir, "main_results_strict_good.csv"),
+  row.names = FALSE, na = "NA", fileEncoding = "UTF-8"
 )
 
-keep <- reg$table_block == "regression_models" & reg$model %in% c(
-  "angle_abs ~ PC1 + PC2", "axial_pitch ~ PC1 + PC2"
-)
-main <- reg[keep, c(
-  "model", "subset", "n", "r_squared", "adj_r_squared", "f_statistic",
-  "df1", "df2", "p_model", "PC1_estimate", "PC1_p", "PC2_estimate", "PC2_p"
-)]
-main$quantity_note <- ifelse(
-  grepl("axial_pitch", main$model),
-  "endpoint-equivalent pitch is algebraically derived from angle and span",
-  "measured winding angle"
-)
-
-dir.create(dirname(args[[5]]), recursive = TRUE, showWarnings = FALSE)
-dir.create(dirname(args[[6]]), recursive = TRUE, showWarnings = FALSE)
-write.csv(specimen, args[[5]], row.names = FALSE, na = "")
-write.csv(main, args[[6]], row.names = FALSE, na = "")
-
-cat("Specimen rows:", nrow(specimen), "\n")
-cat("Main-result rows:", nrow(main), "\n")
+cat("Primary rows:", nrow(primary), "(n = 63)\n")
+cat("Strict rows:", nrow(strict), "(n = 53)\n")

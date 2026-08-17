@@ -1,2 +1,2 @@
-"primary_analysis";"isometric_null";"n_specimens";"n_pc_axes_primary";"primary_variance_percent";"sensitivity_analysis";"sensitivity_variance_percent";"pc1_pc5_fitted_effect_percent";"n_permutations"
-"RRPP regression of all non-zero atlas PCs on log centroid size";"zero multivariate shape slope because atlas shape is scale-normalized";68;67;100;"RRPP regression of PC1-PC5 on log centroid size";61,3789516569387;92,6149168116418;9999
+primary_analysis,isometric_null,n_specimens,n_pc_axes_primary,primary_variance_percent,sensitivity_analysis,sensitivity_variance_percent,pc1_pc5_fitted_effect_percent,n_permutations
+RRPP regression of all non-zero atlas PCs on log centroid size,zero multivariate shape slope because atlas shape is scale-normalized,68,67,100,RRPP regression of PC1-PC5 on log centroid size,61.3789516569387,92.6149168116418,9999

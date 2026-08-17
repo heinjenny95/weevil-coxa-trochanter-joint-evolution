@@ -1,5 +1,5 @@
-"analysis","test","n","effect","statistic","p_value","r_squared"
-"Whole-volume coxal wall thickness versus coxa size","linear model",68,0.804352658320062,75.5626015030613,1.53135959416044e-12,0.533775168729343
-"Size-corrected whole-volume coxal wall thickness versus coxal wall opening","linear model",68,-0.0532284287912533,-1.59176592336206,0.116289360151527,0.551266913900706
-"Coxal wall opening versus coxa size","binomial GLM",68,-0.385453626477406,-0.249371665857085,0.803073300328212,NA
-"Opening-by-size interaction for whole-volume coxal wall thickness","nested-model F test",68,NA,0.742474889265549,0.392086265305,NA
+analysis,test,n,effect,statistic,p_value,r_squared
+Whole-volume coxal wall thickness versus coxa size,linear model,68,0.804352658320062,75.5626015030613,1.53135959416044e-12,0.533775168729343
+Size-corrected whole-volume coxal wall thickness versus coxal wall opening,linear model,68,-0.0532284287912533,-1.59176592336206,0.116289360151527,0.551266913900706
+Coxal wall opening versus coxa size,binomial GLM,68,-0.385453626477406,-0.249371665857085,0.803073300328212,NA
+Opening-by-size interaction for whole-volume coxal wall thickness,nested-model F test,68,NA,0.742474889265549,0.392086265305,NA

@@ -1,4 +1,4 @@
-"Term";"Df";"SS";"MS";"Rsq";"F";"Z";"Pr(>F)";"analysis_scope";"n_pc_axes";"pc_axes";"variance_represented_percent";"null_hypothesis";"n_permutations"
-"logCS";1;0,306983827688689;0,306983827688689;0,105852043751979;7,81328731874072;3,8034470163342;1e-04;"PC1-PC5_sensitivity";5;"PC1,PC2,PC3,PC4,PC5";61,3789516569387;"zero multivariate shape slope under isometry";9999
-"Residuals";66;2,59313804816267;0,0392899704267072;0,894147956248021;NA;NA;NA;"PC1-PC5_sensitivity";5;"PC1,PC2,PC3,PC4,PC5";61,3789516569387;"zero multivariate shape slope under isometry";9999
-"Total";67;2,90012187585136;NA;NA;NA;NA;NA;"PC1-PC5_sensitivity";5;"PC1,PC2,PC3,PC4,PC5";61,3789516569387;"zero multivariate shape slope under isometry";9999
+Term,Df,SS,MS,Rsq,F,Z,Pr(>F),analysis_scope,n_pc_axes,pc_axes,variance_represented_percent,null_hypothesis,n_permutations
+logCS,1,0.306983827688689,0.306983827688689,0.105852043751979,7.81328731874072,3.8034470163342,1e-04,PC1-PC5_sensitivity,5,"PC1,PC2,PC3,PC4,PC5",61.3789516569387,zero multivariate shape slope under isometry,9999
+Residuals,66,2.59313804816267,0.0392899704267072,0.894147956248021,NA,NA,NA,PC1-PC5_sensitivity,5,"PC1,PC2,PC3,PC4,PC5",61.3789516569387,zero multivariate shape slope under isometry,9999
+Total,67,2.90012187585136,NA,NA,NA,NA,NA,PC1-PC5_sensitivity,5,"PC1,PC2,PC3,PC4,PC5",61.3789516569387,zero multivariate shape slope under isometry,9999
