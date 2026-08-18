@@ -64,14 +64,15 @@ consistency corrections.
 
 ## `morphospace`
 
-- `kPCA_sensitivity_summary.csv` and
-  `kPCA_shape_geometry_regressions.csv`: legacy threshold-aligned ordinary-PCA
-  and kernel-PCA sensitivity results using the >=30-degree, n = 60 subset.
-  These tables audit the historical atlas-momenta ordination and are not used
-  to support the robust helix-fit results. The repository includes the kPCA
-  workflow, ordered atlas dataset and exact Deformetrica configuration;
-  regenerated momenta can be produced by rerunning that atlas workflow on the
-  deposited meshes.
+- `kPCA_sensitivity_summary.csv`: publication-facing comparison of ordinary
+  PCA and two RBF-kPCA parameterizations for global morphospace structure,
+  family and joint-type organization, family dispersion and allometry.
+- `kPCA_shape_geometry_regressions.csv`: legacy threshold-aligned geometry
+  audit output retained for numerical traceability only. It is not used as
+  evidence for the robust three-dimensional helix-fit analyses. The repository
+  includes the kPCA workflow, ordered atlas dataset and exact Deformetrica
+  configuration; regenerated momenta can be produced by rerunning that atlas
+  workflow on the deposited meshes.
 
 ## `phylogeny`
 
