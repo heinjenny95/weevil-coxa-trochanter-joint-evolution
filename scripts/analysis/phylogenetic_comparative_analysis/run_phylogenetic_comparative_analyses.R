@@ -2310,6 +2310,7 @@ write_clean_csv(
 
 robust_evol_summary <- robust_evol_models %>%
   dplyr::filter(!is.na(best_model)) %>%
+  dplyr::distinct(tree_id, trait, best_model) %>%
   dplyr::count(trait, best_model, name = "n_trees") %>%
   dplyr::group_by(trait) %>%
   dplyr::mutate(prop_trees = n_trees / sum(n_trees)) %>%
@@ -2439,12 +2440,12 @@ message("SECTION 23B finished. Tree robustness outputs written to: ", tree_robus
 
 
 # ============================================================
-# SECTION 24: CONTINUOUS ASR / CONTMAP FOR SHAPE + SCREW-JOINT GEOMETRY
+# SECTION 24: CONTINUOUS ASR / CONTMAP FOR SHAPE + SCREW JOINT GEOMETRY
 # Combined figure with shared legend
 # BLACK BACKGROUND VERSION - REFINED
 # ============================================================
 
-message("SECTION 24: Building combined contMap figure for PC1-PC5 plus screw-joint geometry ...")
+message("SECTION 24: Building combined contMap figure for PC1-PC5 plus screw joint geometry ...")
 
 asr_plot_dir <- file.path(output_dir, "08_ASR")
 dir.create(asr_plot_dir, showWarnings = FALSE, recursive = TRUE)
@@ -2674,7 +2675,7 @@ draw_combined_contmap_panel_set <- function() {
   }
 
   mtext(
-    "Continuous ancestral reconstructions of shape and screw-joint geometry",
+    "Continuous ancestral reconstructions of shape and screw joint geometry",
     outer = TRUE,
     cex = 1.12,
     font = 2,
@@ -2775,7 +2776,7 @@ if (exists("asr_cont_results") && is.data.frame(asr_cont_results) && nrow(asr_co
   )
 }
 
-message("Combined contASR figure for shape + screw-joint geometry saved to: ", asr_plot_dir)
+message("Combined contASR figure for shape + screw joint geometry saved to: ", asr_plot_dir)
 
 
 ################################################################################

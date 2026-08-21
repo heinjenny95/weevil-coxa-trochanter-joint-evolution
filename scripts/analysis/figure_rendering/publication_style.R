@@ -48,6 +48,10 @@ ecology_palettes <- list(
     angiosperm = "#167A5C",
     gymnosperm = "#62BE9E"
   ),
+  wood_association_broad = c(
+    "non-wood" = "#B25C00",
+    wood = "#F09A3F"
+  ),
   woody_association_broad = c(
     nonwoody = "#B25C00",
     woody = "#F09A3F"

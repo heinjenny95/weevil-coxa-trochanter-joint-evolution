@@ -7,6 +7,7 @@
 suppressPackageStartupMessages({
   library(ggplot2)
   library(ggrepel)
+  library(patchwork)
 })
 
 args <- commandArgs(trailingOnly = TRUE)
@@ -29,17 +30,16 @@ specs <- list(
   list(
     predictor = "abs_winding_angle_deg",
     title = "PC1 and fitted winding angle",
-    x = "Absolute fitted winding angle (degrees)",
-    filename = "Supplementary_Fig_16_robust_PGLS_angle.jpg"
+    x = "Absolute fitted winding angle (degrees)"
   ),
   list(
     predictor = "axial_pitch_360",
     title = "PC1 and fitted axial pitch",
-    x = "Fitted axial pitch per 360-degree turn",
-    filename = "Supplementary_Fig_17_robust_PGLS_pitch.jpg"
+    x = "Fitted axial pitch per 360-degree turn"
   )
 )
 
+plots <- list()
 for (spec in specs) {
   model_row <- pgls[
     pgls$response == "PC1" &
@@ -65,7 +65,7 @@ for (spec in specs) {
     model_row$n_taxa
   )
 
-  p <- ggplot(plot_df, aes(x = .data[[spec$predictor]], y = PC1)) +
+  plots[[length(plots) + 1L]] <- ggplot(plot_df, aes(x = .data[[spec$predictor]], y = PC1)) +
     geom_smooth(method = "lm", se = TRUE, colour = "#356AE6", fill = "grey75") +
     geom_point(size = 2.8, colour = "black") +
     geom_text_repel(aes(label = tree_tip), size = 3.2, max.overlaps = Inf, seed = 1) +
@@ -73,12 +73,14 @@ for (spec in specs) {
     theme_bw(base_size = 13) +
     theme(plot.title = element_text(face = "bold"))
 
-  ggsave(
-    filename = file.path(output_dir, spec$filename),
-    plot = p,
-    width = 10,
-    height = 8,
-    units = "in",
-    dpi = 300
-  )
 }
+
+combined <- wrap_plots(plots, ncol = 1) + plot_annotation(tag_levels = "a")
+ggsave(
+  filename = file.path(output_dir, "Supplementary_Fig_16_robust_PGLS_geometry.jpg"),
+  plot = combined,
+  width = 10,
+  height = 12,
+  units = "in",
+  dpi = 300
+)

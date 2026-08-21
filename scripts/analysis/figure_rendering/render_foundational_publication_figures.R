@@ -58,11 +58,13 @@ disparity_order <- c("Anthribidae", "Brentidae", "Curculionidae", "Attelabidae")
 disparity_observed <- read_mixed(file.path(
   source_root, "S01_PCA_and_Morphospace", "family_disparity_summary_pc1_pc5.csv"
 )) %>%
+  rename(Family = family) %>%
   mutate(Family = factor(Family, levels = disparity_order)) %>%
   arrange(Family)
 disparity_rarefied <- read_mixed(file.path(
   source_root, "S01_PCA_and_Morphospace", "family_disparity_rarefied_n4_pc1_pc5.csv"
 )) %>%
+  rename(Family = family) %>%
   mutate(Family = factor(Family, levels = disparity_order)) %>%
   arrange(Family)
 disparity_global <- read_mixed(file.path(
@@ -128,13 +130,13 @@ cluster_data <- read_mixed(file.path(source_root, "S01_PCA_and_Morphospace", "cl
       cluster_mclust = "mclust"
     ),
     method = factor(method, levels = c("Hierarchical", "k-means", "mclust")),
-    cluster = factor(paste("cluster", cluster), levels = names(cluster_cols))
+    cluster = factor(paste("cluster", cluster))
   )
 
 s4 <- ggplot(cluster_data, aes(PC1, PC2, fill = cluster)) +
   geom_point(shape = 21, size = 2.5, colour = "white", stroke = 0.48, alpha = 1) +
   facet_wrap(~method, nrow = 1) +
-  scale_fill_manual(values = cluster_cols, drop = FALSE, name = NULL) +
+  scale_fill_manual(values = cluster_cols, drop = TRUE, name = NULL) +
   labs(x = "PC1", y = "PC2") +
   theme_pub(base_size = 9) +
   theme(
@@ -243,15 +245,20 @@ save_plot_set(
   7.09, 5.05
 )
 
-# Supplementary Figures 21-23: the same saturated predictor palettes are used
-# for all response variables so colour encodes predictor consistently.
-ecology <- read_mixed(file.path(source_root, "S06_Ecology_Matrix", "ecology_analysis_input_merged.csv"))
-pgls <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_pgls_factor_results.csv"))
-phyanova <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_phylogenetic_anova_results.csv"))
+# Supplementary Figures 20-22 show shape-only ecological contrasts. The
+# dedicated 15-tip plotting matrix prevents the 14-tip main and 12-tip
+# high-confidence geometry matrices from being stacked and plotting the same
+# proxy tip twice. Inferential annotations are likewise restricted to the
+# shape-only rows in Tables 35 and 36.
+ecology <- read_mixed(file.path(repo_root, "data", "foundational_figures", "ecology_shape_only_plot_data.csv"))
+pgls <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_pgls_factor_results.csv")) %>%
+  filter(quality_set == "shape_only")
+phyanova <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_phylogenetic_anova_results.csv")) %>%
+  filter(quality_set == "shape_only")
 
 predictor_specs <- list(
   host_lineage_broad = list(title = "Host lineage", levels = c("angiosperm", "gymnosperm"), labels = c("Angiosperm", "Gymnosperm")),
-  woody_association_broad = list(title = "Woody association", levels = c("nonwoody", "woody"), labels = c("Non-woody", "Woody")),
+  wood_association_broad = list(title = "Wood association", levels = c("non-wood", "wood"), labels = c("Non-wood", "Wood")),
   larval_lifestyle_broad = list(title = "Larval lifestyle", levels = c("internal", "other"), labels = c("Internal", "Other")),
   fungal_association_broad = list(title = "Fungal association", levels = c("no", "yes"), labels = c("No", "Yes"))
 )
@@ -286,18 +293,18 @@ ecology_panel <- function(response, predictor, ylab) {
 
 ecology_figure <- function(response, ylab) {
   p1 <- ecology_panel(response, "host_lineage_broad", ylab)
-  p2 <- ecology_panel(response, "woody_association_broad", ylab)
+  p2 <- ecology_panel(response, "wood_association_broad", ylab)
   p3 <- ecology_panel(response, "larval_lifestyle_broad", ylab)
   p4 <- ecology_panel(response, "fungal_association_broad", ylab)
   ((p1 | p2) / (p3 | p4)) + plot_annotation(tag_levels = "a")
 }
 
-s21 <- ecology_figure("PC2", "PC2")
-s22 <- ecology_figure("centroid_size", "Centroid size")
-s23 <- ecology_figure("PC1", "PC1")
+s20 <- ecology_figure("PC2", "PC2")
+s21 <- ecology_figure("centroid_size", "Centroid size")
+s22 <- ecology_figure("PC1", "PC1")
 
-save_plot_set(s21, "Supplementary_Fig_21_ecology_PC2", "04_Supplementary_Figures/Supplementary_Fig_21_ecology_PC2_180mm", 7.09, 7.09)
-save_plot_set(s22, "Supplementary_Fig_22_ecology_centroid_size", "04_Supplementary_Figures/Supplementary_Fig_22_ecology_centroid_size_180mm", 7.09, 7.09)
-save_plot_set(s23, "Supplementary_Fig_23_ecology_PC1", "04_Supplementary_Figures/Supplementary_Fig_23_ecology_PC1_180mm", 7.09, 7.09)
+save_plot_set(s20, "Supplementary_Fig_20_ecology_PC2", "04_Supplementary_Figures/Supplementary_Fig_20_ecology_PC2_180mm", 7.09, 7.09)
+save_plot_set(s21, "Supplementary_Fig_21_ecology_centroid_size", "04_Supplementary_Figures/Supplementary_Fig_21_ecology_centroid_size_180mm", 7.09, 7.09)
+save_plot_set(s22, "Supplementary_Fig_22_ecology_PC1", "04_Supplementary_Figures/Supplementary_Fig_22_ecology_PC1_180mm", 7.09, 7.09)
 
 message("Foundational publication-style figures written to: ", normalizePath(out_dir, winslash = "/", mustWork = TRUE))

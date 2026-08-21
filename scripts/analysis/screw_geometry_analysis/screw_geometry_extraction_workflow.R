@@ -5,8 +5,7 @@
 # This script does ALL of the following:
 # 1) reads PCA and screw-geometry CSV files robustly
 # 2) cleans and merges the data
-# 3) applies the legacy 30-degree cutoff only to endpoint-pitch input; robust
-#    fitted-pitch tables are filtered by upstream geometric model adequacy
+# 3) requires robust fitted-pitch input selected by upstream geometric model adequacy
 # 4) computes axial pitch
 # 5) creates:
 #    - MAIN TEXT FIGURE: 1x2 grid
@@ -402,15 +401,13 @@ fitted_pitch_col <- find_col(
   geom,
   c("fitted_pitch_360", "axial_pitch_360"),
   "robust fitted pitch per 360 degrees",
-  required = FALSE
+  required = TRUE
 )
 
-# Legacy tables require the historical 30-degree cutoff because their pitch is
-# an endpoint quotient. Robust-helix input tables already carry an explicit
-# geometry-quality analysis-set selection and provide pitch fitted from all
-# ordered points, so no additional angular cutoff is applied.
-angle_cutoff_deg <- if (is.null(fitted_pitch_col)) 30 else 0
-pitch_source_label <- if (is.null(fitted_pitch_col)) "Endpoint-equivalent axial pitch" else "Fitted axial pitch"
+# Robust-helix input tables carry an explicit geometry-quality analysis-set
+# selection and provide pitch fitted from all ordered points. No angular cutoff
+# is applied in the current workflow.
+pitch_source_label <- "Fitted axial pitch"
 
 if (is.null(axial_span_col) && is.null(start_end_col)) {
   stop("Neither axial_span nor start_end_dist found in geometry file.")
@@ -434,9 +431,9 @@ alias_hit <- geom[[id_geom]] %in% names(legacy_id_aliases)
 geom[[id_geom]][alias_hit] <- unname(legacy_id_aliases[geom[[id_geom]][alias_hit]])
 
 geometry_angle_input <- to_num(geom[[angle_col]])
-n_below_angle_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input < angle_cutoff_deg)
-n_at_or_above_cutoff <- sum(!is.na(geometry_angle_input) & geometry_angle_input >= angle_cutoff_deg)
-eligible_geometry_ids <- geom[[id_geom]][!is.na(geometry_angle_input) & geometry_angle_input >= angle_cutoff_deg]
+n_missing_angle <- sum(is.na(geometry_angle_input))
+n_with_angle <- sum(!is.na(geometry_angle_input))
+eligible_geometry_ids <- geom[[id_geom]][!is.na(geometry_angle_input)]
 n_eligible_matched_to_pca <- sum(eligible_geometry_ids %in% pca[[id_pca]])
 eligible_unmatched_ids <- setdiff(eligible_geometry_ids, pca[[id_pca]])
 
@@ -451,7 +448,7 @@ if (!is.null(axial_span_col))   geom_keep <- c(geom_keep, axial_span_col)
 if (!is.null(start_end_col))    geom_keep <- c(geom_keep, start_end_col)
 if (!is.null(fit_rms_col))      geom_keep <- c(geom_keep, fit_rms_col)
 if (!is.null(fit_radius_col))   geom_keep <- c(geom_keep, fit_radius_col)
-if (!is.null(fitted_pitch_col)) geom_keep <- c(geom_keep, fitted_pitch_col)
+geom_keep <- c(geom_keep, fitted_pitch_col)
 
 geom_keep <- unique(geom_keep)
 
@@ -499,15 +496,7 @@ df$axial_metric <- if (!is.null(axial_span_col)) {
   df[[start_end_col]]
 }
 
-df$axial_pitch <- if (!is.null(fitted_pitch_col)) {
-  df[[fitted_pitch_col]]
-} else {
-  ifelse(
-    is.na(df$angle_abs) | df$angle_abs == 0,
-    NA,
-    df$axial_metric * 360 / df$angle_abs
-  )
-}
+df$axial_pitch <- df[[fitted_pitch_col]]
 
 if (!is.null(fit_rms_col)) {
   df$fit_rms <- df[[fit_rms_col]]
@@ -532,9 +521,8 @@ if (!is.null(fit_radius_col)) {
 # ============================================================
 
 # -------------------
-# Legacy endpoint-derived pitch uses angle_abs >= 30. Robust fitted-pitch input
-# uses angle_cutoff_deg = 0 because model adequacy was selected upstream and
-# conditional uncertainty is propagated separately.
+# Model adequacy was selected upstream and conditional uncertainty is
+# propagated separately; no additional angular cutoff is applied here.
 # -------------------
 df <- df %>%
   filter(
@@ -543,8 +531,7 @@ df <- df %>%
     !is.na(angle_abs),
     !is.na(axial_pitch),
     is.finite(axial_pitch),
-    axial_pitch > 0,
-    angle_abs >= angle_cutoff_deg
+    axial_pitch > 0
   )
 
 cat("Rows after final filtering:", nrow(df), "\n")
@@ -980,8 +967,8 @@ sample_flow <- data.frame(
   stage = c(
     "atlas specimens",
     "specimens with exported screw-trajectory measurements",
-    paste0("geometry measurements below ", angle_cutoff_deg, "-degree cutoff"),
-    paste0("geometry measurements at or above ", angle_cutoff_deg, "-degree cutoff"),
+    "geometry measurements missing a winding angle",
+    "geometry measurements with a winding angle",
     "eligible geometry measurements matched to PCA",
     "eligible geometry measurements unmatched to PCA",
     "final specimen-level shape-geometry analysis"
@@ -989,17 +976,17 @@ sample_flow <- data.frame(
   n = c(
     n_pca_input,
     n_geometry_input,
-    n_below_angle_cutoff,
-    n_at_or_above_cutoff,
+    n_missing_angle,
+    n_with_angle,
     n_eligible_matched_to_pca,
     length(eligible_unmatched_ids),
     nrow(df)
   ),
   details = c(
     "complete atlas PCA dataset",
-    if (is.null(fitted_pitch_col)) "before the angular cutoff" else "input analysis set selected upstream by robust-helix model adequacy",
-    if (is.null(fitted_pitch_col)) "excluded because endpoint-derived pitch is unstable at very small angles" else "none; robust fitted pitch is used",
-    if (is.null(fitted_pitch_col)) "eligible after the legacy angle cutoff" else "eligible after upstream robust-helix model-adequacy selection",
+    "input analysis set selected upstream by robust-helix model adequacy",
+    "excluded because no winding-angle estimate was available",
+    "eligible without an angular cutoff because robust fitted pitch is used",
     "after applying documented legacy-ID normalization",
     if (length(eligible_unmatched_ids)) paste(eligible_unmatched_ids, collapse = "; ") else "none",
     "used for Supplementary Figure 11 and associated ordinary linear models"

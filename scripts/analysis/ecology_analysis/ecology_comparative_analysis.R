@@ -396,7 +396,7 @@ for (pred in broad_predictors) {
 # ------------------- COMBINED PLOTS BY RESPONSE TRAIT -------------------
 predictor_labels <- c(
   host_lineage_broad = "Host lineage",
-  woody_association_broad = "Woody association",
+  woody_association_broad = "Wood association",
   larval_lifestyle_broad = "Larval lifestyle",
   fungal_association_broad = "Fungal association"
 )
