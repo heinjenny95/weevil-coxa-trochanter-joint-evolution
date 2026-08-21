@@ -18,12 +18,3 @@ Allometry,RBF-kPCA adaptive median-distance kernel,full ordination,Multivariate 
 Allometry,Ordinary PCA,first five axes,Multivariate R2,0.10585204,7.8132873,0.0001,
 Allometry,RBF-kPCA legacy gamma 0.25,first five matched axes,Multivariate R2,0.10567538,7.7987064,0.0001,
 Allometry,RBF-kPCA adaptive median-distance kernel,first five matched axes,Multivariate R2,0.09627392,7.0309784,0.0002,
-Shape-geometry,Ordinary PCA,winding angle versus first two axes (>=30 deg; n=60),Regression R2,0.29777497,12.08528,4.21e-05,Threshold-aligned with the main analysis
-Shape-geometry,RBF-kPCA legacy gamma 0.25,winding angle versus first two matched axes (>=30 deg; n=60),Regression R2,0.30359985,12.42475,3.32e-05,Threshold-aligned with the main analysis
-Shape-geometry,RBF-kPCA adaptive median-distance kernel,winding angle versus first two matched axes (>=30 deg; n=60),Regression R2,0.36405828,16.31543,2.50e-06,Threshold-aligned with the main analysis
-Shape-geometry,Ordinary PCA,axial span versus first two axes (>=30 deg; n=60),Regression R2,0.14285483,4.74991,0.01236,Threshold-aligned with the main analysis
-Shape-geometry,RBF-kPCA legacy gamma 0.25,axial span versus first two matched axes (>=30 deg; n=60),Regression R2,0.13911806,4.60558,0.01399,Threshold-aligned with the main analysis
-Shape-geometry,RBF-kPCA adaptive median-distance kernel,axial span versus first two matched axes (>=30 deg; n=60),Regression R2,0.05613439,1.69498,0.19273,Threshold-aligned with the main analysis
-Shape-geometry,Ordinary PCA,endpoint-equivalent axial pitch versus first two axes (>=30 deg; n=60),Regression R2,0.04032100,1.19743,0.30945,Derived variable; threshold-aligned
-Shape-geometry,RBF-kPCA legacy gamma 0.25,endpoint-equivalent axial pitch versus first two matched axes (>=30 deg; n=60),Regression R2,0.04168940,1.23984,0.29712,Derived variable; threshold-aligned
-Shape-geometry,RBF-kPCA adaptive median-distance kernel,endpoint-equivalent axial pitch versus first two matched axes (>=30 deg; n=60),Regression R2,0.05780980,1.74867,0.18321,Derived variable; threshold-aligned
