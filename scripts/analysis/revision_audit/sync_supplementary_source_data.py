@@ -2,7 +2,8 @@
 """Synchronize numbered supplementary-table payloads with robust analyses.
 
 The script keeps the atlas-only 15-tip shape analyses separate from the
-specimen-matched robust-geometry analyses (14 primary / 12 strict tips), adds
+specimen-matched robust-geometry analyses (14 main-dataset / 12
+high-confidence tips), adds
 an explicit ``quality_set`` column whenever both geometry-quality sets are
 combined, rebuilds the SHA-256 manifest, and removes workstation paths from
 released tree-robustness tables.
@@ -62,7 +63,12 @@ def sanitize_value(value: str) -> str:
 def write_csv(path: Path, fieldnames: list[str], rows: list[dict[str, str]]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8", newline="") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fieldnames, extrasaction="ignore")
+        writer = csv.DictWriter(
+            handle,
+            fieldnames=fieldnames,
+            extrasaction="ignore",
+            lineterminator="\n",
+        )
         writer.writeheader()
         for row in rows:
             writer.writerow({key: sanitize_value(row.get(key, "")) for key in fieldnames})
@@ -72,8 +78,8 @@ def combine(primary: Path, strict: Path, output: Path) -> None:
     p_fields, p_rows = read_csv(primary)
     s_fields, s_rows = read_csv(strict)
     fields = ["quality_set"] + list(dict.fromkeys(p_fields + s_fields))
-    rows = [dict(quality_set="primary_adequate", **row) for row in p_rows]
-    rows += [dict(quality_set="strict_good", **row) for row in s_rows]
+    rows = [dict(quality_set="main_dataset", **row) for row in p_rows]
+    rows += [dict(quality_set="high_confidence", **row) for row in s_rows]
     write_csv(output, fields, rows)
 
 
@@ -214,17 +220,19 @@ def main() -> None:
     # Table 13: all fits plus the explicitly defined main and high-confidence sets.
     t13 = source / "S02_Shape_Geometry"
     copy(screw / "robust_geometry_primary_adequate.csv", t13 / "specimen_level_screw_joint_geometry.csv")
-    for name in ("robust_geometry_all.csv", "robust_geometry_strict_good.csv", "robust_helix_metrics.csv"):
-        copy(screw / name, t13 / name)
+    copy(screw / "robust_geometry_all.csv", t13 / "robust_geometry_all.csv")
+    copy(screw / "robust_geometry_strict_good.csv", t13 / "robust_geometry_high_confidence.csv")
+    copy(screw / "robust_helix_metrics.csv", t13 / "robust_helix_metrics.csv")
 
     # Tables 14--17: canonical robust summaries and uncertainty propagation.
     for stale in (t13 / "Table_main_results.csv", t13 / "Table_regression_summary.csv"):
         if stale.exists():
             stale.unlink()
-    for name in ("main_results.csv", "main_results_strict_good.csv", "shape_model_uncertainty_summary.csv"):
-        copy(screw / name, t13 / name)
-    for name in ("regression_summary.csv", "regression_summary_strict_good.csv"):
-        copy(screw / name, t13 / name)
+    copy(screw / "main_results.csv", t13 / "main_results.csv")
+    copy(screw / "main_results_strict_good.csv", t13 / "main_results_high_confidence.csv")
+    copy(screw / "shape_model_uncertainty_summary.csv", t13 / "shape_model_uncertainty_summary.csv")
+    copy(screw / "regression_summary.csv", t13 / "regression_summary.csv")
+    copy(screw / "regression_summary_strict_good.csv", t13 / "regression_summary_high_confidence.csv")
 
     t16 = source / "S09_PCM_PGLS"
     combine(
@@ -248,11 +256,11 @@ def main() -> None:
     filter_shape_only(t19 / "pgls_results_main_traits.csv")
     copy(
         primary / "allometry/Allometry_Phylogenetic/pgls_results_main_traits.csv",
-        t19 / "pgls_geometry_main_traits_primary_adequate.csv",
+        t19 / "pgls_geometry_main_traits_main_dataset.csv",
     )
     copy(
         strict / "allometry/Allometry_Phylogenetic/pgls_results_main_traits.csv",
-        t19 / "pgls_geometry_main_traits_strict_good.csv",
+        t19 / "pgls_geometry_main_traits_high_confidence.csv",
     )
 
     # Tables 23--34: matched-tip PCM outputs for both quality definitions.
@@ -296,25 +304,36 @@ def main() -> None:
         if path.name != "_manifest.csv":
             sanitize_file(path)
 
+    # Remove superseded public aliases so they cannot re-enter the release manifest.
+    for stale in (
+        t13 / "robust_geometry_strict_good.csv",
+        t13 / "main_results_strict_good.csv",
+        t13 / "regression_summary_strict_good.csv",
+        t19 / "pgls_geometry_main_traits_primary_adequate.csv",
+        t19 / "pgls_geometry_main_traits_strict_good.csv",
+    ):
+        if stale.exists():
+            stale.unlink()
+
     titles = {
         "13": "Table 13: Specimen-level screw joint geometry measurements.",
-        "14": "Table 14: Main shape–geometry analysis results.",
-        "15": "Table 15: Regression summary for shape–geometry relationships.",
+        "14": "Table 14: Main shape-geometry analysis results.",
+        "15": "Table 15: Regression summary for shape-geometry relationships.",
         "16": "Table 16: Core PGLS relationships between shape and axial span.",
         "17": "Table 17: Screw joint geometry statistics by joint type.",
         "22": "Table 22: Phylogenetically informed allometry results.",
     }
     additions: dict[str, tuple[str, str]] = {}
-    for name in ("robust_geometry_all.csv", "robust_geometry_strict_good.csv", "robust_helix_metrics.csv"):
+    for name in ("robust_geometry_all.csv", "robust_geometry_high_confidence.csv", "robust_helix_metrics.csv"):
         additions[f"S02_Shape_Geometry/{name}"] = ("13", titles["13"])
-    for name in ("main_results.csv", "main_results_strict_good.csv", "shape_model_uncertainty_summary.csv"):
+    for name in ("main_results.csv", "main_results_high_confidence.csv", "shape_model_uncertainty_summary.csv"):
         additions[f"S02_Shape_Geometry/{name}"] = ("14", titles["14"])
-    for name in ("regression_summary.csv", "regression_summary_strict_good.csv"):
+    for name in ("regression_summary.csv", "regression_summary_high_confidence.csv"):
         additions[f"S02_Shape_Geometry/{name}"] = ("15", titles["15"])
     additions["S09_PCM_PGLS/pgls_shape_geometry_rubin_summary.csv"] = ("16", titles["16"])
     additions["S05_Joint_Typology/joint_type_uncertainty_summary.csv"] = ("17", titles["17"])
-    additions["S03_Allometry/pgls_geometry_main_traits_primary_adequate.csv"] = ("22", titles["22"])
-    additions["S03_Allometry/pgls_geometry_main_traits_strict_good.csv"] = ("22", titles["22"])
+    additions["S03_Allometry/pgls_geometry_main_traits_main_dataset.csv"] = ("22", titles["22"])
+    additions["S03_Allometry/pgls_geometry_main_traits_high_confidence.csv"] = ("22", titles["22"])
     rebuild_manifest(source, additions)
 
     print("Supplementary source data synchronized and manifest rebuilt.")

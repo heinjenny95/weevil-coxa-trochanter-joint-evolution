@@ -44,6 +44,7 @@ required <- c(
   file.path(source_dir, "ecology_tip_level_data.csv"),
   file.path(screw_dir, "shape_geometry_analysis_dataset.csv"),
   file.path(screw_dir, "robust_helix_metrics.csv"),
+  file.path(repo_root, "data", "metadata", "specimen_key.csv"),
   tree_file
 )
 missing_files <- required[!file.exists(required)]
@@ -64,7 +65,7 @@ read_mixed <- function(path) {
 }
 
 fmt_p <- function(x) {
-  if (is.na(x)) return("NA")
+  if (length(x) == 0 || is.na(x) || !is.finite(x)) return("NA")
   if (x < 0.001) return(format(x, scientific = TRUE, digits = 2))
   sprintf("%.3f", x)
 }
@@ -151,12 +152,30 @@ save_canonical <- function(plot, rel_base, width, height, tiff = FALSE) {
   invisible(base)
 }
 
+normalise_specimen_id <- function(x) {
+  x <- sub("_trochanter_mirrored_aligned$", "_aligned", x)
+  x <- sub("_trochanter_aligned$", "_aligned", x)
+  x <- sub("_mirrored_aligned$", "_aligned", x)
+  sub("pseudonastus", "pseudonasutus", x, fixed = TRUE)
+}
+
 allom <- read_mixed(file.path(source_dir, "allometry_merged_table.csv"))
+specimen_key <- read_mixed(file.path(repo_root, "data", "metadata", "specimen_key.csv")) %>%
+  transmute(join_key = normalise_specimen_id(specimen_id), taxon_binomial)
 shape <- read_mixed(file.path(screw_dir, "shape_geometry_analysis_dataset.csv"))
 shape <- shape %>%
   left_join(allom %>% select(specimen_id, Family, logCS), by = "specimen_id")
 metrics <- read_mixed(file.path(screw_dir, "robust_helix_metrics.csv")) %>%
-  left_join(allom %>% select(specimen_id, Family), by = "specimen_id")
+  left_join(allom %>% select(specimen_id, Family), by = "specimen_id") %>%
+  mutate(join_key = normalise_specimen_id(specimen_id)) %>%
+  left_join(specimen_key, by = "join_key") %>%
+  select(-join_key)
+if (anyNA(metrics$taxon_binomial)) {
+  stop(
+    "Missing taxon_binomial entries in data/metadata/specimen_key.csv for: ",
+    paste(metrics$specimen_id[is.na(metrics$taxon_binomial)], collapse = ", ")
+  )
+}
 uni_stats <- read_mixed(file.path(source_dir, "allometry_univariate_PC1_to_PC5_results.csv"))
 geom_stats <- read_mixed(file.path(source_dir, "allometry_continuous_traits_results.csv"))
 rrpp_stats <- read_mixed(file.path(source_dir, "allometry_rrpp_multivariate_results.csv"))
@@ -420,7 +439,7 @@ s10 <- (
     plot.margin = margin(8, 9, 7, 10)
   )
 save_repo(s10, "Supplementary_Fig_10_robust_geometry_QC.png", 11.8, 13.2)
-save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_PC1_PC5_vs_winding_angle_180mm", 7.09, 8.0)
+save_canonical(s10, "04_Supplementary_Figures/Supplementary_Fig_10_shape_geometry_fit_quality_diagnostics_180mm", 7.09, 8.0)
 
 # Supplementary Figure 11 ------------------------------------------------------
 axial_df <- allom %>% filter(!is.na(abs_winding_angle_deg), !is.na(axial_span), !is.na(axial_pitch_360))
@@ -541,25 +560,26 @@ s14 <- wrap_plots(s14_plots, ncol = 3)
 save_repo(s14, "Supplementary_Fig_14_robust_allometry.png", 13.2, 15.5)
 save_canonical(s14, "04_Supplementary_Figures/Supplementary_Fig_14_additional_specimen_allometry_180mm", 7.09, 8.3)
 
-# Supplementary Figures 16 and 17 ---------------------------------------------
+# Supplementary Figure 16 -----------------------------------------------------
 pgls_all <- read_mixed(file.path(screw_dir, "sensitivity", "pgls_primary_adequate.csv"))
 pgls_stat <- function(response, predictor) {
   r <- pgls_all %>% filter(.data$response == .env$response, .data$predictor == .env$predictor, term == .env$predictor) %>% slice(1)
   if (nrow(r) == 0) return("")
   sprintf("PGLS beta = %.3g; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s16_base <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", stats = pgls_stat("PC1","abs_winding_angle_deg")) +
+s16a <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", title = "a", stats = pgls_stat("PC1","abs_winding_angle_deg")) +
   theme(plot.margin = margin(18, 8, 9, 8))
-s17_base <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", stats = pgls_stat("PC1","axial_pitch_360")) +
+s16b <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", title = "b", stats = pgls_stat("PC1","axial_pitch_360")) +
   theme(plot.margin = margin(18, 8, 9, 8))
-s16 <- with_single_line_family_legend(s16_base + theme(legend.position = "none"), s16_base, legend_height = 0.075)
-s17 <- with_single_line_family_legend(s17_base + theme(legend.position = "none"), s17_base, legend_height = 0.075)
-save_repo(s16, "Supplementary_Fig_16_robust_PGLS_angle.jpg", 7.0, 5.4)
-save_repo(s17, "Supplementary_Fig_17_robust_PGLS_pitch.jpg", 7.0, 5.4)
-save_canonical(s16, "04_Supplementary_Figures/Supplementary_Fig_16_additional_PGLS_traits_I_180mm", 7.09, 5.1)
-save_canonical(s17, "04_Supplementary_Figures/Supplementary_Fig_17_additional_PGLS_traits_II_180mm", 7.09, 5.1)
+s16 <- (
+  (s16a + theme(legend.position = "none")) /
+    (s16b + theme(legend.position = "none")) /
+    wrap_elements(full = single_line_family_legend(s16a))
+) + plot_layout(heights = c(1, 1, 0.075))
+save_repo(s16, "Supplementary_Fig_16_robust_PGLS_geometry.jpg", 7.0, 8.0)
+save_canonical(s16, "04_Supplementary_Figures/Supplementary_Fig_16_PGLS_shape_vs_screw_geometry_180mm", 7.09, 7.7)
 
-# Supplementary Figure 18 ------------------------------------------------------
+# Supplementary Figure 17 ------------------------------------------------------
 tree_detail <- read_mixed(file.path(source_dir, "pgls_tree_variant_detail.csv")) %>%
   filter(model_type == "tree_variant", response == "PC1", predictor %in% c("abs_winding_angle_deg", "axial_span"), !is.na(estimate)) %>%
   mutate(
@@ -575,10 +595,10 @@ s18 <- ggplot(tree_detail, aes(estimate, tree_label, colour = tree_class)) +
   scale_colour_manual(values = tree_class_cols, na.value = "#8B9AA5") +
   labs(x = "PGLS slope estimate", y = NULL, colour = "Tree class") + theme_pub() +
   theme(legend.position="bottom", axis.text.y = element_text(size = 6.8))
-save_repo(s18, "Supplementary_Fig_18_robust_tree_PGLS.jpg", 12.8, 7.2)
-save_canonical(s18, "04_Supplementary_Figures/Supplementary_Fig_18_tree_sensitivity_PGLS_slopes_180mm", 7.09, 4.4)
+save_repo(s18, "Supplementary_Fig_17_robust_tree_PGLS.jpg", 12.8, 7.2)
+save_canonical(s18, "04_Supplementary_Figures/Supplementary_Fig_17_tree_sensitivity_PGLS_slopes_180mm", 7.09, 4.4)
 
-# Supplementary Figures 19 and 20 ---------------------------------------------
+# Supplementary Figures 18 and 19 ---------------------------------------------
 loo <- read_mixed(file.path(source_dir, "pgls_leave_one_out_detail.csv")) %>%
   filter(predictor == "axial_span", response %in% c("PC1", "PC2"), !is.na(estimate)) %>%
   mutate(
@@ -589,25 +609,34 @@ s19 <- ggplot(loo, aes(estimate, dropped_label, colour = response)) +
   geom_vline(xintercept = 0, linetype = "dashed", colour = bluegrey) + geom_point(size = 2.2) +
   facet_wrap(~response, ncol = 1, scales = "free_y") +
   scale_colour_manual(values = c(PC1 = teal, PC2 = coral), guide = "none") +
-  labs(x = "Slope after dropping one proxy tip", y = NULL) + theme_pub() + theme(axis.text.y = element_text(size=7))
+  labs(x = "Slope after dropping one proxy tip", y = NULL) + theme_pub() +
+  theme(axis.text.y = element_text(size = 7, face = "italic"))
 s20 <- ggplot(loo, aes(lambda, dropped_label, colour = response)) +
   geom_vline(xintercept = 1, linetype = "dashed", colour = bluegrey) + geom_point(size = 2.2) +
   facet_wrap(~response, ncol = 1, scales = "free_y") +
   scale_colour_manual(values = c(PC1 = teal, PC2 = coral), guide = "none") +
-  labs(x = "Estimated Pagel's lambda after dropping one proxy tip", y = NULL) + theme_pub() + theme(axis.text.y = element_text(size=7))
-save_repo(s19, "Supplementary_Fig_19_robust_LOO_slopes.jpg", 9.0, 9.5)
-save_repo(s20, "Supplementary_Fig_20_robust_LOO_lambda.jpg", 9.0, 9.5)
-save_canonical(s19, "04_Supplementary_Figures/Supplementary_Fig_19_leave_one_out_PGLS_slopes_180mm", 7.09, 7.1)
-save_canonical(s20, "04_Supplementary_Figures/Supplementary_Fig_20_leave_one_out_Pagels_lambda_180mm", 7.09, 7.1)
+  labs(x = "Estimated Pagel's lambda after dropping one proxy tip", y = NULL) + theme_pub() +
+  theme(axis.text.y = element_text(size = 7, face = "italic"))
+save_repo(s19, "Supplementary_Fig_18_robust_LOO_slopes.jpg", 9.0, 9.5)
+save_repo(s20, "Supplementary_Fig_19_robust_LOO_lambda.jpg", 9.0, 9.5)
+save_canonical(s19, "04_Supplementary_Figures/Supplementary_Fig_18_leave_one_out_PGLS_slopes_180mm", 7.09, 7.1)
+save_canonical(s20, "04_Supplementary_Figures/Supplementary_Fig_19_leave_one_out_Pagels_lambda_180mm", 7.09, 7.1)
 
-# Supplementary Figures 24 and 25 ---------------------------------------------
+# Supplementary Figures 23 and 24 ---------------------------------------------
 eco <- read_mixed(file.path(source_dir, "ecology_tip_level_data.csv"))
 eco_panel <- function(response, predictor, title, ylab, fill_cols) {
   dat <- eco %>% filter(!is.na(.data[[response]]), !is.na(.data[[predictor]]))
+  axis_labels <- if (identical(predictor, "woody_association_broad")) {
+    c(nonwoody = "Non-wood", woody = "Wood")
+  } else {
+    waiver()
+  }
   ggplot(dat, aes(.data[[predictor]], .data[[response]], fill = .data[[predictor]])) +
     geom_boxplot(width = 0.62, alpha = 0.88, outlier.shape = NA, colour = ink, linewidth = 0.6) +
     geom_point(position = position_jitter(width = 0.08, height = 0, seed = 20260811), size = 2.05, colour = ink, alpha = 1) +
-    scale_fill_manual(values = fill_cols) + labs(x = NULL, y = ylab, title = title) + theme_pub() +
+    scale_fill_manual(values = fill_cols) +
+    scale_x_discrete(labels = axis_labels) +
+    labs(x = NULL, y = ylab, title = title) + theme_pub() +
     theme(legend.position="none", axis.text.x = element_text(angle = 12, hjust = 1))
 }
 eco_figure <- function(response, ylab) {
@@ -618,19 +647,14 @@ eco_figure <- function(response, ylab) {
 }
 s24 <- eco_figure("abs_winding_angle_deg", "Absolute winding angle (degrees)")
 s25 <- eco_figure("axial_span", "Fitted axial span")
-save_repo(s24, "Supplementary_Fig_24_robust_ecology_angle.png", 11.8, 9.0)
-save_repo(s25, "Supplementary_Fig_25_robust_ecology_span.png", 11.8, 9.0)
-save_canonical(s24, "04_Supplementary_Figures/Supplementary_Fig_24_ecology_absolute_winding_angle_180mm", 7.09, 5.4)
-save_canonical(s25, "04_Supplementary_Figures/Supplementary_Fig_25_ecology_axial_span_180mm", 7.09, 5.4)
+save_repo(s24, "Supplementary_Fig_23_robust_ecology_angle.png", 11.8, 9.0)
+save_repo(s25, "Supplementary_Fig_24_robust_ecology_span.png", 11.8, 9.0)
+save_canonical(s24, "04_Supplementary_Figures/Supplementary_Fig_23_ecology_absolute_winding_angle_180mm", 7.09, 5.4)
+save_canonical(s25, "04_Supplementary_Figures/Supplementary_Fig_24_ecology_axial_span_180mm", 7.09, 5.4)
 
-# Supplementary Figure 28 ------------------------------------------------------
-short_specimen <- function(x) {
-  z <- sub("^[0-9]+_", "", x)
-  z <- sub("_trochanter_aligned$", "", z)
-  gsub("_", " ", z)
-}
+# Supplementary Figure 27 ------------------------------------------------------
 metrics <- metrics %>% mutate(
-  label = short_specimen(specimen_id),
+  label = taxon_binomial,
   quality_class = factor(
     recode(quality_class,
       good = "Good",
@@ -647,19 +671,19 @@ label_rms <- metrics %>% slice_max(helix_rms_relative_to_radius, n = 4, with_tie
 qcols <- c("Good" = teal, "Caution" = gold, "Limited identifiability" = coral)
 s28a <- ggplot(metrics, aes(released_abs_winding_angle_deg, abs_winding_angle_deg, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
-  geom_text_repel(data=label_angle,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  geom_text_repel(data=label_angle,aes(label=label),size=2.2,fontface="italic",max.overlaps=Inf,box.padding=.25,seed=20260811) +
   scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="a", x="Released winding angle (degrees)",y="Robust fitted angle (degrees)") + theme_pub() + theme(legend.position="none")
 s28b <- ggplot(metrics, aes(released_endpoint_equivalent_pitch_360, fitted_pitch_360, colour = quality_class)) +
   geom_abline(slope=1,intercept=0,linetype="dashed",colour=bluegrey) + geom_point(size=2) +
-  geom_text_repel(data=label_pitch,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  geom_text_repel(data=label_pitch,aes(label=label),size=2.2,fontface="italic",max.overlaps=Inf,box.padding=.25,seed=20260811) +
   scale_x_log10() + scale_y_log10() + scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) +
   labs(tag="b", x="Released endpoint-equivalent pitch",y="Robust fitted pitch") + theme_pub() + theme(legend.position="none")
 s28c <- ggplot(metrics, aes(abs_winding_angle_deg, axial_angle_r_squared, colour = quality_class)) + geom_point(size=2) +
-  geom_text_repel(data=label_quality,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  geom_text_repel(data=label_quality,aes(label=label),size=2.2,fontface="italic",max.overlaps=Inf,box.padding=.25,seed=20260811) +
   scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="c", x="Robust fitted angle (degrees)",y="Axial-angular R2") + theme_pub() + theme(legend.position="none")
 s28d <- ggplot(metrics, aes(abs_winding_angle_deg, helix_rms_relative_to_radius, colour = quality_class)) + geom_point(size=2) +
   geom_hline(yintercept=.10,linetype="dashed",colour=coral) +
-  geom_text_repel(data=label_rms,aes(label=label),size=2.2,max.overlaps=Inf,box.padding=.25,seed=20260811) +
+  geom_text_repel(data=label_rms,aes(label=label),size=2.2,fontface="italic",max.overlaps=Inf,box.padding=.25,seed=20260811) +
   scale_colour_manual(values=qcols, name="Fit quality", drop=FALSE) + labs(tag="d", x="Robust fitted angle (degrees)",y="Helix RMS / fitted radius") + theme_pub() + theme(legend.position="none")
 s28_legend_plot <- ggplot(
   data.frame(
@@ -682,7 +706,7 @@ s28_legend_plot <- ggplot(
 s28_legend <- cowplot::get_legend(s28_legend_plot)
 s28 <- ((s28a | s28b) / (s28c | s28d) / wrap_elements(full = s28_legend)) +
   plot_layout(heights = c(1, 1, 0.075))
-save_repo(s28, "Supplementary_Fig_28_robust_fit_audit.png", 12.2, 10.4)
-save_canonical(s28, "04_Supplementary_Figures/Supplementary_Fig_28_screw_geometry_quality_control_180mm", 7.09, 6.0)
+save_repo(s28, "Supplementary_Fig_27_robust_fit_audit.png", 12.2, 10.4)
+save_canonical(s28, "04_Supplementary_Figures/Supplementary_Fig_27_screw_geometry_quality_control_180mm", 7.09, 6.0)
 
 message("Publication-style robust figures written to: ", normalizePath(out_dir, winslash = "/", mustWork = TRUE))

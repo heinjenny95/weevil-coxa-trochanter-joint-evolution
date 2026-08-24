@@ -1,0 +1,16 @@
+tree_label,PC1,PC2,centroid_size,family,tree_tip,n_specimens,host_lineage_broad,wood_association_broad,larval_lifestyle_broad,fungal_association_broad
+Curculionidae___Dendroctonus,-0.0445675533991518,0.00869959195241613,222.01237776627,Curculionidae,Dendroctonus,3,,wood,internal,
+Curculionidae___Ips,-0.0185701756517761,-0.0198082851151856,188.2590905499,Curculionidae,Ips,3,angiosperm,wood,internal,yes
+Curculionidae___Nedyus,-0.0567168164023641,0.023456447120256,208.559734753387,Curculionidae,Nedyus,6,angiosperm,non-wood,other,no
+Curculionidae___Curculio,-0.0626916851644466,0.000247581829502192,217.928683868789,Curculionidae,Curculio,13,angiosperm,,other,no
+Curculionidae___Larinus,-0.121410970616135,-0.0408821023951989,278.838051001576,Curculionidae,Larinus,7,angiosperm,,internal,no
+Curculionidae___Diaprepes,-0.0616967034656656,-0.0595666505923478,233.803706583558,Curculionidae,Diaprepes,12,angiosperm,non-wood,other,no
+Curculionidae___Oxoplatypus,-0.0393689934749423,-0.0262890418285976,189.265732370854,Curculionidae,Oxoplatypus,1,angiosperm,wood,internal,yes
+Curculionidae___Sitophilus,-0.121742540424842,-0.0340133949551881,236.642014895252,Curculionidae,Sitophilus,3,angiosperm,,internal,no
+Brentidae___Nanophyes,0.29491134540487,-0.122287184474699,159.270738007947,Brentidae,Nanophyes,2,angiosperm,non-wood,internal,no
+Brentidae___Arrhenodes,0.267904544705844,-0.110473779862832,248.973452233583,Brentidae,Arrhenodes,6,angiosperm,non-wood,internal,no
+Caridae___Car,-0.0163459772431715,0.205849960175507,111.757409872142,Caridae,Car,1,gymnosperm,wood,internal,no
+Attelabidae___Synolabus,0.0590264612445578,0.0411855870200834,206.388256808391,Attelabidae,Synolabus,4,angiosperm,non-wood,other,no
+Belidae___Agnesiotis,0.014880177258265,0.0715334967448723,94.817756709851,Belidae,Agnesiotis,1,,,,
+Anthribidae___Euparius,0.11974365496382,0.32958560768065,104.311290292066,Anthribidae,Euparius,4,,,internal,
+Nemonychidae___Rhynchitomacerinus,0.149003935455337,0.168797455760859,95.3340964190101,Nemonychidae,Rhynchitomacerinus,2,gymnosperm,wood,internal,no

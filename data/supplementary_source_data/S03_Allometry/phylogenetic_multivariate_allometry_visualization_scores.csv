@@ -1,4 +1,4 @@
-tree_label,level,label,log_centroid_size,multivariate_allometry_score,n_specimens,Family
+tree_label,level,label,log_centroid_size,multivariate_allometry_score,n_specimens,family
 Curculionidae___Nedyus,specimen,15_mononychus_punctumalbum_trochanter_aligned,5.78710328690317,0.0440608729911452,1,Curculionidae
 Anthribidae___Euparius,specimen,240_anthribus_nebulosus_trochanter_aligned,4.76788743938928,-0.244588847063961,1,Anthribidae
 Nemonychidae___Rhynchitomacerinus,specimen,291_basilogeus_dacrycarpi_trochanter_aligned,3.77200317270571,-0.194765953949639,1,Nemonychidae

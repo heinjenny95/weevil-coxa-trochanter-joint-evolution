@@ -13,7 +13,8 @@ consistency corrections.
 
 ## `metadata`
 
-- `specimen_key.csv`: corrected specimen metadata. Human-readable taxonomy uses
+- `specimen_key.csv`: analysis identifiers and coded analytical variables.
+  Human-readable taxonomy uses
   *Rhynchites cupreus* and the phylogeny display label uses *Nedyus*.
 - `taxonomic_proxy_mapping.csv`: explicit mapping of 68 specimens to the 15
   taxonomic proxy tips used by the comparative analyses. Five specimens have an
@@ -30,14 +31,16 @@ consistency corrections.
 - `robust_helix_point_residuals.csv`: point-level radial, axial and combined
   residuals for the fitted trajectory.
 - `robust_geometry_all.csv`, `robust_geometry_primary_adequate.csv` and
-  `robust_geometry_strict_good.csv`: downstream-compatible tables for all 64,
-  the primary 63 and the strict 53 trajectories.
+  `robust_geometry_strict_good.csv`: downstream-compatible internal tables for
+  all 64 fits, the 63-specimen main dataset and the 53-specimen
+  high-confidence subset. The historical internal suffixes are mapped to the
+  manuscript terminology in the released supplementary-source tables.
 - `geometry_sample_flow.csv`, `shape_geometry_analysis_dataset.csv`,
   `regression_summary.csv`, `main_results.csv`,
   `joint_type_geometry_stats.csv` and
   `specimen_level_screw_joint_geometry.csv`: main-dataset downstream outputs.
-  Files with the `_strict_good` suffix provide the corresponding quality
-  sensitivity where applicable.
+  Internal files with the `_strict_good` suffix provide the corresponding
+  high-confidence sensitivity where applicable.
 - `shape_model_uncertainty_summary.csv`,
   `shape_coefficients_rubin_summary.csv`,
   `joint_type_uncertainty_summary.csv`,
@@ -58,18 +61,17 @@ consistency corrections.
   strict shape-geometry sensitivity outputs.
 - `sensitivity/`: matched-tip PGLS, alternative-tree and leave-one-out
   summaries plus primary/strict allometry and ecology tables.
-- `winding_metrics.csv`, `winding_metrics_legacy_endpoint_axis.csv` and
-  `geometry_cutoff_sensitivity.csv`: legacy endpoint-axis outputs retained for
-  numerical audit, not the current primary geometry analysis.
+- `winding_metrics.csv` and `winding_metrics_legacy_endpoint_axis.csv`: legacy
+  endpoint-axis outputs retained for numerical audit, not the current robust
+  geometry analysis.
 
 ## `morphospace`
 
 - `kPCA_sensitivity_summary.csv` and
-  `kPCA_shape_geometry_regressions.csv`: legacy threshold-aligned ordinary-PCA
-  and kernel-PCA sensitivity results using the >=30-degree, n = 60 subset.
-  These tables audit the historical atlas-momenta ordination and are not used
-  to support the robust helix-fit results. The repository includes the kPCA
-  workflow, ordered atlas dataset and exact Deformetrica configuration;
+  `kPCA_shape_geometry_regressions.csv`: ordination-sensitivity outputs for
+  ordinary PCA and kernel PCA. Geometry-related historical outputs are kept
+  separate from the current robust helix-fit evidence. The repository includes
+  the kPCA workflow, ordered atlas dataset and exact Deformetrica configuration;
   regenerated momenta can be produced by rerunning that atlas workflow on the
   deposited meshes.
 

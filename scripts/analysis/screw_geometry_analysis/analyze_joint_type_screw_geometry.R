@@ -31,8 +31,7 @@
 #
 # Important:
 # - Uses ABSOLUTE winding angle for all biological analyses
-# - Filters out angle < 30 degrees by default, because those cases do not
-#   represent robust screw-like geometry and destabilize pitch estimates
+# - Uses upstream robust-helix quality definitions without an angular cutoff
 # ============================================================
 
 rm(list = ls())
@@ -59,9 +58,6 @@ out_fig_pdf <- file.path(out_dir, "joint_type_screw_geometry_1x3.pdf")
 
 out_stats_csv <- file.path(out_dir, "joint_type_screw_geometry_stats.csv")
 out_plotdata_csv <- file.path(out_dir, "joint_type_screw_geometry_plotdata.csv")
-
-# ------------------- SETTINGS -------------------
-ANGLE_CUTOFF_DEG <- 30
 
 # ------------------- PACKAGES -------------------
 pkgs <- c("ggplot2", "FSA", "vegan", "patchwork", "dplyr")
@@ -281,9 +277,6 @@ typ  <- read_csv_robust(type_path)
 
 names(geom) <- clean_str(names(geom))
 names(typ)  <- clean_str(names(typ))
-robust_fitted_pitch_present <- any(c("fitted_pitch_360", "axial_pitch_360") %in% names(geom))
-if (robust_fitted_pitch_present) ANGLE_CUTOFF_DEG <- 0
-
 # ------------------- CHECK REQUIRED COLUMNS -------------------
 req_geom <- c("specimen_id", "abs_winding_angle_deg", "start_end_dist", "axial_span")
 req_typ  <- c("specimen_id", "joint_type", "screw_state")
@@ -366,20 +359,11 @@ df <- df_all %>%
 cat("\n==============================\n")
 cat("SCREW-GEOMETRY ANALYSIS SUBSET (ONLY screw joints)\n")
 cat("==============================\n")
-cat("Rows kept before angle cutoff:", nrow(df), "\n")
+cat("Rows retained for joint-type analysis:", nrow(df), "\n")
 
 excluded <- setdiff(unique(df_all$joint_type), unique(df$joint_type))
 cat("\nExcluded joint types (non-screw) that had geometry entries:\n")
 if (length(excluded) == 0) cat("None.\n") else print(excluded)
-
-# ------------------- ANGLE CUTOFF -------------------
-# Important:
-# The 30-degree cutoff applies only to legacy endpoint-derived pitch. Robust
-# input has already been selected by upstream helix model adequacy.
-df <- df %>%
-  filter(abs_winding_angle_deg >= ANGLE_CUTOFF_DEG)
-
-cat("\nRows kept after angle cutoff (>= ", ANGLE_CUTOFF_DEG, " degrees): ", nrow(df), "\n", sep = "")
 
 if (nrow(df) < 3) stop("Too few screw joint rows after filtering.")
 

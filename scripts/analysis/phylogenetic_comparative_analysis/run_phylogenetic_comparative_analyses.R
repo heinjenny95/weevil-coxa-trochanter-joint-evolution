@@ -2311,6 +2311,7 @@ write_clean_csv(
 
 robust_evol_summary <- robust_evol_models %>%
   dplyr::filter(!is.na(best_model)) %>%
+  dplyr::distinct(tree_id, trait, best_model) %>%
   dplyr::count(trait, best_model, name = "n_trees") %>%
   dplyr::group_by(trait) %>%
   dplyr::mutate(prop_trees = n_trees / sum(n_trees)) %>%

@@ -5,7 +5,7 @@ whether trochanter shape and screw-geometry variables scale with centroid
 size.
 
 - `allometry_full_workflow.R`
-  merges specimen metadata, PCA scores, centroid size and screw-geometry
+  merges analysis identifiers, PCA scores, centroid size and screw-geometry
   measurements; runs univariate analyses and the primary multivariate RRPP
   test across all non-zero atlas PC axes; and exports diagnostic tables and
   plots. The PC1-PC5 model is retained as an anatomical sensitivity analysis,
