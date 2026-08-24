@@ -78,11 +78,11 @@ consistency corrections.
 ## `phylogeny`
 
 - `P01_Trees/`: primary and source tree variants supplied with the study. The
-  comparative results remain conditional on the documented 15-tip taxonomic
-  proxy mapping. `15_calibration_sensitivity_root195_curculionidae151.tre` is a
-  deterministic updated-calibration sensitivity tree; its constraint and fit-
-  diagnostic CSVs are stored beside it. It is not substituted silently for the
-  archived primary tree.
+  topology-based `01_primary_tree_grafen.tre` is the primary working phylogeny;
+  its branch lengths are not interpreted as divergence times. Comparative
+  results remain conditional on the documented 15-tip taxonomic proxy mapping.
+  Calibrated 170, 195 and historical 223 Ma representations are retained only
+  as labelled sensitivity trees.
 
 The identifiers for *Lissorhoptrus oryzophilus*, *Ormiscus saltator* and
 *Tropiphorus pseudonasutus* are normalized to the atlas/PCA spellings. Current

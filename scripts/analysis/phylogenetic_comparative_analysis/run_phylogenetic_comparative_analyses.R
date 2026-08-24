@@ -71,7 +71,7 @@ input_dir <- Sys.getenv(
 )
 tree_file <- Sys.getenv(
   "WEV_TREE_FILE",
-  unset = file.path(input_dir, "curc_fig1_withCaridae_calibrated_Grafen.tre")
+  unset = file.path(input_dir, "curc_fig1_grafen_withCaridae_correct.tre")
 )
 tree_variant_dir <- Sys.getenv(
   "WEV_TREE_VARIANT_DIR",
@@ -98,9 +98,13 @@ tree_variant_files <- c(
   grafen = "curc_fig1_grafen.tre",
   with_caridae_ml = "curc_fig1_withCaridae_ML.tre",
   with_caridae_calibrated = "curc_fig1_withCaridae_calibrated.tre",
-  with_caridae_calibrated_grafen = "curc_fig1_withCaridae_calibrated_Grafen.tre",
   ultrametric_with_caridae = "curc_fig1_ultrametric_withCaridae_correct.tre",
-  grafen_with_caridae = "curc_fig1_grafen_withCaridae_correct.tre"
+  grafen_with_caridae = "curc_fig1_grafen_withCaridae_correct.tre",
+  historical_223_calibration = "candidate_historical_223.tre",
+  fixed_195_calibration = "candidate_fixed_195.tre",
+  interval_157_3_195_calibration = "candidate_interval_157_3_195.tre",
+  interval_157_3_170_calibration = "candidate_interval_157_3_170.tre",
+  interval_157_3_223_calibration = "candidate_interval_157_3_223.tre"
 )
 
 tree_outgroup_label <- "Nemonychidae___Rhynchitomacerinus"
@@ -532,6 +536,18 @@ standardize_tree_labels <- function(tree) {
 safe_root_tree <- function(tree, outgroup_label) {
   tree <- standardize_tree_labels(tree)
   if (!outgroup_label %in% tree$tip.label) return(tree)
+
+  # Avoid re-rooting a tree that is already rooted directly on the requested
+  # outgroup. ape::root() preserves its covariance matrix in this case, but it
+  # can reorder the internal representation in a way that causes fastAnc() to
+  # fail for otherwise valid complete traits.
+  if (ape::is.rooted(tree)) {
+    root_node <- ape::Ntip(tree) + 1L
+    outgroup_tip <- match(outgroup_label, tree$tip.label)
+    root_children <- tree$edge[tree$edge[, 1] == root_node, 2]
+    if (outgroup_tip %in% root_children) return(tree)
+  }
+
   tryCatch(
     ape::root(tree, outgroup = outgroup_label, resolve.root = TRUE),
     error = function(e) tree
@@ -600,7 +616,7 @@ build_tree_variant_set <- function(
     invisible(NULL)
   }
 
-  add_variant(reference_tree, "working_tree", tree_file, "working", "Primary tree used in main PCM workflow.")
+  add_variant(reference_tree, "working_tree", tree_file, "working", "Topology-based Grafen primary working tree; branch lengths are not interpreted as divergence times.")
 
   for (variant_id in names(tree_variant_files)) {
     path_i <- file.path(tree_variant_dir, tree_variant_files[[variant_id]])
@@ -2205,6 +2221,10 @@ if (!exists("tree_variant_metadata") || !is.data.frame(tree_variant_metadata)) {
 
 extract_root_fastAnc <- function(tree, trait_vec, trait_name) {
   tmp <- safe_fastAnc(tree, trait_vec, trait_name)
+  finite_tip_count <- sum(
+    names(trait_vec) %in% tree$tip.label & is.finite(as.numeric(trait_vec)),
+    na.rm = TRUE
+  )
   if (is.null(tmp) || nrow(tmp) == 0) {
     return(tibble::tibble(
       trait = trait_name,
@@ -2213,12 +2233,20 @@ extract_root_fastAnc <- function(tree, trait_vec, trait_name) {
       variance = NA_real_,
       CI95_lower = NA_real_,
       CI95_upper = NA_real_,
-      root_node_expected = as.character(ape::Ntip(tree) + 1),
+      trait_n_tips = finite_tip_count,
+      root_node_expected = as.character(finite_tip_count + 1),
       matched_root = FALSE
     ))
   }
 
-  root_node_expected <- as.character(ape::Ntip(tree) + 1)
+  # safe_fastAnc() prunes tips with missing values before reconstructing the
+  # trait. Node numbers therefore refer to the trait-specific pruned tree, not
+  # necessarily to the full tree variant. In an ape phylo object the root is
+  # the first internal node, Ntip + 1. Derive it from the returned node labels
+  # so geometry traits with missing proxy tips are not assigned a descendant
+  # node as their apparent root.
+  returned_nodes <- suppressWarnings(as.integer(tmp$node))
+  root_node_expected <- as.character(min(returned_nodes, na.rm = TRUE))
   root_row <- tmp %>%
     dplyr::filter(node == root_node_expected)
 
@@ -2226,6 +2254,7 @@ extract_root_fastAnc <- function(tree, trait_vec, trait_name) {
 
   root_row %>%
     dplyr::mutate(
+      trait_n_tips = finite_tip_count,
       root_node_expected = root_node_expected,
       matched_root = node == root_node_expected
     )

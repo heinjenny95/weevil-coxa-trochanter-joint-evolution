@@ -36,14 +36,15 @@ repeatability of manual semilandmark placement.
    adjusted p = 1.0).
 4. **Phylogenetic shape-geometry results are exploratory trends, not robust
    positive tests.** With matched specimen sets aggregated to 14 main-dataset or
-   12 high-confidence proxy tips, PC1 ~ winding angle gave p = 0.0543 in the selected
-   tree for the main dataset and p = 0.150 in the high-confidence subset. The slope was negative across all
-   main-dataset tree variants, but none of the 13 tree-specific tests survived FDR
-   correction; only 3/13 trees were nominally significant in the high-confidence subset.
-   PC1 ~ axial span was supported on the selected tree for the main dataset (p = 0.0394) but not in
-   the high-confidence subset (p = 0.137), and its significance changed under both tree
-   choice and leave-one-tip-out sensitivity. PC1 ~ fitted pitch was unsupported
-   in the main and high-confidence analyses (p = 0.165 and 0.519).
+   12 high-confidence proxy tips, PC1 ~ winding angle gave raw p = 0.065 on the
+   topology-based Grafen primary tree and did not survive FDR correction. The
+   main-dataset slope was negative across all 15 topology and branch-length
+   representations, but none of the 15 tree-specific tests survived FDR correction.
+   PC1 ~ axial span was nominally supported on the Grafen primary tree for the
+   main dataset (raw p = 0.039, FDR-adjusted p = 0.177) but not in the
+   high-confidence subset (raw p = 0.205, FDR-adjusted p = 0.364), and its
+   significance changed under both tree choice and leave-one-tip-out sensitivity.
+   PC1 ~ fitted pitch was likewise unsupported after correction.
 5. **Joint-type comparisons have strongly unequal group sizes.** The main
    screw joint subset contains 57 true screw-and-nut joints and only 3 unopposed screw
    configurations. Winding angle differs nominally in this unbalanced sample
@@ -51,11 +52,14 @@ repeatability of manual semilandmark placement.
    set contains 51 versus 1 specimen, so inferential group tests are invalid.
    The joint-type result must therefore be described as exploratory and
    unstable rather than as a general group difference.
-6. **No ecological association survives multiplicity correction.** Across
-   broad host lineage, wood association, larval lifestyle and fungal
-   association factors, all ecology PGLS and phylogenetic-ANOVA results were
-   FDR-nonsignificant. A few nominal high-confidence results were dependent on the
-   response, model and uncertainty treatment and are not robust discoveries.
+6. **Ecological results depend on model and sampling balance.** Under the Grafen
+   primary tree, host lineage was FDR-supported in the PGLS analyses for PC2 and
+   centroid size, whereas the companion phylogenetic ANOVA did not survive
+   correction. A main-dataset winding-angle/fungal-association PGLS was also
+   FDR-supported, but the comparison contained only nine versus two proxy tips,
+   was absent from the high-confidence result and was unsupported by the companion
+   phylogenetic ANOVA. These results are reported as method-, tree- and
+   imbalance-sensitive associations rather than robust ecological discoveries.
 
 ## Rejected or limited analyses
 

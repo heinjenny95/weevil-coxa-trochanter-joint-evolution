@@ -1,3 +1,3 @@
-﻿"term";"estimate";"std_error";"statistic";"p_value";"response";"predictor";"n_taxa";"lambda";"predictor_type";"fdr_p_value"
-"axial_span";"-0,7550428533834758";"0,326630999980135";"-2,3116080636234613";"0,0393613576518326";"PC1";"axial_span";"14";"1";"continuous";"0,149301701437986"
-"axial_span";"-0,0357653406602427";"0,391829065924888";"-0,0912779162409018";"0,9287777693868099";"PC2";"axial_span";"14";"1";"continuous";"0,954711370433152"
+term,estimate,std_error,statistic,p_value,response,predictor,n_taxa,lambda,predictor_type,fdr_p_value
+axial_span,-0.4726030912215560,0.203700950246091,-2.320082899223615,0.0387613845505988,PC1,axial_span,14,1,continuous,0.177403778122431
+axial_span,0.0703430400054208,0.213875788955765,0.328896694426547,0.7479026963351788,PC2,axial_span,14,1,continuous,0.831002995927976

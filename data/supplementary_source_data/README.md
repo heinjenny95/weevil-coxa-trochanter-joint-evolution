@@ -11,8 +11,9 @@ definitions include an explicit `quality_set` column; phylogenetic geometry
 tables likewise distinguish the 14-tip main and 12-tip high-confidence matched
 datasets. Atlas-only shape analyses retain their documented 15-tip scope.
 
-`S11_Robustness/Calibration_Sensitivity/` documents the provenance of the
-historical 223 Ma calibration ceiling and contains primary-versus-195 Ma reruns
+`S11_Robustness/Calibration_Sensitivity/` documents why the historical 223 Ma
+tree was replaced by a topology-based Grafen primary working tree and contains
+comparisons across calibrated and alternative branch-length representations
 for phylogenetic signal, evolutionary models, predictor slopes, continuous
 ancestral states and ecological tests. These files supplement the numbered
 robustness tables without creating an additional Supplementary Table number.

@@ -78,6 +78,8 @@ root with:
 ```text
 Rscript scripts/analysis/figure_rendering/render_foundational_publication_figures.R
 Rscript scripts/analysis/screw_geometry_analysis/render_publication_style_figures.R
+Rscript scripts/analysis/figure_rendering/render_supplementary_figure_7.R <REPOSITORY_ROOT> [<MANUSCRIPT_ROOT>]
+Rscript scripts/analysis/figure_rendering/render_supplementary_figure_15.R <REPOSITORY_ROOT> <PCM_MAIN_OUTPUT> [<MANUSCRIPT_ROOT>]
 ```
 
 The intended generic project layout is:
@@ -105,6 +107,13 @@ use only matched qualifying specimens and therefore contain 14 main-dataset or
 12 high-confidence proxy tips. Results are reported across alternative trees
 because the backbone is not sufficiently resolved to support
 topology-independent claims.
+
+The primary comparative tree is `data/phylogeny/P01_Trees/01_primary_tree_grafen.tre`.
+Its Grafen branch lengths encode relative node depth and are not geological
+ages. Fourteen additional topology and branch-length representations, including
+the archived historical 223 Ma calibration and alternative calibration
+settings, are retained for sensitivity analyses; no divergence-time estimate is
+made from these trees.
 
 ### Allometry analysis scope
 

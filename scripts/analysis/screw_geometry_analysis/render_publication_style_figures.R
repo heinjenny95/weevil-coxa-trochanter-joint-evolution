@@ -26,7 +26,7 @@ dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
 source_dir <- file.path(repo_root, "data", "screw_geometry", "figure_source_data")
 screw_dir <- file.path(repo_root, "data", "screw_geometry")
-tree_file <- file.path(repo_root, "data", "phylogeny", "P01_Trees", "01_primary_tree_calibrated_grafen.tre")
+tree_file <- file.path(repo_root, "data", "phylogeny", "P01_Trees", "01_primary_tree_grafen.tre")
 style_file <- file.path(repo_root, "scripts", "analysis", "figure_rendering", "publication_style.R")
 source(style_file)
 set.seed(20260811)
@@ -315,11 +315,17 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   if (kind == "png") png(device_path, width = width, height = height, units = "in", res = dpi, bg = "white", type = "cairo")
   if (kind == "jpeg") jpeg(device_path, width = width, height = height, units = "in", res = dpi, bg = "white", quality = 96)
   on.exit(dev.off(), add = TRUE)
-  layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1.08,1,1), heights = c(1,1,1))
+  layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1.18,0.95,0.95), heights = c(1,1,1))
   par(mar = c(1.0, 0.4, 2.4, 0.4), oma = c(0.5, 0.2, 0.5, 0.2), family = "sans", fg = ink, col.axis = ink, col.lab = ink)
   par(mar = c(0.5, 0.2, 1.7, 0.2))
-  plot(asr_tree, show.tip.label = TRUE, tip.color = "#000000", cex = 0.58, label.offset = 2.5, edge.color = "#A7B8C2", no.margin = FALSE)
+  tip_depth <- max(node.depth.edgelength(asr_tree))
+  plot(asr_tree, show.tip.label = FALSE, edge.color = "#A7B8C2", no.margin = FALSE, x.lim = c(0, 1.92 * tip_depth))
   tiplabels(pch = 16, col = "#000000", cex = 0.62)
+  tip_y <- seq.int(Ntip(asr_tree), 1)
+  tip_family <- sub("___.*$", "", asr_tree$tip.label)
+  tip_genus <- sub("^.*___", "", asr_tree$tip.label)
+  text(1.05 * tip_depth, tip_y, labels = tip_family, pos = 4, offset = 0, cex = 0.52, col = ink)
+  text(1.48 * tip_depth, tip_y, labels = tip_genus, pos = 4, offset = 0, cex = 0.52, col = ink, font = 3)
   title(main = "a   Reference phylogeny", adj = 0, line = 0.25, cex.main = 0.86, col.main = ink)
   for (i in seq_along(asr_maps)) {
     plot(asr_maps[[i]], legend = FALSE, ftype = "off", lwd = 3.0, outline = FALSE, mar = c(0.5,0.2,1.7,0.2), direction = "rightwards")
@@ -479,13 +485,14 @@ save_canonical(s11, "04_Supplementary_Figures/Supplementary_Fig_11_axial_screw_g
 # Supplementary Figure 12 ------------------------------------------------------
 tip_df <- read_mixed(file.path(source_dir, "pcm_tip_level_data.csv"))
 pgls_span <- read_mixed(file.path(source_dir, "pgls_core_axial_span.csv"))
+tip_span_df <- tip_df %>% filter(!is.na(axial_span), !is.na(PC1), !is.na(PC2))
 pgls_label <- function(response, predictor) {
   r <- pgls_span %>% filter(.data$response == .env$response, .data$predictor == .env$predictor) %>% slice(1)
   if (nrow(r) == 0) return("")
   sprintf("PGLS beta = %.3f; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s12a <- lm_panel(tip_df, "axial_span", "PC1", "Fitted axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
-s12b <- lm_panel(tip_df, "axial_span", "PC2", "Fitted axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
+s12a <- lm_panel(tip_span_df, "axial_span", "PC1", "Fitted axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
+s12b <- lm_panel(tip_span_df, "axial_span", "PC2", "Fitted axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
 s12 <- with_single_line_family_legend(
   (s12a + theme(legend.position = "none")) | (s12b + theme(legend.position = "none")),
   s12a
@@ -567,9 +574,10 @@ pgls_stat <- function(response, predictor) {
   if (nrow(r) == 0) return("")
   sprintf("PGLS beta = %.3g; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s16a <- lm_panel(tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", title = "a", stats = pgls_stat("PC1","abs_winding_angle_deg")) +
+pgls_geometry_tip_df <- tip_df %>% filter(!is.na(PC1), !is.na(abs_winding_angle_deg), !is.na(axial_pitch_360))
+s16a <- lm_panel(pgls_geometry_tip_df, "abs_winding_angle_deg", "PC1", "Absolute fitted winding angle (degrees)", "PC1", title = "a", stats = pgls_stat("PC1","abs_winding_angle_deg")) +
   theme(plot.margin = margin(18, 8, 9, 8))
-s16b <- lm_panel(tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", title = "b", stats = pgls_stat("PC1","axial_pitch_360")) +
+s16b <- lm_panel(pgls_geometry_tip_df, "axial_pitch_360", "PC1", "Fitted axial pitch per 360-degree turn", "PC1", title = "b", stats = pgls_stat("PC1","axial_pitch_360")) +
   theme(plot.margin = margin(18, 8, 9, 8))
 s16 <- (
   (s16a + theme(legend.position = "none")) /
@@ -584,7 +592,24 @@ tree_detail <- read_mixed(file.path(source_dir, "pgls_tree_variant_detail.csv"))
   filter(model_type == "tree_variant", response == "PC1", predictor %in% c("abs_winding_angle_deg", "axial_span"), !is.na(estimate)) %>%
   mutate(
     predictor_label = recode(predictor, abs_winding_angle_deg = "PC1 ~ winding angle", axial_span = "PC1 ~ fitted axial span"),
-    tree_label = gsub("_", " ", tree_id),
+    tree_label = recode(
+      tree_id,
+      working_tree = "Grafen primary",
+      ml_unrooted = "ML unrooted",
+      consensus_unrooted = "Consensus unrooted",
+      rooted_ml = "Rooted ML",
+      ultrametric = "Ultrametric",
+      grafen = "Grafen (without Caridae)",
+      with_caridae_calibrated = "Calibrated with Caridae",
+      ultrametric_with_caridae = "Ultrametric with Caridae",
+      historical_223_calibration = "Historical 223 Ma calibration",
+      fixed_195_calibration = "Fixed 195 Ma calibration",
+      interval_157_3_195_calibration = "Interval 157.3-195 Ma",
+      interval_157_3_170_calibration = "Interval 157.3-170 Ma",
+      interval_157_3_223_calibration = "Interval 157.3-223 Ma",
+      grafen_power_0_5 = "Grafen power 0.5",
+      grafen_power_2 = "Grafen power 2"
+    ),
     tree_class = recode(variant_group, working = "Working tree", existing_file = "Existing tree", generated_branch_lengths = "Generated branch lengths")
   )
 tree_class_cols <- c("Working tree" = teal, "Existing tree" = bluegrey, "Generated branch lengths" = coral)

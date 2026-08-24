@@ -24,7 +24,7 @@ pcm_tip_path <- Sys.getenv(
 )
 tree_path <- Sys.getenv(
   "WEV_TREE_FILE",
-  unset = file.path(project_root, "analysis_data", "Input", "curc_fig1_withCaridae_calibrated_Grafen.tre")
+  unset = file.path(project_root, "analysis_data", "Input", "curc_fig1_grafen_withCaridae_correct.tre")
 )
 out_dir <- Sys.getenv(
   "WEV_ECOLOGY_OUTPUT_DIR",

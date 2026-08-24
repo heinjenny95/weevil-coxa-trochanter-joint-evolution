@@ -31,12 +31,25 @@ key_path <- resolve_analysis_path(2, "WEV_SPECIMEN_KEY_FILE", "<MANUSCRIPT_PROJE
 pca_path <- resolve_analysis_path(3, "WEV_PCA_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv")
 geom_path <- resolve_analysis_path(4, "WEV_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
 out_dir <- resolve_analysis_path(5, "WEV_ALLOMETRY_OUTPUT_DIR", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry")
+tree_path <- resolve_analysis_path(6, "WEV_TREE_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_grafen_withCaridae_correct.tre")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
 
 # ------------------- OUTPUT FILES -------------------
 out_key_csv                 <- file.path(out_dir, "specimen_key_with_centroid_size.csv")
 out_pca_csv                 <- file.path(out_dir, "PCA_scores_with_specimen_id_with_centroid_size.csv")
 out_merged_csv              <- file.path(out_dir, "allometry_merged_table.csv")
+
+# Later sections of this legacy combined workflow clear the R workspace and
+# therefore cannot reuse analysis_args directly.  Persist the resolved paths in
+# task-specific environment variables before those sections run so that a
+# command-line invocation remains self-contained and does not fall back to the
+# literal documentation placeholders.
+Sys.setenv(
+  WEV_ALLOMETRY_OUTPUT_DIR = out_dir,
+  WEV_ALLOMETRY_MERGED_TABLE = out_merged_csv,
+  WEV_SPECIMEN_KEY_FILE = key_path,
+  WEV_TREE_FILE = tree_path
+)
 
 out_univar_pc_csv           <- file.path(out_dir, "allometry_univariate_PC1_to_PC5_results.csv")
 out_univar_all_pc_csv       <- file.path(out_dir, "allometry_univariate_all_PC_results.csv")
@@ -1919,7 +1932,7 @@ key_path <- Sys.getenv(
 )
 tree_path <- Sys.getenv(
   "WEV_TREE_FILE",
-  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_withCaridae_calibrated_Grafen.tre"
+  unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_grafen_withCaridae_correct.tre"
 )
 
 out_dir <- file.path(allometry_parent_dir, "Allometry_Phylogenetic")

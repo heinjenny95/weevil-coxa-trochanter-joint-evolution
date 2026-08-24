@@ -1,7 +1,7 @@
-﻿"analysis_level";"set_label";"model";"fit_status";"delta_plot";"converged";"AIC";"logLik"
-"Multivariate";"PC1-PC5";"BM";"converged";"0,0000000000000";TRUE;"-141,3465786395558";"90,6732893197779"
-"Multivariate";"PC1-PC5";"OU";"converged";"19,4435971618292";TRUE;"-121,9029814777266";"95,9514907388633"
-"Multivariate";"PC1-PC5";"EB";"failed";NA;FALSE;NA;NA
-"Multivariate";"PC1-PC4";"BM";"converged";"0,0000000000000";TRUE;"-98,2575800381560";"63,1287900190780"
-"Multivariate";"PC1-PC4";"OU";"converged";"16,6164559303701";TRUE;"-81,6411241077859";"64,8205620538929"
-"Multivariate";"PC1-PC4";"EB";"failed";NA;FALSE;NA;NA
+analysis_level,set_label,model,fit_status,delta_plot,converged,AIC,logLik
+Multivariate,PC1-PC5,BM,converged,3.04578157192208,TRUE,-149.706491424116,94.8532457120579
+Multivariate,PC1-PC5,OU,converged,0.00000000000000,TRUE,-152.752272996038,111.3761364980189
+Multivariate,PC1-PC5,EB,failed,NA,FALSE,NA,NA
+Multivariate,PC1-PC4,BM,converged,0.00000000000000,TRUE,-110.772726032257,69.3863630161286
+Multivariate,PC1-PC4,OU,failed,NA,FALSE,NA,NA
+Multivariate,PC1-PC4,EB,failed,NA,FALSE,NA,NA

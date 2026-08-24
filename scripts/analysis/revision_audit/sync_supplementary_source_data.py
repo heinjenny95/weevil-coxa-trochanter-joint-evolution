@@ -20,8 +20,13 @@ from pathlib import Path, PureWindowsPath
 
 
 TREE_PATHS = {
-    "curc_fig1_withCaridae_calibrated_Grafen.tre": "data/phylogeny/P01_Trees/01_primary_tree_calibrated_grafen.tre",
-    "curc_fig1_grafen_withCaridae_correct.tre": "data/phylogeny/P01_Trees/10_grafen_with_caridae_corrected.tre",
+    "curc_fig1_grafen_withCaridae_correct.tre": "data/phylogeny/P01_Trees/01_primary_tree_grafen.tre",
+    "curc_fig1_withCaridae_calibrated_Grafen.tre": "data/phylogeny/P01_Trees/16_historical_primary_tree_223ma.tre",
+    "candidate_historical_223.tre": "data/phylogeny/P01_Trees/16_historical_primary_tree_223ma.tre",
+    "candidate_fixed_195.tre": "data/phylogeny/P01_Trees/15_calibration_sensitivity_root195_curculionidae151.tre",
+    "candidate_interval_157_3_170.tre": "data/phylogeny/P01_Trees/17_calibration_sensitivity_interval_157_3_170.tre",
+    "candidate_interval_157_3_195.tre": "data/phylogeny/P01_Trees/18_calibration_sensitivity_interval_157_3_195.tre",
+    "candidate_interval_157_3_223.tre": "data/phylogeny/P01_Trees/19_calibration_sensitivity_interval_157_3_223.tre",
     "curc_fig1_grafen.tre": "data/phylogeny/P01_Trees/07_grafen.tre",
     "curc_fig1_rooted.tre": "data/phylogeny/P01_Trees/06_rooted_ml.tre",
     "curc_fig1_ultrametric_withCaridae_correct.tre": "data/phylogeny/P01_Trees/12_ultrametric_with_caridae_corrected.tre",
