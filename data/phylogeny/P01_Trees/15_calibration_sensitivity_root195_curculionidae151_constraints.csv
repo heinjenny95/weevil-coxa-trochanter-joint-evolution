@@ -1,0 +1,3 @@
+"node","age.min","age.max","soft.bounds","clade","age.start","bound_role"
+16,195,195,FALSE,"Curculionoidea",195,"fixed root age for calibration sensitivity"
+22,113,151,FALSE,"Curculionidae",132,"minimum and sensitivity maximum"

@@ -381,7 +381,7 @@ df <- df %>%
 
 cat("\nRows kept after angle cutoff (>= ", ANGLE_CUTOFF_DEG, " degrees): ", nrow(df), "\n", sep = "")
 
-if (nrow(df) < 3) stop("Too few screw-joint rows after filtering.")
+if (nrow(df) < 3) stop("Too few screw joint rows after filtering.")
 
 # ------------------- FACTORS -------------------
 df$joint_type  <- factor(df$joint_type)

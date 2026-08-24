@@ -251,7 +251,7 @@ phyanova <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_phyl
 
 predictor_specs <- list(
   host_lineage_broad = list(title = "Host lineage", levels = c("angiosperm", "gymnosperm"), labels = c("Angiosperm", "Gymnosperm")),
-  woody_association_broad = list(title = "Woody association", levels = c("nonwoody", "woody"), labels = c("Non-woody", "Woody")),
+  woody_association_broad = list(title = "Wood association", levels = c("nonwoody", "woody"), labels = c("No wood association", "Wood association")),
   larval_lifestyle_broad = list(title = "Larval lifestyle", levels = c("internal", "other"), labels = c("Internal", "Other")),
   fungal_association_broad = list(title = "Fungal association", levels = c("no", "yes"), labels = c("No", "Yes"))
 )

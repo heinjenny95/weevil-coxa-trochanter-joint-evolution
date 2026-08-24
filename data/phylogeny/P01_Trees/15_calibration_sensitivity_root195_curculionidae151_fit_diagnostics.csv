@@ -1,0 +1,2 @@
+"input_tree","output_tree","model","lambda","dual_iter_max","converged","optimizer_message","dual_iterations"
+"curc_fig1.treefile","calibration_sensitivity_root195_curculionidae151_final.tre","correlated",1,1000,TRUE,"relative convergence (4)",59

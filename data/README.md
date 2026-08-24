@@ -35,7 +35,7 @@ consistency corrections.
 - `geometry_sample_flow.csv`, `shape_geometry_analysis_dataset.csv`,
   `regression_summary.csv`, `main_results.csv`,
   `joint_type_geometry_stats.csv` and
-  `specimen_level_screw_joint_geometry.csv`: primary-set downstream outputs.
+  `specimen_level_screw_joint_geometry.csv`: main-dataset downstream outputs.
   Files with the `_strict_good` suffix provide the corresponding quality
   sensitivity where applicable.
 - `shape_model_uncertainty_summary.csv`,
@@ -49,7 +49,7 @@ consistency corrections.
   ecology.
 - `figure_source_data/`: compact, checked-in plotting inputs for the final
   publication-style main, Extended Data and Supplementary figures. The
-  phylogenetic comparative tables use the 14-tip `pcm_matched` primary set
+  phylogenetic comparative tables use the 14-tip `pcm_matched` main dataset
   reported in the manuscript. `Figure_5_geometry_schematic.png` preserves the
   original pre-reanalysis Figure 5 composite at full resolution; the renderer
   extracts the complete descriptive trochanter/helix panel, removes embedded
@@ -77,7 +77,10 @@ consistency corrections.
 
 - `P01_Trees/`: primary and source tree variants supplied with the study. The
   comparative results remain conditional on the documented 15-tip taxonomic
-  proxy mapping.
+  proxy mapping. `15_calibration_sensitivity_root195_curculionidae151.tre` is a
+  deterministic updated-calibration sensitivity tree; its constraint and fit-
+  diagnostic CSVs are stored beside it. It is not substituted silently for the
+  archived primary tree.
 
 The identifiers for *Lissorhoptrus oryzophilus*, *Ormiscus saltator* and
 *Tropiphorus pseudonasutus* are normalized to the atlas/PCA spellings. Current

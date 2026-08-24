@@ -996,16 +996,17 @@ skip_log <- tibble::tibble(
   reason = character()
 )
 
-geometry_pairs <- combn(geometry_vars_main, 2, simplify = FALSE)
+geometry_vars_available <- intersect(geometry_vars_main, names(tip_level_df))
+geometry_pairs <- combn(geometry_vars_available, 2, simplify = FALSE)
 geometry_models <- purrr::map(geometry_pairs, ~ tibble::tibble(response = .x[1], predictor = .x[2])) %>%
   dplyr::bind_rows()
 
-shape_geometry_models <- tidyr::expand_grid(response = pc_vars_main, predictor = geometry_vars_main) %>%
+shape_geometry_models <- tidyr::expand_grid(response = pc_vars_main, predictor = geometry_vars_available) %>%
   dplyr::filter(response %in% names(tip_level_df), predictor %in% names(tip_level_df))
 
 size_models <- dplyr::bind_rows(
   tibble::tibble(response = pc_vars_main, predictor = size_var),
-  tibble::tibble(response = geometry_vars_main, predictor = size_var)
+  tibble::tibble(response = geometry_vars_available, predictor = size_var)
 ) %>%
   dplyr::filter(response %in% names(tip_level_df), predictor %in% names(tip_level_df))
 
@@ -2439,12 +2440,12 @@ message("SECTION 23B finished. Tree robustness outputs written to: ", tree_robus
 
 
 # ============================================================
-# SECTION 24: CONTINUOUS ASR / CONTMAP FOR SHAPE + SCREW-JOINT GEOMETRY
+# SECTION 24: CONTINUOUS ASR / CONTMAP FOR SHAPE + SCREW JOINT GEOMETRY
 # Combined figure with shared legend
 # BLACK BACKGROUND VERSION - REFINED
 # ============================================================
 
-message("SECTION 24: Building combined contMap figure for PC1-PC5 plus screw-joint geometry ...")
+message("SECTION 24: Building combined contMap figure for PC1-PC5 plus screw joint geometry ...")
 
 asr_plot_dir <- file.path(output_dir, "08_ASR")
 dir.create(asr_plot_dir, showWarnings = FALSE, recursive = TRUE)
@@ -2674,7 +2675,7 @@ draw_combined_contmap_panel_set <- function() {
   }
 
   mtext(
-    "Continuous ancestral reconstructions of shape and screw-joint geometry",
+    "Continuous ancestral reconstructions of shape and screw joint geometry",
     outer = TRUE,
     cex = 1.12,
     font = 2,
@@ -2775,7 +2776,7 @@ if (exists("asr_cont_results") && is.data.frame(asr_cont_results) && nrow(asr_co
   )
 }
 
-message("Combined contASR figure for shape + screw-joint geometry saved to: ", asr_plot_dir)
+message("Combined contASR figure for shape + screw joint geometry saved to: ", asr_plot_dir)
 
 
 ################################################################################

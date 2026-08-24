@@ -603,8 +603,8 @@ manifest <- c(
   paste("Bootstrap draws:", normalizePath(draws_path)),
   paste("Bootstrap replicates:", length(unique(draws$bootstrap_replicate))),
   paste("Analysis set sizes:", paste(names(analysis_sets), lengths(analysis_sets), collapse = "; ")),
-  "Primary set: helix RMS / fitted radius <= 0.10.",
-  "Strict set: no provisional geometry-quality warnings.",
+  "Main dataset: helix RMS / fitted radius <= 0.10.",
+  "High-confidence subset: no provisional geometry-quality warnings.",
   "PGLS lambda is optimized on the point-estimate geometry and then held fixed across measurement-bootstrap draws.",
   "Uncertainty remains conditional on the traced semilandmarks and excludes manual placement repeatability."
 )

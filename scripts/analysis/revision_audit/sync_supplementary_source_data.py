@@ -211,7 +211,7 @@ def main() -> None:
         "53", "53",
     )
 
-    # Table 13: all fits plus the explicitly defined primary and strict sets.
+    # Table 13: all fits plus the explicitly defined main and high-confidence sets.
     t13 = source / "S02_Shape_Geometry"
     copy(screw / "robust_geometry_primary_adequate.csv", t13 / "specimen_level_screw_joint_geometry.csv")
     for name in ("robust_geometry_all.csv", "robust_geometry_strict_good.csv", "robust_helix_metrics.csv"):
@@ -297,11 +297,11 @@ def main() -> None:
             sanitize_file(path)
 
     titles = {
-        "13": "Table 13: Specimen-level screw-joint geometry measurements.",
+        "13": "Table 13: Specimen-level screw joint geometry measurements.",
         "14": "Table 14: Main shape–geometry analysis results.",
         "15": "Table 15: Regression summary for shape–geometry relationships.",
         "16": "Table 16: Core PGLS relationships between shape and axial span.",
-        "17": "Table 17: Screw-joint geometry statistics by joint type.",
+        "17": "Table 17: Screw joint geometry statistics by joint type.",
         "22": "Table 22: Phylogenetically informed allometry results.",
     }
     additions: dict[str, tuple[str, str]] = {}

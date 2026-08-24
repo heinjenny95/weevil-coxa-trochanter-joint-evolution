@@ -1,0 +1,8 @@
+"analysis_block","raw_p_threshold_changes","adjusted_p_threshold_changes","best_model_changes","interpretation"
+"phylogenetic_signal",0,0,,"No 0.05-threshold changes."
+"pgls_predictor_slopes",0,0,,"No 0.05-threshold changes in predictor slopes."
+"phylogenetic_allometry_slopes",0,0,,"No 0.05-threshold changes in predictor slopes."
+"univariate_evolutionary_model_ranking",,,1,"PC1 changed from EB to BM; all other trait rankings were unchanged."
+"ecology_pgls",0,0,,"No 0.05-threshold changes."
+"ecology_phylogenetic_anova",0,0,,"No 0.05-threshold changes."
+"continuous_ancestral_state_reconstruction",,,,"Numerical root estimates changed, as expected for a branch-length sensitivity."

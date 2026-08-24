@@ -35,7 +35,7 @@ Recommended order:
    rebuilds the three-panel specimen-level relationships figure from the
    corrected plotting table.
 7. `plot_robust_supplementary_pgls.R`
-   rebuilds the publication-labelled primary-set PC1 plots for fitted winding
+   rebuilds the publication-labelled main-dataset PC1 plots for fitted winding
    angle and fitted axial pitch from the released proxy-tip and PGLS tables.
 8. `render_publication_style_figures.R`
    rebuilds the manuscript-facing main, Extended Data and Supplementary

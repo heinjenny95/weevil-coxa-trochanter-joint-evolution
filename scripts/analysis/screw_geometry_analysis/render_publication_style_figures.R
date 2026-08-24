@@ -611,7 +611,7 @@ eco_panel <- function(response, predictor, title, ylab, fill_cols) {
     theme(legend.position="none", axis.text.x = element_text(angle = 12, hjust = 1))
 }
 eco_figure <- function(response, ylab) {
-  p1 <- eco_panel(response,"woody_association_broad","Woody association",ylab,ecology_palettes$woody_association_broad)
+  p1 <- eco_panel(response,"woody_association_broad","Wood association",ylab,ecology_palettes$woody_association_broad)
   p2 <- eco_panel(response,"larval_lifestyle_broad","Larval lifestyle",ylab,ecology_palettes$larval_lifestyle_broad)
   p3 <- eco_panel(response,"fungal_association_broad","Fungal association",ylab,ecology_palettes$fungal_association_broad)
   (p1 | p2) / (p3 | plot_spacer()) + plot_annotation(tag_levels="a")
