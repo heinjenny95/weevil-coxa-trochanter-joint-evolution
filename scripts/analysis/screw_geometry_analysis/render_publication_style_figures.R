@@ -201,6 +201,21 @@ label_cols <- seq(
   dim(schematic_crop)[[2]]
 )
 schematic_crop[label_rows, label_cols, ] <- 1
+# The left half of the legacy composite contains substantial unused space above
+# and below the schematic. Patchwork aligns this raster with panel b's plotting
+# area (excluding panel b's legends), so retaining the full legacy height makes
+# the trochanter appear markedly smaller than the scatterplot. Crop only that
+# empty vertical margin; the complete trochanter, helix and descriptor legend
+# remain inside the retained 12-92% interval.
+schematic_crop <- schematic_crop[
+  seq(
+    round(dim(schematic_crop)[[1]] * 0.12),
+    round(dim(schematic_crop)[[1]] * 0.92)
+  ),
+  ,
+  ,
+  drop = FALSE
+]
 figure5_tag_theme <- theme(
   plot.tag = element_text(
     family = "Arial",
@@ -225,12 +240,38 @@ p5a <- ggplot() +
 p5b <- ggplot(shape, aes(PC1, PC2, fill = angle_abs, size = axial_pitch)) +
   geom_point(shape = 21, colour = "white", stroke = 0.45, alpha = 1) +
   scale_fill_viridis_c(option = "plasma", name = "Winding angle (degrees)") +
-  scale_size_continuous(range = c(1.7, 5.0), guide = "none") +
-  guides(fill = guide_colourbar(title.position = "top", title.hjust = 0.5, barwidth = grid::unit(3.0, "cm"), barheight = grid::unit(0.22, "cm"))) +
+  scale_size_continuous(
+    range = c(1.7, 5.0),
+    name = "Fitted axial pitch\nper 360-degree turn",
+    breaks = c(0.05, 0.15, 0.30),
+    labels = c("0.05", "0.15", "0.30")
+  ) +
+  guides(
+    fill = guide_colourbar(
+      order = 1,
+      title.position = "top",
+      title.hjust = 0.5,
+      barwidth = grid::unit(3.0, "cm"),
+      barheight = grid::unit(0.22, "cm")
+    ),
+    size = guide_legend(
+      order = 2,
+      title.position = "top",
+      title.hjust = 0.5,
+      nrow = 1,
+      byrow = TRUE,
+      override.aes = list(fill = ink, colour = ink)
+    )
+  ) +
   labs(x = "PC1", y = "PC2", tag = "b") +
   theme_pub() +
   figure5_tag_theme +
-  theme(legend.position = "bottom", plot.margin = margin(7, 5, 4, 5))
+  theme(
+    legend.position = "bottom",
+    legend.box = "horizontal",
+    legend.box.just = "center",
+    plot.margin = margin(7, 5, 4, 5)
+  )
 fig5 <- (p5a | p5b) +
   plot_layout(widths = c(1, 1))
 save_repo(fig5, "Figure_5_robust_shape_geometry.png", 12.4, 6.9)
