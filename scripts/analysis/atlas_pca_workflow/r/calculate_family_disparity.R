@@ -2,10 +2,10 @@
 
 # Family-level disparity in PC1-PC5.
 #
-# Outputs observed mean squared distances to family centroids, bootstrap
-# confidence intervals, a global PERMDISP test, FDR-adjusted pairwise PERMDISP
-# tests, and a rarefaction sensitivity analysis at the smallest retained family
-# sample size. Families represented by fewer than three specimens are excluded.
+# Outputs descriptive mean squared distances to family centroids with bootstrap
+# confidence intervals and rarefaction, plus separate global and pairwise
+# PERMDISP tests on bias-adjusted unsquared centroid distances. Families
+# represented by fewer than three specimens are excluded.
 
 options(stringsAsFactors = FALSE)
 
@@ -168,7 +168,7 @@ global_test <- extract_permdisp(
   permutations = n_perm
 ) |>
   mutate(
-    test = "PERMDISP on Euclidean distances to family centroids",
+    test = "PERMDISP on bias-adjusted unsquared Euclidean distances to family centroids",
     dimensions = paste0("PC1-PC", k_pcs),
     families = nlevels(analysis_data$Family),
     specimens = nrow(analysis_data),
@@ -226,8 +226,8 @@ scope <- tibble(
   analysis = "Family-level disparity",
   response = "PC1-PC5",
   disparity_metric = "Mean squared Euclidean distance to the family centroid",
-  global_test = "PERMDISP with centroid distances and bias adjustment",
-  pairwise_test = "Pairwise PERMDISP with Benjamini-Hochberg FDR correction",
+  global_test = "Separate PERMDISP on bias-adjusted unsquared Euclidean distances to family centroids",
+  pairwise_test = "Separate pairwise PERMDISP on bias-adjusted unsquared Euclidean distances to family centroids with Benjamini-Hochberg FDR correction",
   sensitivity_analysis = paste0(
     "Rarefaction to ", target_n,
     " specimens per family without replacement"

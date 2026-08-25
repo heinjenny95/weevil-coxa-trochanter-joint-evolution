@@ -80,9 +80,13 @@ ed1a <- ggplot(disparity_observed, aes(Family, disparity, fill = Family)) +
   labs(
     tag = "a",
     title = "Observed sample",
-    subtitle = sprintf("PERMDISP: F = %.2f, P = %.4f", disparity_global$F, disparity_global$p_value),
+    subtitle = sprintf(
+      "PERMDISP on bias-adjusted centroid distances: F = %.2f, P = %.4f",
+      disparity_global$F,
+      disparity_global$p_value
+    ),
     x = NULL,
-    y = "Family-level disparity"
+    y = "Mean squared distance\nto family centroid"
   ) +
   theme_pub(base_size = 9) +
   theme(axis.text.x = element_text(angle = 15, hjust = 1))
@@ -97,7 +101,7 @@ ed1b <- ggplot(disparity_rarefied, aes(Family, rarefied_disparity_mean, fill = F
     title = "Rarefied to n = 4",
     subtitle = " ",
     x = NULL,
-    y = "Family-level disparity"
+    y = "Mean squared distance\nto family centroid"
   ) +
   theme_pub(base_size = 9) +
   theme(
