@@ -1,0 +1,13 @@
+{
+  "seed": 20260825,
+  "historical_n": 67,
+  "current_n": 68,
+  "missing_from_historical_sensitivity": [
+    "rhynchites_cupreus"
+  ],
+  "absent_from_current_final": [],
+  "workflow_stage": "parameter selection before the final 68-specimen atlas",
+  "selected_width": 0.1,
+  "final_atlas_policy": "Kernel width 0.1 was retained without further tuning when Rhynchites cupreus was added to the final 68-specimen atlas.",
+  "interpretation_limit": "The five archived runs quantify stability of the development-stage 67-specimen ordinations. They document parameter selection but are not sensitivity reruns of the final 68-specimen atlas and do not establish that width 0.1 is uniquely optimal."
+}

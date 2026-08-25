@@ -27,3 +27,27 @@ python scripts/analysis/atlas_pca_workflow/python/run_kpca_sensitivity.py `
 ```
 
 Kernel eigenvalue fractions describe inertia in kernel feature space and should not be interpreted as percentages of the original anatomical shape variance.
+
+## Atlas kernel-width selection audit
+
+`python/analyze_kernel_width_stability.py` quantifies agreement among the five
+archived Deformetrica runs used during parameter selection (kernel widths
+0.025, 0.075, 0.1, 0.15 and 0.2). These development-stage runs contain the 67
+specimens available at that time. They preceded the final 68-specimen atlas,
+which added *Rhynchites cupreus* while retaining kernel width 0.1 without
+further tuning. The archived runs therefore document parameter selection; they
+are not final-dataset sensitivity reruns and do not imply that 0.1 is uniquely
+optimal.
+
+The audit reports rank concordance of all pairwise specimen distances,
+PC1-PC5 distance concordance, Procrustes similarity and disparity, nearest-
+neighbour overlap, repeated 80% subsampling intervals and 999-permutation
+Mantel P values. Effect-size concordance, rather than Mantel significance, is
+used to assess stability.
+
+```powershell
+python scripts/analysis/atlas_pca_workflow/python/analyze_kernel_width_stability.py `
+  --kernel-root path/to/archived_kernel_width_runs `
+  --final-scores data/supplementary_source_data/S01_PCA_and_Morphospace/PCA_scores_with_specimen_id.csv `
+  --output-dir data/supplementary_source_data/S01_PCA_and_Morphospace/Kernel_Width_Selection
+```

@@ -11,6 +11,13 @@ definitions include an explicit `quality_set` column; phylogenetic geometry
 tables likewise distinguish the 14-tip main and 12-tip high-confidence matched
 datasets. Atlas-only shape analyses retain their documented 15-tip scope.
 
+`S01_PCA_and_Morphospace/Kernel_Width_Selection/` contains the quantitative
+audit supporting Supplementary Fig. 25. The five archived kernel-width runs
+contain 67 specimens and were performed during workflow development. Kernel
+width 0.1 was then retained without further tuning for the final 68-specimen
+atlas, which additionally included *Rhynchites cupreus*. The audit is therefore
+evidence for parameter selection, not a sensitivity rerun of the final atlas.
+
 `S11_Robustness/Calibration_Sensitivity/` documents why the historical 223 Ma
 tree was replaced by a topology-based Grafen primary working tree and contains
 comparisons across calibrated and alternative branch-length representations

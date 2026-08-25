@@ -1,0 +1,6 @@
+kernel_width,n_subjects,n_control_points,dimensions,workflow_stage,included_in_final_atlas
+0.025,67,49096,3,parameter selection before final atlas,False
+0.075,67,2028,3,parameter selection before final atlas,False
+0.1,67,900,3,parameter selection before final atlas,False
+0.15,67,294,3,parameter selection before final atlas,False
+0.2,67,125,3,parameter selection before final atlas,False
