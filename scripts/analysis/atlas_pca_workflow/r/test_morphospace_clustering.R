@@ -22,7 +22,7 @@ pca_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_speci
 out_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Clustering"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-k_pcs <- 6                 # use PC1..PCk
+k_pcs <- 5                 # use PC1..PCk
 k_range <- 2:10            # candidate k to evaluate
 seed <- 1
 
@@ -325,9 +325,10 @@ library(hopkins)
 
 # ------------------- SETTINGS -------------------
 pca_path <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv"
-k_pcs <- 6
-n_boot <- 100
-set.seed(1)
+k_pcs <- 5
+n_evaluations <- 100L
+seed <- 1L
+set.seed(seed)
 
 # ------------------- READ DATA -------------------
 df <- read.csv2(pca_path, stringsAsFactors = FALSE)
@@ -365,19 +366,32 @@ H_single <- get_H(H_single_raw)
 
 cat("Hopkins statistic (single run):", round(H_single, 3), "\n")
 
-# ------------------- BOOTSTRAPPED HOPKINS -------------------
-H_vals <- replicate(n_boot, {
+# ------------------- REPEATED RANDOMIZED HOPKINS EVALUATIONS -------------------
+H_vals <- replicate(n_evaluations, {
   get_H(hopkins::hopkins(X, m = m_val))
 })
 
-H_tbl <- tibble(Hopkins = H_vals)
+H_tbl <- tibble(
+  evaluation = seq_along(H_vals),
+  hopkins = H_vals
+)
 
 H_summary <- H_tbl %>%
   summarise(
-    mean = mean(Hopkins),
-    sd   = sd(Hopkins),
-    min  = min(Hopkins),
-    max  = max(Hopkins)
+    dimensions = paste0("PC1-PC", k_pcs),
+    n_specimens = nrow(X),
+    m = m_val,
+    randomized_evaluations = n_evaluations,
+    seed = seed,
+    single_evaluation = H_single,
+    mean = mean(hopkins),
+    median = median(hopkins),
+    sd = sd(hopkins),
+    min = min(hopkins),
+    max = max(hopkins),
+    q025 = quantile(hopkins, 0.025),
+    q975 = quantile(hopkins, 0.975),
+    fraction_above_0_75 = mean(hopkins > 0.75)
   )
 
 print(H_summary)
@@ -386,8 +400,38 @@ print(H_summary)
 out_dir <- "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Clustering"
 dir.create(out_dir, recursive = TRUE, showWarnings = FALSE)
 
-write.csv2(H_tbl, file.path(out_dir, "hopkins_bootstrap_values.csv"), row.names = FALSE)
+write.csv2(H_tbl, file.path(out_dir, "hopkins_randomized_values.csv"), row.names = FALSE)
 write.csv2(H_summary, file.path(out_dir, "hopkins_summary.csv"), row.names = FALSE)
+
+# Descriptive m-sensitivity. Repeated evaluations do not create additional
+# independent specimens and are not treated as formal Hopkins inference.
+m_sensitivity <- map_dfr(4:10, function(m_candidate) {
+  sensitivity_seed <- 1000L + m_candidate
+  set.seed(sensitivity_seed)
+  values <- replicate(
+    1000L,
+    get_H(hopkins::hopkins(X, m = m_candidate))
+  )
+  tibble(
+    m = m_candidate,
+    sample_fraction = m_candidate / nrow(X),
+    randomized_evaluations = length(values),
+    seed = sensitivity_seed,
+    mean = mean(values),
+    median = median(values),
+    sd = sd(values),
+    q025 = quantile(values, 0.025),
+    q25 = quantile(values, 0.25),
+    q75 = quantile(values, 0.75),
+    q975 = quantile(values, 0.975),
+    fraction_above_0_75 = mean(values > 0.75)
+  )
+})
+write.csv2(
+  m_sensitivity,
+  file.path(out_dir, "hopkins_m_sensitivity.csv"),
+  row.names = FALSE
+)
 
 # ------------------- VISUALIZATION -------------------
 png(
@@ -401,13 +445,13 @@ hist(
   breaks = 20,
   col = "grey70",
   border = "white",
-  main = "Hopkins statistic (bootstrap)",
+  main = "Hopkins statistic (100 randomized evaluations)",
   xlab = "Hopkins H"
 )
 abline(v = 0.5, lty = 2, col = "red")
 dev.off()
 
-cat("Hopkins test finished. Results written to:\n", out_dir, "\n")
+cat("Descriptive Hopkins evaluations finished. Results written to:\n", out_dir, "\n")
 
 
 

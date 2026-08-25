@@ -6,6 +6,28 @@ This directory contains the scripts used to summarize the subject-specific Defor
 
 The `r/` scripts reproduce the ordinary-PCA workflow used for the main analyses, including PCA variance, specimen scores, morphospace clustering, disparity and allometry.
 
+### Hopkins clusterability diagnostic
+
+`r/run_hopkins_clusterability.R` reproduces the descriptive Hopkins diagnostic
+from standardized PC1-PC5 scores. The primary output contains 100 randomized
+evaluations with `n = 68`, `m = 6` and seed 1. These evaluations repeatedly
+sample observed and uniformly generated reference points within the Hopkins
+calculation; they are not specimen bootstraps. Because the dataset is too
+small to satisfy conventional large-sample conditions for formal Hopkins
+inference, the result is interpreted only as exploratory evidence of departure
+from spatial randomness.
+
+The script additionally runs 1,000 randomized evaluations for each `m = 4-10`
+with documented independent seeds. This sensitivity analysis tests whether the
+qualitative indication depends on the selected `m`; it does not add independent
+specimens or convert the diagnostic into a formal significance test.
+
+```powershell
+Rscript scripts/analysis/atlas_pca_workflow/r/run_hopkins_clusterability.R `
+  data/supplementary_source_data/S01_PCA_and_Morphospace/PCA_scores_with_specimen_id.csv `
+  data/supplementary_source_data/S01_PCA_and_Morphospace
+```
+
 ## Nonlinear sensitivity analysis
 
 `python/run_kpca_sensitivity.py` compares ordinary PCA with two radial-basis-function kernel PCA ordinations:
