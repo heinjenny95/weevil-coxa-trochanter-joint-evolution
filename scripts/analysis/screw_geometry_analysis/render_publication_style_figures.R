@@ -356,7 +356,10 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   if (kind == "png") png(device_path, width = width, height = height, units = "in", res = dpi, bg = "white", type = "cairo")
   if (kind == "jpeg") jpeg(device_path, width = width, height = height, units = "in", res = dpi, bg = "white", quality = 96)
   on.exit(dev.off(), add = TRUE)
-  layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1.18,0.95,0.95), heights = c(1,1,1))
+  # Keep every tree panel on exactly the same drawing canvas.  The former
+  # wider first column stretched panels a, d and g relative to the remaining
+  # reconstructions and made identical topologies look geometrically different.
+  layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1,1,1), heights = c(1,1,1))
   par(mar = c(1.0, 0.4, 2.4, 0.4), oma = c(0.5, 0.2, 0.5, 0.2), family = "sans", fg = ink, col.axis = ink, col.lab = ink)
   par(mar = c(0.5, 0.2, 1.7, 0.2))
   tip_depth <- max(node.depth.edgelength(asr_tree))
