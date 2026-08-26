@@ -286,7 +286,7 @@ ed3a <- lm_panel(shape_score, "logCS", "full_shape_regression_score", "log centr
 ed3b <- lm_panel(allom, "logCS", "PC1", "log centroid size", "PC1", stats = stat_line(uni_stats %>% filter(trait == "PC1")), stats_outside = TRUE)
 ed3c <- lm_panel(allom, "logCS", "PC2", "log centroid size", "PC2", stats = stat_line(uni_stats %>% filter(trait == "PC2")), stats_outside = TRUE)
 ed3d <- lm_panel(allom %>% filter(!is.na(abs_winding_angle_deg)), "logCS", "abs_winding_angle_deg", "log centroid size", "Absolute winding angle (degrees)", stats = stat_line(geom_stats %>% filter(trait == "abs_winding_angle_deg")), stats_outside = TRUE)
-ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Fitted axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")), stats_outside = TRUE)
+ed3e <- lm_panel(allom %>% filter(!is.na(axial_span)), "logCS", "axial_span", "log centroid size", "Axial span", stats = stat_line(geom_stats %>% filter(trait == "axial_span")), stats_outside = TRUE)
 ed3_legend <- get_legend(
   ed3b +
     guides(fill = guide_legend(title = "Family", ncol = 2, byrow = TRUE, override.aes = list(shape = 21, colour = "white", size = 3))) +
@@ -312,8 +312,8 @@ save_canonical(ed3, "03_Extended_Data_Figures/Extended_Data_Figure_3_allometry_1
 # Extended Data Figure 4 -------------------------------------------------------
 signal_df <- read_mixed(file.path(source_dir, "phylogenetic_signal_plot_data.csv")) %>%
   mutate(
-    trait_label = recode(trait_label, "Absolute winding angle" = "Absolute winding angle", "Axial span" = "Fitted axial span"),
-    trait_label = factor(trait_label, levels = rev(c("PC1", "PC2", "PC3", "PC4", "PC5", "Absolute winding angle", "Fitted axial span"))),
+    trait_label = recode(trait_label, "Absolute winding angle" = "Absolute winding angle", "Axial span" = "Axial span"),
+    trait_label = factor(trait_label, levels = rev(c("PC1", "PC2", "PC3", "PC4", "PC5", "Absolute winding angle", "Axial span"))),
     method = factor(method, levels = c("Blomberg's K", "Pagel's lambda"))
   )
 ed4 <- ggplot(signal_df, aes(estimate, trait_label, fill = method, alpha = signal_status)) +
@@ -335,7 +335,7 @@ asr_input <- asr_input[complete.cases(asr_input[, c("PC1", "PC2", "PC3", "PC4", 
 asr_tree <- drop.tip(asr_tree, setdiff(asr_tree$tip.label, asr_input$tree_label))
 asr_input <- asr_input[match(asr_tree$tip.label, asr_input$tree_label), ]
 asr_traits <- c("PC1", "PC2", "PC3", "PC4", "PC5", "abs_winding_angle_deg", "axial_span")
-asr_titles <- c(PC1 = "PC1", PC2 = "PC2", PC3 = "PC3", PC4 = "PC4", PC5 = "PC5", abs_winding_angle_deg = "Winding angle", axial_span = "Fitted axial span")
+asr_titles <- c(PC1 = "PC1", PC2 = "PC2", PC3 = "PC3", PC4 = "PC4", PC5 = "PC5", abs_winding_angle_deg = "Winding angle", axial_span = "Axial span")
 asr_maps <- lapply(asr_traits, function(v) {
   x <- setNames(asr_input[[v]], asr_input$tree_label)
   obj <- contMap(asr_tree, x, plot = FALSE, lims = c(-2.2, 2.2), res = 120)
@@ -517,8 +517,8 @@ with_single_line_family_legend <- function(main_plot, legend_source, legend_heig
       wrap_elements(full = single_line_family_legend(legend_source))
   ) + plot_layout(heights = c(1, legend_height))
 }
-s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Fitted axial span (log10 scale)", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"), log_y = TRUE)
-s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per\n360-degree turn (log10 scale)", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"), log_y = TRUE)
+s11a <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_span", "Absolute winding angle (degrees)", "Axial span", title = "a", stats = lm_stat_line(axial_df, "axial_span", "abs_winding_angle_deg"))
+s11b <- lm_panel(axial_df, "abs_winding_angle_deg", "axial_pitch_360", "Absolute winding angle (degrees)", "Fitted axial pitch per\n360-degree turn", title = "b", stats = lm_stat_line(axial_df, "axial_pitch_360", "abs_winding_angle_deg"))
 s11 <- with_single_line_family_legend(
   (s11a + theme(legend.position = "none")) | (s11b + theme(legend.position = "none")),
   s11a
@@ -535,8 +535,8 @@ pgls_label <- function(response, predictor) {
   if (nrow(r) == 0) return("")
   sprintf("PGLS beta = %.3f; P = %s\nFDR P = %s; lambda = %.2f; n = %d", r$estimate, fmt_p(r$p_value), fmt_p(r$fdr_p_value), r$lambda, r$n_taxa)
 }
-s12a <- lm_panel(tip_span_df, "axial_span", "PC1", "Fitted axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
-s12b <- lm_panel(tip_span_df, "axial_span", "PC2", "Fitted axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
+s12a <- lm_panel(tip_span_df, "axial_span", "PC1", "Axial span", "PC1", title = "a", stats = pgls_label("PC1", "axial_span"))
+s12b <- lm_panel(tip_span_df, "axial_span", "PC2", "Axial span", "PC2", title = "b", stats = pgls_label("PC2", "axial_span"))
 s12 <- with_single_line_family_legend(
   (s12a + theme(legend.position = "none")) | (s12b + theme(legend.position = "none")),
   s12a
@@ -556,7 +556,7 @@ box_panel <- function(y, label, panel_label) {
 }
 s13 <- box_panel("abs_winding_angle_deg", "Absolute winding angle\n(degrees)", "a") |
   box_panel("axial_pitch_360", "Fitted axial pitch\nper 360-degree turn", "b") |
-  box_panel("axial_span", "Fitted axial span", "c")
+  box_panel("axial_span", "Axial span", "c")
 save_repo(s13, "Supplementary_Fig_13_robust_joint_type.png", 13.2, 4.8)
 save_canonical(s13, "04_Supplementary_Figures/Supplementary_Fig_13_screw_geometry_by_joint_type_180mm", 7.09, 2.9)
 
@@ -571,7 +571,7 @@ supp14_specs <- tribble(
   "start_end_dist", "Start-to-end\ndistance", FALSE,
   "fit_radius", "Fitted radius", FALSE,
   "fit_rms", "Helix RMS", TRUE,
-  "axial_span", "Fitted axial span", FALSE,
+  "axial_span", "Axial span", FALSE,
   "ratio_axial_span_fit_radius", "Axial span /\nfitted radius", FALSE,
   "ratio_start_end_fit_radius", "Start-to-end distance\n/ radius", FALSE,
   "ratio_fit_rms_fit_radius", "Helix RMS /\nfitted radius", TRUE
@@ -635,7 +635,7 @@ save_canonical(s16, "04_Supplementary_Figures/Supplementary_Fig_16_PGLS_shape_vs
 tree_detail <- read_mixed(file.path(source_dir, "pgls_tree_variant_detail.csv")) %>%
   filter(model_type == "tree_variant", response == "PC1", predictor %in% c("abs_winding_angle_deg", "axial_span"), !is.na(estimate)) %>%
   mutate(
-    predictor_label = recode(predictor, abs_winding_angle_deg = "PC1 ~ winding angle", axial_span = "PC1 ~ fitted axial span"),
+    predictor_label = recode(predictor, abs_winding_angle_deg = "PC1 ~ winding angle", axial_span = "PC1 ~ axial span"),
     tree_label = recode(
       tree_id,
       working_tree = "Grafen primary",
@@ -715,7 +715,7 @@ eco_figure <- function(response, ylab) {
   (p1 | p2) / (p3 | plot_spacer()) + plot_annotation(tag_levels="a")
 }
 s24 <- eco_figure("abs_winding_angle_deg", "Absolute winding angle (degrees)")
-s25 <- eco_figure("axial_span", "Fitted axial span")
+s25 <- eco_figure("axial_span", "Axial span")
 save_repo(s24, "Supplementary_Fig_23_robust_ecology_angle.png", 11.8, 9.0)
 save_repo(s25, "Supplementary_Fig_24_robust_ecology_span.png", 11.8, 9.0)
 save_canonical(s24, "04_Supplementary_Figures/Supplementary_Fig_23_ecology_absolute_winding_angle_180mm", 7.09, 5.4)

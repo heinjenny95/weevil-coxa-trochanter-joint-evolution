@@ -1173,20 +1173,16 @@ cat("\nMain results table exported.\n")
 
 library(scales)
 
-# optional: log-transform (empfohlen, weil Werte oft stark streuen)
-df$log_axial_span  <- log10(df$axial_metric)
-df$log_axial_pitch <- log10(df$axial_pitch)
-
 # -------------------
 # PANEL A: axial span vs winding angle
 # -------------------
-p_span <- ggplot(df, aes(x = angle_abs, y = log_axial_span)) +
+p_span <- ggplot(df, aes(x = angle_abs, y = axial_metric)) +
   geom_point(alpha = 0.85) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
     title = "A. Axial span vs winding angle",
     x = "Winding angle (deg)",
-    y = "Axial span (log10)"
+    y = "Axial span"
   ) +
   theme_classic(base_size = 13) +
   theme(
@@ -1197,13 +1193,13 @@ p_span <- ggplot(df, aes(x = angle_abs, y = log_axial_span)) +
 # -------------------
 # PANEL B: axial pitch vs winding angle
 # -------------------
-p_pitch <- ggplot(df, aes(x = angle_abs, y = log_axial_pitch)) +
+p_pitch <- ggplot(df, aes(x = angle_abs, y = axial_pitch)) +
   geom_point(alpha = 0.85) +
   geom_smooth(method = "lm", se = FALSE, linewidth = 0.8) +
   labs(
     title = paste0("B. ", pitch_source_label, " vs winding angle"),
     x = "Winding angle (deg)",
-    y = "Axial pitch per 360 (log10)"
+    y = "Axial pitch per 360"
   ) +
   theme_classic(base_size = 13) +
   theme(

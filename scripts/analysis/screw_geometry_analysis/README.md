@@ -58,11 +58,16 @@ arguments. The shape-geometry workflow uses `<PCA CSV> <geometry CSV>
 CSV> <output directory>`. The supplementary PGLS plotter uses
 `<tip-level CSV> <PGLS-results CSV> <output directory>`.
 
-For robust input, axial pitch is the fitted axial rise per full turn and uses
-all ordered points. For legacy input only, endpoint-equivalent pitch is
-calculated as `axial span * 360 / absolute winding angle`; regressions of that
-legacy quotient against either component are descriptive rather than
-independent tests.
+For robust input, `axial_span` is the absolute displacement between the first
+and last traced semilandmarks projected onto the fitted helix axis. It is the
+span variable used in all downstream analyses and is labelled simply "axial
+span" in the manuscript and figures. Axial pitch is the fitted axial rise per
+full turn and uses all ordered points. The separate audit field
+`fitted_axial_span` is the model-derived product of fitted pitch and angular
+extent and is not used in downstream analyses. For legacy input only,
+endpoint-equivalent pitch is calculated as `axial span * 360 / absolute winding
+angle`; regressions of that legacy quotient against either component are
+descriptive rather than independent tests.
 
 The final sample flow is written to `geometry_sample_flow.csv`. The robust
 analysis fitted all 64 trajectories, and the main dataset contains the 63 fits
