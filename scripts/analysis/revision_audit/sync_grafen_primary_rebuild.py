@@ -2,10 +2,10 @@
 """Publish the canonical 2026-08-24 Grafen-primary rebuild.
 
 The script copies only machine-readable outputs produced by the completed
-Grafen-primary workflows.  It normalizes released CSVs to UTF-8/comma/decimal
-point, adds an explicit quality_set column to combined main/high-confidence
-tables, strips workstation paths from tree-robustness outputs, and refreshes
-the supplementary-table manifest.  It does not run inferential analyses.
+Grafen-primary main-dataset workflows. It normalizes released CSVs to
+UTF-8/comma/decimal point, labels geometry-dependent rows as main_dataset,
+strips workstation paths from tree-robustness outputs, and refreshes the
+supplementary-table manifest. It does not run inferential analyses.
 """
 
 from __future__ import annotations
@@ -61,12 +61,10 @@ def copy_csv(source: Path, target: Path) -> None:
     write_csv(target, fields, rows)
 
 
-def combine(main: Path, high: Path, target: Path) -> None:
+def copy_main(main: Path, target: Path) -> None:
     main_fields, main_rows = read_csv(main)
-    high_fields, high_rows = read_csv(high)
-    fields = ["quality_set"] + list(dict.fromkeys(main_fields + high_fields))
+    fields = ["quality_set"] + main_fields
     rows = [dict(quality_set="main_dataset", **row) for row in main_rows]
-    rows += [dict(quality_set="high_confidence", **row) for row in high_rows]
     write_csv(target, fields, rows)
 
 
@@ -89,6 +87,31 @@ def refresh_manifest(root: Path) -> None:
         row["size_bytes"] = str(path.stat().st_size)
         row["sha256"] = sha256(path)
         kept.append(row)
+
+    known = {row["relative_path"] for row in kept}
+    for path in root.rglob("*.csv"):
+        if path.name == "_manifest.csv":
+            continue
+        rel = path.relative_to(root).as_posix()
+        if rel in known:
+            continue
+        is_calibration = rel.startswith("S11_Robustness/Calibration_Sensitivity/")
+        kept.append({
+            "supplementary_table": "",
+            "caption": (
+                "Calibration-sensitivity analysis provenance and outputs."
+                if is_calibration
+                else "Auxiliary analysis source data."
+            ),
+            "relative_path": rel,
+            "role": (
+                "calibration_sensitivity_source_data"
+                if is_calibration
+                else "auxiliary_source_data"
+            ),
+            "size_bytes": str(path.stat().st_size),
+            "sha256": sha256(path),
+        })
     write_csv(manifest, fields, kept)
 
 
@@ -112,9 +135,7 @@ def main() -> None:
     rebuild = args.rebuild_root.resolve()
     project = args.project_root.resolve()
     pcm_main = rebuild / "PCM_Main"
-    pcm_high = rebuild / "PCM_High_Confidence"
     eco_main = rebuild / "Ecology_Main"
-    eco_high = rebuild / "Ecology_High_Confidence"
     allom = rebuild / "Allometry_Main"
     phy_allom = rebuild / "Phylogenetic_Multivariate_Allometry"
 
@@ -161,9 +182,8 @@ def main() -> None:
     ):
         copy_csv(allom / name, s03 / name)
     copy_csv(allom / "Allometry_Phylogenetic/pgls_results_main_traits.csv", s03 / "pgls_results_main_traits.csv")
-    combine(pcm_main / "05_Allometry/allometry_results.csv", pcm_high / "05_Allometry/allometry_results.csv", s03 / "pgls_allometry_all_traits.csv")
+    copy_main(pcm_main / "05_Allometry/allometry_results.csv", s03 / "pgls_allometry_all_traits.csv")
     copy_csv(pcm_main / "05_Allometry/allometry_results.csv", s03 / "pgls_geometry_main_traits_main_dataset.csv")
-    copy_csv(pcm_high / "05_Allometry/allometry_results.csv", s03 / "pgls_geometry_main_traits_high_confidence.csv")
     for name in (
         "phylogenetic_multivariate_allometry_matching.csv",
         "phylogenetic_multivariate_allometry_projection.csv",
@@ -192,7 +212,7 @@ def main() -> None:
         "S11_Robustness/robustness_leave_one_out_summary.csv": "04_PGLS/robustness_checks/robustness_leave_one_out_summary.csv",
     }
     for destination, relative in combined_outputs.items():
-        combine(pcm_main / relative, pcm_high / relative, supp / destination)
+        copy_main(pcm_main / relative, supp / destination)
 
     ecology_outputs = {
         "S06_Ecology_Matrix/ecology_analysis_input_merged.csv": "ecology_analysis_input_merged.csv",
@@ -202,7 +222,7 @@ def main() -> None:
         "S07_Ecology_Tests/ecology_nonphylo_group_tests.csv": "ecology_nonphylo_group_tests.csv",
     }
     for destination, name in ecology_outputs.items():
-        combine(eco_main / name, eco_high / name, supp / destination)
+        copy_main(eco_main / name, supp / destination)
 
     for path in supp.rglob("*.csv"):
         if path.name != "_manifest.csv":

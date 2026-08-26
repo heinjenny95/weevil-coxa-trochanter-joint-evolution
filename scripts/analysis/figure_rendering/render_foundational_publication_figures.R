@@ -250,10 +250,10 @@ save_plot_set(
 )
 
 # Supplementary Figures 20-22 show shape-only ecological contrasts. The
-# dedicated 15-tip plotting matrix prevents the 14-tip main and 12-tip
-# high-confidence geometry matrices from being stacked and plotting the same
-# proxy tip twice. Inferential annotations are likewise restricted to the
-# shape-only rows in Tables 35 and 36.
+# dedicated 15-tip plotting matrix prevents the 14-tip geometry matrix from
+# being stacked with the shape-only matrix and plotting the same proxy tip
+# twice. Inferential annotations are likewise restricted to the shape-only
+# rows in Tables 35 and 36.
 ecology <- read_mixed(file.path(repo_root, "data", "foundational_figures", "ecology_shape_only_plot_data.csv"))
 pgls <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_pgls_factor_results.csv")) %>%
   filter(quality_set == "shape_only")

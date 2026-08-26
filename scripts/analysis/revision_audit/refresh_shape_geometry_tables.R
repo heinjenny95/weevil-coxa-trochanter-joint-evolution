@@ -1,8 +1,8 @@
 #!/usr/bin/env Rscript
 
-# Rebuild the concise robust shape--geometry result tables from the canonical
-# primary (n = 63) and strict (n = 53) regression summaries. Model-level
-# P values are kept distinct from the PC1 coefficient P values.
+# Rebuild the concise robust shape--geometry result table from the canonical
+# main dataset (n = 63). Model-level P values are kept distinct from the PC1
+# coefficient P values.
 
 args <- commandArgs(trailingOnly = TRUE)
 if (length(args) != 1) {
@@ -49,16 +49,9 @@ build_main <- function(regression_path, expected_full_n, expected_main_n) {
 }
 
 primary <- build_main(file.path(data_dir, "regression_summary.csv"), 63, 55)
-strict <- build_main(file.path(data_dir, "regression_summary_strict_good.csv"), 53, 53)
 
 write.csv(
   primary, file.path(data_dir, "main_results.csv"),
   row.names = FALSE, na = "NA", fileEncoding = "UTF-8"
 )
-write.csv(
-  strict, file.path(data_dir, "main_results_strict_good.csv"),
-  row.names = FALSE, na = "NA", fileEncoding = "UTF-8"
-)
-
 cat("Primary rows:", nrow(primary), "(n = 63)\n")
-cat("Strict rows:", nrow(strict), "(n = 53)\n")

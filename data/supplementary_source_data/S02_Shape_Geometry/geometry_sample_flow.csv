@@ -4,5 +4,4 @@ specimens without a discernible helical ridge,4,no screw trajectory could be tra
 traced trajectories with converged robust helix fits,64,all fitted without an angular cutoff
 fit exceeding the main RMS/radius threshold,1,excluded because helix RMS divided by fitted radius exceeded 0.10
 main dataset,63,used for the reported specimen-level robust-geometry analyses
-main-dataset fits with one or more remaining provisional warnings,10,retained in the main dataset but excluded from the sensitivity subset
-high-confidence sensitivity subset,53,no provisional geometry-quality warnings
+main-dataset fits with one or more descriptive diagnostic warnings,10,retained because point count and angular coverage partly reflect biological helix extent

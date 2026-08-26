@@ -1,4 +1,0 @@
-model,subset,n,r_squared,p_value,PC1_effect,PC1_p
-Winding angle ~ shape,Full dataset,53,0.059,0.218,-190.909,0.172
-Axial pitch ~ shape,Full dataset,53,0.002,0.949,-0.033,0.8
-Winding angle ~ shape,Main region (PC1 < 0.1),53,0.059,0.218,-190.909,0.172

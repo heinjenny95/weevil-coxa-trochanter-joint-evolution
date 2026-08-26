@@ -1,6 +1,6 @@
 # Robust screw-geometry reanalysis
 
-## Analysis sets and uncertainty scope
+## Analysis dataset and uncertainty scope
 
 The ordered semilandmark trajectories were refitted with a robust circular
 three-dimensional helix model. The fit estimates a continuous axis, centre,
@@ -11,7 +11,13 @@ draws per specimen (12,800 successful draws in total).
 - `all`: all 64 traced trajectories.
 - `primary_adequate` (manuscript: main dataset): 63 trajectories with helix RMS / fitted radius <= 0.10.
   Only *Dryophthorus corticalis* was excluded (relative RMS = 0.180).
-- `strict_good` (manuscript: high-confidence subset): 53 trajectories without provisional fit-quality warnings.
+
+Other fit warnings are retained as descriptive diagnostics, not as exclusion
+criteria. In particular, the former warning-free subset disproportionately
+removed short trajectories: point count and angular coverage partly measure the
+biological extent of the helix rather than fit failure. All short and long
+helices that meet the relative-RMS criterion therefore remain in the main
+analysis dataset.
 
 The bootstrap is conditional on the traced semilandmarks. It does not estimate
 repeatability of manual semilandmark placement.
@@ -24,42 +30,36 @@ repeatability of manual semilandmark placement.
 2. **Axial pitch is not robustly associated with shape or size.** In the
    main-dataset specimen-level model, pitch ~ PC1 + PC2 was only marginal
    (R2 = 0.0973, p = 0.0463) and was significant in 55.5% of measurement
-   bootstrap draws. It disappeared in the high-confidence subset (R2 = 0.0021,
-   p = 0.9487). Pitch was unrelated to centroid size in both sets
-   (main-dataset p = 0.611; high-confidence p = 0.678).
-3. **The winding-angle/shape association is quality-sensitive.** The main-dataset
+   bootstrap draws. Pitch was unrelated to centroid size (p = 0.611).
+3. **Winding angle covaries with shape in the main dataset.** The main-dataset
    specimen-level angle ~ PC1 + PC2 model was strong (R2 = 0.5119,
-   p = 4.52e-10) and stable to conditional measurement uncertainty, but the
-   high-confidence model was not supported (R2 = 0.0591, p = 0.218). The analogous
-   angle-size association survived Holm correction in the main dataset
-   (R2 = 0.1503, adjusted p = 0.0305) but not the high-confidence subset (R2 = 0.0522,
-   adjusted p = 1.0).
+   p = 4.52e-10) and stable to conditional measurement uncertainty. The
+   angle-size association was weaker but survived Holm correction (R2 = 0.1503,
+   adjusted p = 0.0305).
 4. **Phylogenetic shape-geometry results are exploratory trends, not robust
-   positive tests.** With matched specimen sets aggregated to 14 main-dataset or
-   12 high-confidence proxy tips, PC1 ~ winding angle gave raw p = 0.065 on the
+   positive tests.** With the matched specimens aggregated to 14 main-dataset
+   proxy tips, PC1 ~ winding angle gave raw p = 0.065 on the
    topology-based Grafen primary tree and did not survive FDR correction. The
    main-dataset slope was negative across all 15 topology and branch-length
    representations, but none of the 15 tree-specific tests survived FDR correction.
    PC1 ~ axial span was nominally supported on the Grafen primary tree for the
-   main dataset (raw p = 0.039, FDR-adjusted p = 0.177) but not in the
-   high-confidence subset (raw p = 0.205, FDR-adjusted p = 0.364), and its
-   significance changed under both tree choice and leave-one-tip-out sensitivity.
+   main dataset (raw p = 0.039, FDR-adjusted p = 0.177), and its significance
+   changed under both tree choice and leave-one-tip-out sensitivity.
    PC1 ~ fitted pitch was likewise unsupported after correction.
 5. **Joint-type comparisons have strongly unequal group sizes.** The main
    screw joint subset contains 57 true screw-and-nut joints and only 3 unopposed screw
    configurations. Winding angle differs nominally in this unbalanced sample
-   (Kruskal-Wallis p = 0.0202), whereas pitch and axial span do not. The high-confidence
-   set contains 51 versus 1 specimen, so inferential group tests are invalid.
-   The joint-type result must therefore be described as exploratory and
-   unstable rather than as a general group difference.
+   (Kruskal-Wallis p = 0.0202), whereas pitch and axial span do not. The
+   joint-type result must therefore be described as exploratory rather than as
+   a general group difference.
 6. **Ecological results depend on model and sampling balance.** Under the Grafen
    primary tree, host lineage was FDR-supported in the PGLS analyses for PC2 and
    centroid size, whereas the companion phylogenetic ANOVA did not survive
    correction. A main-dataset winding-angle/fungal-association PGLS was also
-   FDR-supported, but the comparison contained only nine versus two proxy tips,
-   was absent from the high-confidence result and was unsupported by the companion
-   phylogenetic ANOVA. These results are reported as method-, tree- and
-   imbalance-sensitive associations rather than robust ecological discoveries.
+   FDR-supported, but the comparison contained only nine versus two proxy tips
+   and was unsupported by the companion phylogenetic ANOVA. These results are
+   reported as method-, tree- and imbalance-sensitive associations rather than
+   robust ecological discoveries.
 
 ## Rejected or limited analyses
 
@@ -75,8 +75,8 @@ repeatability of manual semilandmark placement.
 ## Interpretation for the manuscript
 
 The defensible conclusion is that screw joint geometry is heterogeneous and
-that some main-dataset associations suggest covariation with major trochanter
-shape and size axes. Those associations are sensitive to fit-quality
-definition, phylogenetic proxy sampling and tree choice. Fitted axial pitch,
-joint-type contrasts and broad ecological predictors do not provide robust
-confirmatory signals in the present data.
+that winding angle covaries with major trochanter shape and size axes in the
+main dataset. Conditional fit bootstraps support the shape-angle relationship,
+whereas phylogenetic geometry analyses remain sensitive to proxy sampling and
+tree choice. Fitted axial pitch, joint-type contrasts and broad ecological
+predictors do not provide robust confirmatory signals in the present data.

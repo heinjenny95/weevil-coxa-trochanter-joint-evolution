@@ -30,26 +30,21 @@ consistency corrections.
   bootstrap draws for each of the 64 trajectories.
 - `robust_helix_point_residuals.csv`: point-level radial, axial and combined
   residuals for the fitted trajectory.
-- `robust_geometry_all.csv`, `robust_geometry_primary_adequate.csv` and
-  `robust_geometry_strict_good.csv`: downstream-compatible internal tables for
-  all 64 fits, the 63-specimen main dataset and the 53-specimen
-  high-confidence subset. The historical internal suffixes are mapped to the
-  manuscript terminology in the released supplementary-source tables.
+- `robust_geometry_all.csv` and `robust_geometry_primary_adequate.csv`:
+  downstream-compatible internal tables for all 64 successful fits and the
+  63-specimen main dataset.
 - `geometry_sample_flow.csv`, `shape_geometry_analysis_dataset.csv`,
   `regression_summary.csv`, `main_results.csv`,
   `joint_type_geometry_stats.csv` and
   `specimen_level_screw_joint_geometry.csv`: main-dataset downstream outputs.
-  Internal files with the `_strict_good` suffix provide the corresponding
-  high-confidence sensitivity where applicable.
 - `shape_model_uncertainty_summary.csv`,
   `shape_coefficients_rubin_summary.csv`,
   `joint_type_uncertainty_summary.csv`,
   `pgls_shape_geometry_rubin_summary.csv` and
   `ecology_pgls_rubin_summary.csv`: downstream propagation of conditional
   measurement uncertainty.
-- `ROBUST_REANALYSIS_SUMMARY.md`: interpretation audit across quality sets,
-  bootstrap draws, phylogenetic trees, leave-one-out checks, allometry and
-  ecology.
+- `ROBUST_REANALYSIS_SUMMARY.md`: interpretation audit across bootstrap draws,
+  phylogenetic trees, leave-one-out checks, allometry and ecology.
 - `figure_source_data/`: compact, checked-in plotting inputs for the final
   publication-style main, Extended Data and Supplementary figures. The
   phylogenetic comparative tables use the 14-tip `pcm_matched` main dataset
@@ -57,10 +52,9 @@ consistency corrections.
   original pre-reanalysis Figure 5 composite at full resolution; the renderer
   extracts the complete descriptive trochanter/helix panel, removes embedded
   original labeling and places it beside the robust regenerated morphospace.
-- `figures/`: publication-style robust-analysis figures plus primary and
-  strict shape-geometry sensitivity outputs.
+- `figures/`: publication-style robust-analysis figures for the main dataset.
 - `sensitivity/`: matched-tip PGLS, alternative-tree and leave-one-out
-  summaries plus primary/strict allometry and ecology tables.
+  summaries plus main-dataset allometry and ecology tables.
 - `winding_metrics.csv` and `winding_metrics_legacy_endpoint_axis.csv`: legacy
   endpoint-axis outputs retained for numerical audit, not the current robust
   geometry analysis.

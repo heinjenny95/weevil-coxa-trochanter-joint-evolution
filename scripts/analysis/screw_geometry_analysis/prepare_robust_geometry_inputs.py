@@ -75,7 +75,6 @@ def compatibility_record(row: dict[str, str]) -> dict[str, object]:
         "analysis_set_primary_adequate": as_bool(
             row, "analysis_set_primary_adequate"
         ),
-        "analysis_set_strict_good": as_bool(row, "analysis_set_strict_good"),
         "measurement_method": "robust_circular_3d_helix_soft_l1",
         "uncertainty_scope": row.get("uncertainty_interpretation", ""),
     }
@@ -108,11 +107,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         "primary_adequate": [
             record for record in records if record["analysis_set_primary_adequate"]
         ],
-        "strict_good": [
-            record for record in records if record["analysis_set_strict_good"]
-        ],
     }
-    expected = {"all": 64, "primary_adequate": 63, "strict_good": 53}
+    expected = {"all": 64, "primary_adequate": 63}
     for set_name, set_records in sets.items():
         if len(set_records) != expected[set_name]:
             raise ValueError(

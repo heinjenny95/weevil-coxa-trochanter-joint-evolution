@@ -51,8 +51,8 @@ summaries are distributed in
 `data/supplementary_source_data/S11_Robustness/Calibration_Sensitivity`.
 
 Results are evaluated across the topology-based primary tree and alternative
-branch-length representations. Findings that change with calibration, tree
-choice or fit-quality filtering are reported as sensitivity-dependent.
+branch-length representations. Findings that change with calibration or tree
+choice are reported as sensitivity-dependent.
 
 The original source alignment, partition files and source-study inference
 outputs are not redistributed in this code repository. They should be obtained

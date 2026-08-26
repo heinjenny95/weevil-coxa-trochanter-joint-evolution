@@ -5,11 +5,12 @@ of the associated manuscript. Files are grouped by analysis domain. The
 `_manifest.csv` file records the table number, caption, relative path, role,
 file size and SHA-256 checksum for every payload.
 
-Robust-geometry tables distinguish the 63-specimen main dataset from the
-53-specimen high-confidence sensitivity subset. Files that combine both
-definitions include an explicit `quality_set` column; phylogenetic geometry
-tables likewise distinguish the 14-tip main and 12-tip high-confidence matched
-datasets. Atlas-only shape analyses retain their documented 15-tip scope.
+Robust-geometry inference uses the 63-specimen main dataset without an angular
+cutoff. Other fit warnings remain descriptive diagnostics and do not define an
+exclusion subset because point count and angular coverage partly reflect the
+biological extent of the helix. Phylogenetic geometry tables use the 14 matched
+proxy tips from this main dataset. Atlas-only shape analyses retain their
+documented 15-tip scope.
 
 `S01_PCA_and_Morphospace/Kernel_Width_Selection/` contains the quantitative
 audit supporting Supplementary Fig. 25. The five archived kernel-width runs

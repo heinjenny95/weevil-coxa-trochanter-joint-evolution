@@ -18,10 +18,11 @@ Recommended order:
    validation, writes specimen- and point-level diagnostics, and performs the
    conditional moving-block residual bootstrap.
 2. `prepare_robust_geometry_inputs.py`
-   writes downstream-compatible tables for all fits, the predeclared primary
-   adequacy set and the strict quality-sensitivity set.
+   writes downstream-compatible tables for all successful fits and the
+   predeclared 63-trajectory main dataset.
 3. `screw_geometry_extraction_workflow.R`
-   reads PCA and screw-geometry measurements, applies geometry filters,
+   reads PCA and screw-geometry measurements, applies the main relative-RMS
+   criterion,
    uses fitted pitch when present and exports shape-geometry regression
    summaries. Despite its historical filename, this is a downstream
    measurement-processing script rather than the helical-fit extractor.
@@ -64,8 +65,9 @@ legacy quotient against either component are descriptive rather than
 independent tests.
 
 The final sample flow is written to `geometry_sample_flow.csv`. The robust
-analysis fitted all 64 trajectories. The primary adequacy set contains 63
-trajectories, and the strict quality-sensitivity set contains 53.
+analysis fitted all 64 trajectories, and the main dataset contains the 63 fits
+with helix RMS divided by fitted radius no greater than 0.10. Other diagnostic
+warnings are reported descriptively and do not remove short helices.
 
 The joint-type PERMANOVA uses 999 permutations with the fixed seed `20260808`
 so its tabulated P value is exactly reproducible.
@@ -143,12 +145,14 @@ would require repeated independent landmark placement. Quality flags are
 diagnostics, not automatic exclusion rules. In particular, short arcs can
 admit several geometrically plausible axes even when their residuals are low.
 
-For downstream validation, the script records three analysis sets without
-modifying the raw fits: `all` contains every successful fit;
+For downstream validation, the script records two analysis sets without
+modifying the raw fits: `all` contains every successful fit and
 `primary_adequate` requires helix RMS divided by fitted radius to be no greater
-than 0.10; and `strict_good` retains only traces without provisional geometry
-warnings. The primary threshold is based only on geometric model adequacy and
-is fixed before inspecting downstream biological associations.
+than 0.10. Other warnings remain descriptive diagnostics and do not define a
+second exclusion subset, because point count and angular coverage partly
+reflect the biological length of the traced helix. The relative-RMS threshold
+is based only on geometric model adequacy and was fixed before inspecting
+downstream biological associations.
 
 Run the synthetic recovery and parser tests with:
 

@@ -994,11 +994,7 @@ def specimen_summary_record(
         "analysis_set_primary_adequate": bool(
             float(quality["helix_rms_relative_to_radius"]) <= 0.10
         ),
-        "analysis_set_strict_good": quality["quality_class"] == "good",
-        "analysis_set_definition": (
-            "primary: helix_rms/fit_radius <= 0.10; "
-            "strict: no provisional geometry-quality warnings"
-        ),
+        "analysis_set_definition": "main: helix_rms/fit_radius <= 0.10",
         "ported_legacy_abs_winding_angle_deg": legacy.abs_winding_angle_deg,
         "ported_legacy_axial_span": legacy.axial_span,
         "ported_legacy_fit_radius": legacy.radius,
@@ -1341,9 +1337,6 @@ def run_batch(arguments: argparse.Namespace) -> int:
         "primary_adequate": sum(
             bool(record["analysis_set_primary_adequate"]) for record in summaries
         ),
-        "strict_good": sum(
-            bool(record["analysis_set_strict_good"]) for record in summaries
-        ),
     }
     manifest = {
         "algorithm": "robust circular 3D helix fit",
@@ -1361,13 +1354,15 @@ def run_batch(arguments: argparse.Namespace) -> int:
         "robust_loss": "soft_l1",
         "robust_f_scale_normalized": 0.02,
         "uncertainty_scope": "conditional moving-block residual bootstrap; does not include manual tracing repeatability",
-        "quality_flags_are": "provisional diagnostics, not preregistered exclusion criteria",
+        "quality_flags_are": (
+            "descriptive diagnostics only; they are not exclusion criteria because "
+            "point count and angular coverage partly reflect biological helix extent"
+        ),
         "quality_class_counts": quality_counts,
         "analysis_set_counts": analysis_set_counts,
         "analysis_set_definition": {
             "all": "all successful geometry fits",
             "primary_adequate": "helix RMS divided by fitted radius <= 0.10",
-            "strict_good": "no provisional geometry-quality warnings",
         },
         "n_bootstrap_draw_rows": len(bootstrap_draws),
         "legacy_reproduction_max_absolute_differences": reproduction_maxima,

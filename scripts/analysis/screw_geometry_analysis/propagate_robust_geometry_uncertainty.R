@@ -81,7 +81,6 @@ for (column in intersect(draw_numeric, names(draws))) {
 for (column in c("PC1", "PC2")) pca[[column]] <- as.numeric(pca[[column]])
 
 metrics$analysis_set_primary_adequate <- as.logical(metrics$analysis_set_primary_adequate)
-metrics$analysis_set_strict_good <- as.logical(metrics$analysis_set_strict_good)
 
 if (nrow(metrics) != 64 || nrow(draws) != 12800) {
   stop("Unexpected robust geometry dimensions")
@@ -91,8 +90,7 @@ if (anyDuplicated(pca$specimen_id)) stop("Duplicate specimen IDs in PCA table")
 
 analysis_sets <- list(
   all = metrics$specimen_id,
-  primary_adequate = metrics$specimen_id[metrics$analysis_set_primary_adequate],
-  strict_good = metrics$specimen_id[metrics$analysis_set_strict_good]
+  primary_adequate = metrics$specimen_id[metrics$analysis_set_primary_adequate]
 )
 
 point_geometry <- metrics %>%
@@ -547,7 +545,7 @@ ecology_predictors <- c(
 )
 ecology_rows <- list()
 ecology_index <- 1L
-for (set_name in c("primary_adequate", "strict_good")) {
+for (set_name in "primary_adequate") {
   point_tip <- build_tip_data(set_name, 0L) %>% left_join(ecology2, by = "tree_label")
   for (response in c("angle", "axial_span")) {
     for (predictor in ecology_predictors) {
@@ -604,7 +602,7 @@ manifest <- c(
   paste("Bootstrap replicates:", length(unique(draws$bootstrap_replicate))),
   paste("Analysis set sizes:", paste(names(analysis_sets), lengths(analysis_sets), collapse = "; ")),
   "Main dataset: helix RMS / fitted radius <= 0.10.",
-  "High-confidence subset: no provisional geometry-quality warnings.",
+  "Other fit diagnostics are retained descriptively and do not define an exclusion subset because point count and angular coverage partly reflect biological helix extent.",
   "PGLS lambda is optimized on the point-estimate geometry and then held fixed across measurement-bootstrap draws.",
   "Uncertainty remains conditional on the traced semilandmarks and excludes manual placement repeatability."
 )
