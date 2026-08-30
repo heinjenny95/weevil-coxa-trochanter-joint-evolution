@@ -1,7 +1,7 @@
-analysis_level,set_label,model,fit_status,delta_plot,converged,AIC,logLik
-Multivariate,PC1-PC5,BM,converged,3.04578157192208,TRUE,-149.706491424116,94.8532457120579
-Multivariate,PC1-PC5,OU,converged,0.00000000000000,TRUE,-152.752272996038,111.3761364980189
-Multivariate,PC1-PC5,EB,failed,NA,FALSE,NA,NA
-Multivariate,PC1-PC4,BM,converged,0.00000000000000,TRUE,-110.772726032257,69.3863630161286
-Multivariate,PC1-PC4,OU,failed,NA,FALSE,NA,NA
-Multivariate,PC1-PC4,EB,failed,NA,FALSE,NA,NA
+analysis_level,set_label,model,fit_status,status_label,delta_plot,n_tips,converged,hessian_reliable,fit_reliable,AIC,logLik,diagnostic
+Multivariate,PC1-PC5,BM,reliable,,0.00000000000000,15,TRUE,TRUE,TRUE,-149.706491424116,94.8532457120579,Optimizer converged and the Hessian diagnostic was reliable.
+Multivariate,PC1-PC5,OU,unreliable_hessian,Hessian unreliable,NA,15,TRUE,FALSE,FALSE,-152.752272996038,111.3761364980189,"Optimizer converged, but mvMORPH reported an unreliable Hessian solution."
+Multivariate,PC1-PC5,EB,reliable,,2.78684874071104,15,TRUE,TRUE,TRUE,-146.919642683405,94.4598213417024,Optimizer converged and the Hessian diagnostic was reliable.
+Multivariate,PC1-PC4,BM,reliable,,0.00000000000000,15,TRUE,TRUE,TRUE,-110.772726032257,69.3863630161286,Optimizer converged and the Hessian diagnostic was reliable.
+Multivariate,PC1-PC4,OU,failed,fit failed,NA,15,FALSE,NA,FALSE,NA,NA,Model failed: the leading minor of order 32 is not positive definite
+Multivariate,PC1-PC4,EB,reliable,,3.24140079797593,15,TRUE,TRUE,TRUE,-107.531325234281,68.7656626171407,Optimizer converged and the Hessian diagnostic was reliable.

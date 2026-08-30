@@ -1335,6 +1335,7 @@ for (set_name in names(mv_pc_sets)) {
   dat <- dat[match(tr$tip.label, dat$tree_label), , drop = FALSE]
   dat_df <- as.data.frame(dat)
   Y <- as.matrix(dat_df[, pcs, drop = FALSE])
+  rownames(Y) <- dat$tree_label
 
   fit_mv_model <- function(model_name) {
     tryCatch({
@@ -1342,23 +1343,49 @@ for (set_name in names(mv_pc_sets)) {
         model_name,
         "BM" = suppressWarnings(mvMORPH::mvBM(tree = tr, data = Y, model = "BM1")),
         "OU" = suppressWarnings(mvMORPH::mvOU(tree = tr, data = Y, model = "OU1")),
-        "EB" = suppressWarnings(mvMORPH::mvEB(tree = tr, data = Y, model = "EB"))
+        "EB" = suppressWarnings(mvMORPH::mvEB(tree = tr, data = Y))
+      )
+      optimizer_converged <- isTRUE(as.integer(fit$convergence) == 0L)
+      hessian_reliable <- length(fit$hess.values) > 0 &&
+        all(is.finite(as.numeric(fit$hess.values))) &&
+        all(as.numeric(fit$hess.values) == 0)
+      fit_reliable <- optimizer_converged && hessian_reliable
+      fit_status <- dplyr::case_when(
+        !optimizer_converged ~ "optimizer_failed",
+        !hessian_reliable ~ "unreliable_hessian",
+        TRUE ~ "reliable"
+      )
+      diagnostic <- dplyr::case_when(
+        fit_status == "optimizer_failed" ~ "Optimizer did not converge.",
+        fit_status == "unreliable_hessian" ~ "Optimizer converged, but mvMORPH reported an unreliable Hessian solution.",
+        TRUE ~ "Optimizer converged and the Hessian diagnostic was reliable."
       )
       tibble::tibble(
         pc_set = set_name,
+        n_tips = nrow(dat),
         model = model_name,
         logLik = as.numeric(stats::logLik(fit)),
         AIC = stats::AIC(fit),
-        converged = TRUE
+        converged = optimizer_converged,
+        hessian_reliable = hessian_reliable,
+        fit_reliable = fit_reliable,
+        fit_status = fit_status,
+        diagnostic = diagnostic
       )
     }, error = function(e) {
-      skip_log <<- add_skip_log(skip_log, "Multivariate_Evol", set_name, model_name, "Model failed or unstable.")
+      failure_reason <- paste0("Model failed: ", conditionMessage(e))
+      skip_log <<- add_skip_log(skip_log, "Multivariate_Evol", set_name, model_name, failure_reason)
       tibble::tibble(
         pc_set = set_name,
+        n_tips = nrow(dat),
         model = model_name,
         logLik = NA_real_,
         AIC = NA_real_,
-        converged = FALSE
+        converged = FALSE,
+        hessian_reliable = NA,
+        fit_reliable = FALSE,
+        fit_status = "failed",
+        diagnostic = failure_reason
       )
     })
   }
@@ -1370,14 +1397,40 @@ for (set_name in names(mv_pc_sets)) {
   ) %>%
     dplyr::group_by(pc_set) %>%
     dplyr::mutate(
-      delta_AIC = AIC - min(AIC, na.rm = TRUE),
-      akaike_weight = dplyr::if_else(
-        is.na(AIC),
-        NA_real_,
-        exp(-0.5 * delta_AIC) / sum(exp(-0.5 * delta_AIC), na.rm = TRUE)
+      raw_eligible = converged & !is.na(AIC),
+      reliable_eligible = fit_reliable & !is.na(AIC),
+      delta_AIC_raw = dplyr::if_else(
+        raw_eligible,
+        AIC - min(AIC[raw_eligible], na.rm = TRUE),
+        NA_real_
       ),
-      best_model = model[which.min(AIC)]
+      akaike_weight_raw = dplyr::if_else(
+        raw_eligible,
+        exp(-0.5 * delta_AIC_raw) / sum(exp(-0.5 * delta_AIC_raw), na.rm = TRUE),
+        NA_real_
+      ),
+      best_model_raw = if (any(raw_eligible)) {
+        as.character(model[raw_eligible][which.min(AIC[raw_eligible])])
+      } else {
+        NA_character_
+      },
+      delta_AIC = dplyr::if_else(
+        reliable_eligible,
+        AIC - min(AIC[reliable_eligible], na.rm = TRUE),
+        NA_real_
+      ),
+      akaike_weight = dplyr::if_else(
+        reliable_eligible,
+        exp(-0.5 * delta_AIC) / sum(exp(-0.5 * delta_AIC), na.rm = TRUE),
+        NA_real_
+      ),
+      best_model = if (any(reliable_eligible)) {
+        as.character(model[reliable_eligible][which.min(AIC[reliable_eligible])])
+      } else {
+        NA_character_
+      }
     ) %>%
+    dplyr::select(-raw_eligible, -reliable_eligible) %>%
     dplyr::ungroup()
 
   mv_model_results <- dplyr::bind_rows(mv_model_results, mv_tmp)
@@ -2911,11 +2964,13 @@ mv_df <- mv_model_results %>%
       as.character(pc_set)
     ),
     model = factor(model, levels = c("BM", "OU", "EB")),
-    converged = as.logical(converged)
+    converged = as.logical(converged),
+    fit_reliable = as.logical(fit_reliable),
+    fit_status = as.character(fit_status)
   )
 
-mv_conv_df <- mv_df %>%
-  dplyr::filter(converged, !is.na(AIC)) %>%
+mv_reliable_df <- mv_df %>%
+  dplyr::filter(fit_reliable, !is.na(AIC)) %>%
   dplyr::group_by(set_label) %>%
   dplyr::mutate(
     delta_plot = AIC - min(AIC, na.rm = TRUE)
@@ -2924,13 +2979,20 @@ mv_conv_df <- mv_df %>%
 
 mv_plot_df <- mv_df %>%
   dplyr::left_join(
-    mv_conv_df %>% dplyr::select(set_label, model, delta_plot),
+    mv_reliable_df %>% dplyr::select(set_label, model, delta_plot),
     by = c("set_label", "model")
   ) %>%
   dplyr::mutate(
-    fit_status = dplyr::case_when(
-      converged & !is.na(AIC) ~ "converged",
-      TRUE ~ "failed"
+    status_x = dplyr::case_when(
+      as.character(model) == "OU" ~ 11.8,
+      as.character(model) == "EB" ~ 16.2,
+      TRUE ~ NA_real_
+    ),
+    status_label = dplyr::case_when(
+      fit_status == "unreliable_hessian" ~ "Hessian unreliable",
+      fit_status == "optimizer_failed" ~ "optimizer failed",
+      fit_status == "failed" ~ "fit failed",
+      TRUE ~ NA_character_
     ),
     set_label = factor(set_label, levels = rev(c("PC1-PC5", "PC1-PC4")))
   )
@@ -2962,7 +3024,7 @@ uni_segment_df <- uni_plot_df %>%
   )
 
 mv_segment_df <- mv_plot_df %>%
-  dplyr::filter(fit_status == "converged", !is.na(delta_plot)) %>%
+  dplyr::filter(fit_status == "reliable", !is.na(delta_plot)) %>%
   dplyr::group_by(set_label) %>%
   dplyr::summarise(
     x_min = min(delta_plot, na.rm = TRUE),
@@ -3030,31 +3092,28 @@ p_mv <- ggplot2::ggplot() +
     linewidth = 1.0
   ) +
   ggplot2::geom_point(
-    data = mv_plot_df %>% dplyr::filter(fit_status == "converged", !is.na(delta_plot)),
+    data = mv_plot_df %>% dplyr::filter(fit_status == "reliable", !is.na(delta_plot)),
     ggplot2::aes(x = delta_plot, y = set_label, color = model, shape = model),
     size = 4.2,
     stroke = 0.8
   ) +
   ggplot2::geom_point(
-    data = mv_plot_df %>% dplyr::filter(fit_status == "failed"),
-    ggplot2::aes(x = failed_x, y = set_label),
-    shape = 4,
-    size = 4.8,
-    stroke = 1.2,
-    color = failed_col
+    data = mv_plot_df %>% dplyr::filter(fit_status != "reliable"),
+    ggplot2::aes(x = status_x, y = set_label, color = model, shape = model),
+    size = 4.2,
+    stroke = 0.8
   ) +
   ggplot2::geom_text(
-    data = mv_plot_df %>% dplyr::filter(fit_status == "failed"),
-    ggplot2::aes(x = failed_x + 0.35, y = set_label, label = "failed"),
+    data = mv_plot_df %>% dplyr::filter(fit_status != "reliable"),
+    ggplot2::aes(x = status_x + 0.35, y = set_label, label = status_label, color = model),
     hjust = 0,
     vjust = 0.5,
-    size = 3.4,
-    color = failed_col
+    size = 3.2
   ) +
   ggplot2::scale_color_manual(values = model_cols) +
   ggplot2::scale_shape_manual(values = model_shapes) +
   ggplot2::scale_x_continuous(
-    limits = c(-0.2, 14),
+    limits = c(-0.2, 20.2),
     breaks = c(0, 2, 5, 10),
     expand = ggplot2::expansion(mult = c(0, 0.01))
   ) +
@@ -3102,7 +3161,10 @@ uni_fig_table <- uni_plot_df %>%
   dplyr::select(analysis_level, set_label, model, fit_status, delta_plot, converged, AIC, AICc, logLik)
 
 mv_fig_table <- mv_plot_df %>%
-  dplyr::select(analysis_level, set_label, model, fit_status, delta_plot, converged, AIC, logLik)
+  dplyr::select(
+    analysis_level, set_label, model, fit_status, status_label, delta_plot,
+    n_tips, converged, hessian_reliable, fit_reliable, AIC, logLik, diagnostic
+  )
 
 write_clean_csv(
   uni_fig_table,

@@ -10,6 +10,13 @@ That script contains the primary analyses of phylogenetic signal, evolutionary
 model fitting, PGLS, phylogenetic ANOVA, ancestral-state reconstruction and
 tree-sensitivity checks.
 
+For multivariate evolutionary-model fits, the script records optimizer
+convergence separately from Hessian reliability, retains raw AIC summaries for
+auditability and calculates reported rankings only across reliable fits. These
+shape models use all 15 shape-only proxy tips. The EB model is fitted with the
+supported `mvMORPH::mvEB(tree, data)` call, without an inapplicable `model`
+argument.
+
 The unit of analysis is 15 taxonomic proxy tips, not 68 sampled genera. The
 backbone tree lacks exact matches for most sampled genera, so specimens were
 assigned to the closest defensible available tip and continuous measurements

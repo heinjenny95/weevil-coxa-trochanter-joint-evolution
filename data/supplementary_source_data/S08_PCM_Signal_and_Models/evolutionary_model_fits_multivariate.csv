@@ -1,7 +1,7 @@
-quality_set,pc_set,model,logLik,AIC,converged,delta_AIC,akaike_weight,best_model
-main_dataset,PC1_5,BM,94.8532457120579,-149.706491424116,TRUE,3.04578157192208,0.179036230854262,OU
-main_dataset,PC1_5,OU,111.3761364980189,-152.752272996038,TRUE,0.00000000000000,0.820963769145738,OU
-main_dataset,PC1_5,EB,NA,NA,FALSE,NA,NA,OU
-main_dataset,PC1_4,BM,69.3863630161286,-110.772726032257,TRUE,0.00000000000000,1.000000000000000,BM
-main_dataset,PC1_4,OU,NA,NA,FALSE,NA,NA,BM
-main_dataset,PC1_4,EB,NA,NA,FALSE,NA,NA,BM
+quality_set,pc_set,n_tips,model,logLik,AIC,converged,hessian_reliable,fit_reliable,fit_status,diagnostic,delta_AIC_raw,akaike_weight_raw,best_model_raw,delta_AIC,akaike_weight,best_model
+main_dataset,PC1_5,15,BM,94.8532457120579,-149.706491424116,TRUE,TRUE,TRUE,reliable,Optimizer converged and the Hessian diagnostic was reliable.,3.04578157192208,0.1714182232696947,OU,0.00000000000000,0.801138361696305,BM
+main_dataset,PC1_5,15,OU,111.3761364980189,-152.752272996038,TRUE,FALSE,FALSE,unreliable_hessian,"Optimizer converged, but mvMORPH reported an unreliable Hessian solution.",0.00000000000000,0.7860316875767387,OU,NA,NA,BM
+main_dataset,PC1_5,15,EB,94.4598213417024,-146.919642683405,TRUE,TRUE,TRUE,reliable,Optimizer converged and the Hessian diagnostic was reliable.,5.83263031263311,0.0425500891535667,OU,2.78684874071104,0.198861638303695,BM
+main_dataset,PC1_4,15,BM,69.3863630161286,-110.772726032257,TRUE,TRUE,TRUE,reliable,Optimizer converged and the Hessian diagnostic was reliable.,0.00000000000000,0.8348917007405590,BM,0.00000000000000,0.834891700740559,BM
+main_dataset,PC1_4,15,OU,NA,NA,FALSE,NA,FALSE,failed,Model failed: the leading minor of order 32 is not positive definite,NA,NA,BM,NA,NA,BM
+main_dataset,PC1_4,15,EB,68.7656626171407,-107.531325234281,TRUE,TRUE,TRUE,reliable,Optimizer converged and the Hessian diagnostic was reliable.,3.24140079797593,0.1651082992594411,BM,3.24140079797593,0.165108299259441,BM

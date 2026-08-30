@@ -398,7 +398,16 @@ if (!is.na(manuscript_root)) {
 uni_models <- read_mixed(file.path(source_dir, "evolutionary_models_univariate.csv")) %>%
   mutate(set_label = factor(set_label, levels = rev(c("PC1", "PC2", "PC3", "PC4", "PC5"))))
 mv_models <- read_mixed(file.path(source_dir, "evolutionary_models_multivariate.csv")) %>%
-  mutate(set_label = factor(set_label, levels = rev(c("PC1-PC5", "PC1-PC4"))))
+  mutate(
+    set_label = factor(set_label, levels = rev(c("PC1-PC5", "PC1-PC4"))),
+    status_x = case_when(model == "OU" ~ 11.8, model == "EB" ~ 16.2, TRUE ~ NA_real_),
+    status_label = case_when(
+      fit_status == "unreliable_hessian" ~ "Hessian unreliable",
+      fit_status == "optimizer_failed" ~ "optimizer failed",
+      fit_status == "failed" ~ "fit failed",
+      TRUE ~ NA_character_
+    )
+  )
 model_cols <- c(BM = bluegrey, OU = ink, EB = coral)
 model_shapes <- c(BM = 16, OU = 17, EB = 15)
 ed6a <- ggplot(uni_models, aes(delta_plot, set_label, colour = model, shape = model, group = set_label)) +
@@ -407,10 +416,10 @@ ed6a <- ggplot(uni_models, aes(delta_plot, set_label, colour = model, shape = mo
   scale_colour_manual(values = model_cols) + scale_shape_manual(values = model_shapes) +
   labs(x = expression(Delta*AIC[c]), y = NULL, colour = NULL, shape = NULL) + theme_pub() + theme(legend.position = "top")
 ed6b <- ggplot(mv_models, aes(delta_plot, set_label, colour = model, shape = model)) +
-  geom_segment(data = mv_models %>% filter(fit_status == "converged") %>% group_by(set_label) %>% summarise(xmin = min(delta_plot), xmax = max(delta_plot), .groups = "drop"), aes(x = xmin, xend = xmax, y = set_label, yend = set_label), inherit.aes = FALSE, colour = grid_col, linewidth = 1.5) +
-  geom_point(data = mv_models %>% filter(fit_status == "converged"), size = 3.2) +
-  geom_point(data = mv_models %>% filter(fit_status == "failed"), aes(x = 11.8), shape = 4, colour = coral, size = 4, stroke = 1.1) +
-  geom_text(data = mv_models %>% filter(fit_status == "failed"), aes(x = 12.3, label = "not reliable"), colour = coral, hjust = 0, size = 3) +
+  geom_segment(data = mv_models %>% filter(fit_status == "reliable") %>% group_by(set_label) %>% summarise(xmin = min(delta_plot), xmax = max(delta_plot), .groups = "drop"), aes(x = xmin, xend = xmax, y = set_label, yend = set_label), inherit.aes = FALSE, colour = grid_col, linewidth = 1.5) +
+  geom_point(data = mv_models %>% filter(fit_status == "reliable"), size = 3.2) +
+  geom_point(data = mv_models %>% filter(fit_status != "reliable"), aes(x = status_x), size = 3.2) +
+  geom_text(data = mv_models %>% filter(fit_status != "reliable"), aes(x = status_x + 0.35, label = status_label), hjust = 0, size = 2.7) +
   geom_vline(xintercept = c(2, 10), linetype = "dashed", colour = bluegrey) +
   scale_colour_manual(values = model_cols) + scale_shape_manual(values = model_shapes) +
   scale_x_continuous(limits = c(-0.2, 20), expand = expansion(mult = c(0, 0.02))) +
