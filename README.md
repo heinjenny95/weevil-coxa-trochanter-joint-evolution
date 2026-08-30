@@ -114,7 +114,13 @@ dataset. Supplementary Table 24 exports raw-scale node estimates, variances and
 95% intervals for all eight traits. Extended Data Figure 5 uses standardized
 scores only for colour mapping and prunes each panel to its numerical
 trait-specific tip set; the missing geometry values for the Nemonychidae proxy
-tip are not used to force the five shape maps onto the 14-tip tree.
+tip are not used to force the five shape maps onto the 14-tip tree. All
+`fastAnc` estimates and `contMap` visualizations are conditional on Brownian
+motion (BM), recorded explicitly as `reconstruction_model = BM`; this common
+reconstruction assumption is not a model-selection result. In particular, the
+exploratory univariate comparison ranks OU above BM for axial span on the
+primary tree, while tree-sensitive rankings do not identify a robust general
+evolutionary process.
 
 The primary comparative tree is `data/phylogeny/P01_Trees/01_primary_tree_grafen.tre`.
 Its Grafen branch lengths encode relative node depth and are not geological

@@ -16,7 +16,11 @@ shape-only sample, and for absolute winding angle and endpoint-based axial span
 on the 14-tip main geometry sample. The standardized Extended Data Figure 5
 source retains all 15 shape tips and marks the unavailable geometry values as
 missing so each `contMap` panel is pruned to the same trait-specific tip set as
-its numerical reconstruction.
+its numerical reconstruction. Both `fastAnc` and `contMap` outputs are
+conditional on Brownian motion (BM), and the numerical files identify that
+assumption in a `reconstruction_model` column. BM is used as a common
+reconstruction model and is not inferred from the exploratory BM/OU/EB model
+comparisons.
 
 For multivariate evolutionary-model fits, the script records optimizer
 convergence separately from Hessian reliability, retains raw AIC summaries for

@@ -392,7 +392,7 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   for (j in seq_along(legend_cols)) {
     rect(legend_x[[j]], 0.46, legend_x[[j + 1]], 0.51, col = legend_cols[[j]], border = NA)
   }
-  text(0.50, 0.64, "Standardized trait score", cex = 0.72, col = ink)
+  text(0.50, 0.64, "BM-conditional standardized trait score", cex = 0.68, col = ink)
   text(0.18, 0.36, "-2.2\nlow", cex = 0.66, col = ink)
   text(0.82, 0.36, "2.2\nhigh", cex = 0.66, col = ink)
 }

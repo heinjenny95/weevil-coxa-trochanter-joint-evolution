@@ -526,6 +526,7 @@ safe_fastAnc <- function(tree, trait_vec, trait_name) {
 
   tibble::tibble(
     trait = trait_name,
+    reconstruction_model = "BM",
     node = names(anc$ace),
     estimate = as.numeric(anc$ace),
     variance = as.numeric(anc$var),
@@ -2507,7 +2508,7 @@ write_clean_csv(
 
 robust_asr_root_summary <- robust_asr_root %>%
   dplyr::filter(!is.na(estimate)) %>%
-  dplyr::group_by(trait) %>%
+  dplyr::group_by(reconstruction_model, trait) %>%
   dplyr::summarise(
     n_trees = dplyr::n(),
     estimate_min = min(estimate, na.rm = TRUE),
