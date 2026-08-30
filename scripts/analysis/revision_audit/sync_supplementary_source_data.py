@@ -101,12 +101,6 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def filter_shape_only(path: Path) -> None:
-    fields, rows = read_csv(path)
-    rows = [row for row in rows if row.get("trait", "").startswith("PC")]
-    write_csv(path, fields, rows)
-
-
 def sanitize_file(path: Path) -> None:
     fields, rows = read_csv(path)
     write_csv(path, fields, rows)
@@ -230,6 +224,14 @@ def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("repo_root", type=Path)
     parser.add_argument("robust_point_estimates", type=Path)
+    parser.add_argument(
+        "--unified-allometry-dir",
+        type=Path,
+        help=(
+            "Directory produced by run_unified_phylogenetic_allometry.R. "
+            "If omitted, the existing unified Table 22 files are preserved."
+        ),
+    )
     args = parser.parse_args()
 
     repo = args.repo_root.resolve()
@@ -273,11 +275,23 @@ def main() -> None:
         primary / "allometry/allometry_continuous_traits_results.csv",
         t19 / "allometry_continuous_traits_results.csv",
     )
-    filter_shape_only(t19 / "pgls_results_main_traits.csv")
-    copy(
-        primary / "allometry/Allometry_Phylogenetic/pgls_results_main_traits.csv",
-        t19 / "pgls_geometry_main_traits_main_dataset.csv",
+    unified_names = (
+        "pgls_allometry_all_traits.csv",
+        "pgls_allometry_tip_data_geometry.csv",
+        "pgls_allometry_tip_data_shape.csv",
+        "pgls_geometry_main_traits_main_dataset.csv",
+        "pgls_results_main_traits.csv",
     )
+    if args.unified_allometry_dir is not None:
+        unified_dir = args.unified_allometry_dir.resolve()
+        for name in unified_names:
+            copy(unified_dir / name, t19 / name)
+    else:
+        missing_unified = [name for name in unified_names if not (t19 / name).exists()]
+        if missing_unified:
+            raise FileNotFoundError(
+                "Missing unified allometry tables: " + ", ".join(missing_unified)
+            )
 
     # Tables 23--34: matched-tip PCM outputs for the main dataset.
     matched_outputs = {
@@ -338,6 +352,8 @@ def main() -> None:
     additions["S09_PCM_PGLS/pgls_shape_geometry_rubin_summary.csv"] = ("16", titles["16"])
     additions["S05_Joint_Typology/joint_type_uncertainty_summary.csv"] = ("17", titles["17"])
     additions["S03_Allometry/pgls_geometry_main_traits_main_dataset.csv"] = ("22", titles["22"])
+    additions["S03_Allometry/pgls_allometry_tip_data_geometry.csv"] = ("22", titles["22"])
+    additions["S03_Allometry/pgls_allometry_tip_data_shape.csv"] = ("22", titles["22"])
     rebuild_manifest(source, additions)
 
     print("Supplementary source data synchronized and manifest rebuilt.")

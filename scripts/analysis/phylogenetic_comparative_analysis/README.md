@@ -23,6 +23,7 @@ Additional focused scripts in this folder are:
   performs the direct phylogenetically informed multivariate RRPP analysis
   across all non-zero atlas PC axes. The fitted one-dimensional projection is
   exported only for visualization.
-- `test_phylogenetic_allometry_axial_span.R`
-  adds the phylogenetically informed allometry test for axial span after the
-  main allometry workflow had already been established.
+
+The univariate PC- and geometry-size PGLS workflow is
+`../allometry_analysis/run_unified_phylogenetic_allometry.R`. The retired
+fixed-lambda axial-span append script is no longer an active entry point.

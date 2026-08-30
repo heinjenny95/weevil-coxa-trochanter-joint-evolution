@@ -96,18 +96,30 @@ def refresh_manifest(root: Path) -> None:
         if rel in known:
             continue
         is_calibration = rel.startswith("S11_Robustness/Calibration_Sensitivity/")
+        is_allometry_tip_data = rel in {
+            "S03_Allometry/pgls_allometry_tip_data_geometry.csv",
+            "S03_Allometry/pgls_allometry_tip_data_shape.csv",
+        }
         kept.append({
-            "supplementary_table": "",
+            "supplementary_table": "22" if is_allometry_tip_data else "",
             "caption": (
-                "Calibration-sensitivity analysis provenance and outputs."
-                if is_calibration
-                else "Auxiliary analysis source data."
+                "Table 22: Phylogenetically informed allometry results."
+                if is_allometry_tip_data
+                else (
+                    "Calibration-sensitivity analysis provenance and outputs."
+                    if is_calibration
+                    else "Auxiliary analysis source data."
+                )
             ),
             "relative_path": rel,
             "role": (
-                "calibration_sensitivity_source_data"
-                if is_calibration
-                else "auxiliary_source_data"
+                "numbered_table_payload"
+                if is_allometry_tip_data
+                else (
+                    "calibration_sensitivity_source_data"
+                    if is_calibration
+                    else "auxiliary_source_data"
+                )
             ),
             "size_bytes": str(path.stat().st_size),
             "sha256": sha256(path),
@@ -138,6 +150,7 @@ def main() -> None:
     eco_main = rebuild / "Ecology_Main"
     allom = rebuild / "Allometry_Main"
     phy_allom = rebuild / "Phylogenetic_Multivariate_Allometry"
+    unified_allom = rebuild / "Unified_Phylogenetic_Allometry"
 
     fig = repo / "data/screw_geometry/figure_source_data"
     figure_map = {
@@ -181,9 +194,14 @@ def main() -> None:
         "allometry_univariate_PC1_to_PC5_results.csv",
     ):
         copy_csv(allom / name, s03 / name)
-    copy_csv(allom / "Allometry_Phylogenetic/pgls_results_main_traits.csv", s03 / "pgls_results_main_traits.csv")
-    copy_main(pcm_main / "05_Allometry/allometry_results.csv", s03 / "pgls_allometry_all_traits.csv")
-    copy_csv(pcm_main / "05_Allometry/allometry_results.csv", s03 / "pgls_geometry_main_traits_main_dataset.csv")
+    for name in (
+        "pgls_allometry_all_traits.csv",
+        "pgls_allometry_tip_data_geometry.csv",
+        "pgls_allometry_tip_data_shape.csv",
+        "pgls_geometry_main_traits_main_dataset.csv",
+        "pgls_results_main_traits.csv",
+    ):
+        copy_csv(unified_allom / name, s03 / name)
     for name in (
         "phylogenetic_multivariate_allometry_matching.csv",
         "phylogenetic_multivariate_allometry_projection.csv",
