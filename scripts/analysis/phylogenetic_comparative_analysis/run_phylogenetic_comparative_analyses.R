@@ -85,6 +85,13 @@ output_dir <- Sys.getenv(
   "WEV_PCM_OUTPUT_DIR",
   unset = "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/PCM"
 )
+unified_allometry_dir <- Sys.getenv("WEV_UNIFIED_ALLOMETRY_DIR", unset = "")
+if (!nzchar(unified_allometry_dir)) {
+  stop(
+    "Set WEV_UNIFIED_ALLOMETRY_DIR to the output directory from ",
+    "run_unified_phylogenetic_allometry.R."
+  )
+}
 require_geometry_matched_specimens <- tolower(Sys.getenv(
   "WEV_REQUIRE_GEOMETRY_MATCHED_SPECIMENS",
   unset = "false"
@@ -1020,16 +1027,9 @@ geometry_models <- purrr::map(geometry_pairs, ~ tibble::tibble(response = .x[1],
 shape_geometry_models <- tidyr::expand_grid(response = pc_vars_main, predictor = geometry_vars_available) %>%
   dplyr::filter(response %in% names(tip_level_df), predictor %in% names(tip_level_df))
 
-size_models <- dplyr::bind_rows(
-  tibble::tibble(response = pc_vars_main, predictor = size_var),
-  tibble::tibble(response = geometry_vars_available, predictor = size_var)
-) %>%
-  dplyr::filter(response %in% names(tip_level_df), predictor %in% names(tip_level_df))
-
 all_cont_models <- dplyr::bind_rows(
   geometry_models,
-  shape_geometry_models,
-  size_models
+  shape_geometry_models
 )
 
 pgls_results <- list()
@@ -1087,13 +1087,40 @@ if (nrow(pgls_results_df) > 0) {
     dplyr::rename_with(~ "statistic", dplyr::any_of(c("t value", "t-value"))) %>%
     dplyr::rename_with(~ "p_value", dplyr::any_of(c("Pr(>|t|)", "p-value"))) %>%
     dplyr::mutate(
+      analysis_set = "main_pcm_matrix",
+      fdr_family = "continuous_trait_matrix_excluding_allometry",
       fdr_p_value = if ("p_value" %in% names(.)) p_adjust_if_possible(p_value) else NA_real_
     )
 }
+
+unified_allometry_results <- read_delim_guess(
+  file.path(unified_allometry_dir, "pgls_allometry_all_traits.csv")
+) %>%
+  dplyr::transmute(
+    analysis_set,
+    term,
+    estimate,
+    std_error,
+    statistic,
+    p_value,
+    response,
+    predictor,
+    n_taxa,
+    lambda,
+    predictor_type = "continuous",
+    fdr_family,
+    fdr_p_value
+  )
+pgls_results_df <- dplyr::bind_rows(pgls_results_df, unified_allometry_results)
 write_clean_csv(pgls_results_df, file.path(output_dir, "04_PGLS", "pgls_continuous_vs_continuous.csv"))
 
 if (length(pgls_anova_results) > 0) {
-  pgls_anova_df <- dplyr::bind_rows(pgls_anova_results)
+  pgls_anova_df <- dplyr::bind_rows(pgls_anova_results) %>%
+    dplyr::mutate(analysis_set = "main_pcm_matrix")
+  unified_allometry_anova <- read_delim_guess(
+    file.path(unified_allometry_dir, "pgls_allometry_all_traits_anova.csv")
+  )
+  pgls_anova_df <- dplyr::bind_rows(pgls_anova_df, unified_allometry_anova)
   write_clean_csv(pgls_anova_df, file.path(output_dir, "04_PGLS", "pgls_continuous_vs_continuous_anova.csv"))
 }
 
@@ -1102,7 +1129,7 @@ if (length(pgls_anova_results) > 0) {
 # ============================================================
 
 allometry_df <- if (nrow(pgls_results_df) > 0 && "predictor" %in% names(pgls_results_df)) {
-  pgls_results_df %>% dplyr::filter(predictor == size_var)
+  pgls_results_df %>% dplyr::filter(predictor == "log_centroid_size")
 } else {
   tibble::tibble()
 }

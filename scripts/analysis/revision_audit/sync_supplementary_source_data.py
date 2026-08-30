@@ -277,6 +277,7 @@ def main() -> None:
     )
     unified_names = (
         "pgls_allometry_all_traits.csv",
+        "pgls_allometry_all_traits_anova.csv",
         "pgls_allometry_tip_data_geometry.csv",
         "pgls_allometry_tip_data_shape.csv",
         "pgls_geometry_main_traits_main_dataset.csv",
@@ -351,6 +352,7 @@ def main() -> None:
         additions[f"S02_Shape_Geometry/{name}"] = ("15", titles["15"])
     additions["S09_PCM_PGLS/pgls_shape_geometry_rubin_summary.csv"] = ("16", titles["16"])
     additions["S05_Joint_Typology/joint_type_uncertainty_summary.csv"] = ("17", titles["17"])
+    additions["S03_Allometry/pgls_allometry_all_traits_anova.csv"] = ("22", titles["22"])
     additions["S03_Allometry/pgls_geometry_main_traits_main_dataset.csv"] = ("22", titles["22"])
     additions["S03_Allometry/pgls_allometry_tip_data_geometry.csv"] = ("22", titles["22"])
     additions["S03_Allometry/pgls_allometry_tip_data_shape.csv"] = ("22", titles["22"])

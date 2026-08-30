@@ -171,7 +171,7 @@ fit_bounded_pgls <- function(tree, tip_data, response, analysis_set) {
   coefficient_table$term <- rownames(coefficient_table)
   rownames(coefficient_table) <- NULL
 
-  data.frame(
+  coefficients <- data.frame(
     analysis_set = analysis_set,
     term = coefficient_table$term,
     estimate = coefficient_table$Value,
@@ -188,6 +188,23 @@ fit_bounded_pgls <- function(tree, tip_data, response, analysis_set) {
     stringsAsFactors = FALSE,
     check.names = FALSE
   )
+
+  anova_table <- as.data.frame(stats::anova(fit))
+  anova_table$term <- rownames(anova_table)
+  rownames(anova_table) <- NULL
+  anova_results <- data.frame(
+    analysis_set = analysis_set,
+    term = anova_table$term,
+    numDF = anova_table$numDF,
+    `F-value` = anova_table$`F-value`,
+    `p-value` = anova_table$`p-value`,
+    response = response,
+    predictor = predictor_name,
+    stringsAsFactors = FALSE,
+    check.names = FALSE
+  )
+
+  list(coefficients = coefficients, anova = anova_results)
 }
 
 allometry <- read_table_auto(allometry_path)
@@ -234,19 +251,15 @@ if (nrow(geometry_tip_data) != 14L) {
   stop("Expected 14 geometry proxy tips, found ", nrow(geometry_tip_data), ".")
 }
 
-shape_results <- do.call(
-  rbind,
-  lapply(shape_responses, function(response) {
-    fit_bounded_pgls(tree, shape_tip_data, response, "shape_only")
-  })
-)
-geometry_results <- do.call(
-  rbind,
-  lapply(geometry_responses, function(response) {
-    fit_bounded_pgls(tree, geometry_tip_data, response, "main_dataset")
-  })
-)
-results <- rbind(shape_results, geometry_results)
+shape_fits <- lapply(shape_responses, function(response) {
+  fit_bounded_pgls(tree, shape_tip_data, response, "shape_only")
+})
+geometry_fits <- lapply(geometry_responses, function(response) {
+  fit_bounded_pgls(tree, geometry_tip_data, response, "main_dataset")
+})
+all_fits <- c(shape_fits, geometry_fits)
+results <- do.call(rbind, lapply(all_fits, `[[`, "coefficients"))
+anova_results <- do.call(rbind, lapply(all_fits, `[[`, "anova"))
 
 results$fdr_family <- ifelse(
   results$analysis_set == "shape_only",
@@ -298,6 +311,7 @@ write_csv_lf <- function(data, path) {
 write_csv_lf(shape_tip_data, file.path(output_dir, "pgls_allometry_tip_data_shape.csv"))
 write_csv_lf(geometry_tip_data, file.path(output_dir, "pgls_allometry_tip_data_geometry.csv"))
 write_csv_lf(results, file.path(output_dir, "pgls_allometry_all_traits.csv"))
+write_csv_lf(anova_results, file.path(output_dir, "pgls_allometry_all_traits_anova.csv"))
 write_csv_lf(summary_table, file.path(output_dir, "pgls_results_main_traits.csv"))
 write_csv_lf(geometry_table, file.path(output_dir, "pgls_geometry_main_traits_main_dataset.csv"))
 

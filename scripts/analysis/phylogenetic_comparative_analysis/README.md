@@ -27,3 +27,8 @@ Additional focused scripts in this folder are:
 The univariate PC- and geometry-size PGLS workflow is
 `../allometry_analysis/run_unified_phylogenetic_allometry.R`. The retired
 fixed-lambda axial-span append script is no longer an active entry point.
+Run that workflow first and pass its output directory as
+`WEV_UNIFIED_ALLOMETRY_DIR` when running the broad comparative script. The
+broad script excludes centroid size from its internal continuous-trait matrix
+and imports the unified coefficient and ANOVA rows instead, so Supplementary
+Tables 27 and 28 cannot reintroduce the former raw-size implementation.

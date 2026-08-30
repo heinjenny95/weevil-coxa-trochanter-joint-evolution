@@ -97,6 +97,7 @@ def refresh_manifest(root: Path) -> None:
             continue
         is_calibration = rel.startswith("S11_Robustness/Calibration_Sensitivity/")
         is_allometry_tip_data = rel in {
+            "S03_Allometry/pgls_allometry_all_traits_anova.csv",
             "S03_Allometry/pgls_allometry_tip_data_geometry.csv",
             "S03_Allometry/pgls_allometry_tip_data_shape.csv",
         }
@@ -196,6 +197,7 @@ def main() -> None:
         copy_csv(allom / name, s03 / name)
     for name in (
         "pgls_allometry_all_traits.csv",
+        "pgls_allometry_all_traits_anova.csv",
         "pgls_allometry_tip_data_geometry.csv",
         "pgls_allometry_tip_data_shape.csv",
         "pgls_geometry_main_traits_main_dataset.csv",
