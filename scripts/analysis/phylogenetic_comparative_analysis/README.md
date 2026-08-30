@@ -10,6 +10,14 @@ That script contains the primary analyses of phylogenetic signal, evolutionary
 model fitting, PGLS, phylogenetic ANOVA, ancestral-state reconstruction and
 tree-sensitivity checks.
 
+Continuous ancestral-state reconstruction exports raw-scale node estimates,
+variances and 95% intervals for PC1-PC5 and centroid size on the 15-tip
+shape-only sample, and for absolute winding angle and endpoint-based axial span
+on the 14-tip main geometry sample. The standardized Extended Data Figure 5
+source retains all 15 shape tips and marks the unavailable geometry values as
+missing so each `contMap` panel is pruned to the same trait-specific tip set as
+its numerical reconstruction.
+
 For multivariate evolutionary-model fits, the script records optimizer
 convergence separately from Hessian reliability, retains raw AIC summaries for
 auditability and calculates reported rankings only across reliable fits. These

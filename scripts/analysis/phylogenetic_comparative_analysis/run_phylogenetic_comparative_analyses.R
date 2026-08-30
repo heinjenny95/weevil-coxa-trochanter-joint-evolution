@@ -1442,11 +1442,22 @@ write_clean_csv(mv_model_results, file.path(output_dir, "03_Evolutionary_models"
 # SECTION 17: ANCESTRAL STATE RECONSTRUCTION (EXPLORATORY)
 # ============================================================
 
-asr_cont_vars <- intersect(c("abs_winding_angle_deg", "axial_span", "PC1", "centroid_size"), names(tip_level_df))
+asr_shape_vars <- intersect(c(paste0("PC", 1:5), "centroid_size"), names(tip_level_df))
+asr_geometry_vars <- intersect(c("abs_winding_angle_deg", "axial_span"), names(tip_level_df))
+asr_cont_vars <- c(asr_shape_vars, asr_geometry_vars)
 asr_cont_results <- purrr::map_dfr(asr_cont_vars, function(v) {
   vec <- tip_level_df[[v]]
   names(vec) <- tip_level_df$tree_label
-  safe_fastAnc(tree_pruned, vec, v)
+  trait_n_tips <- sum(
+    names(vec) %in% tree_pruned$tip.label & is.finite(as.numeric(vec)),
+    na.rm = TRUE
+  )
+  safe_fastAnc(tree_pruned, vec, v) %>%
+    dplyr::mutate(
+      analysis_tip_set = if (v %in% asr_shape_vars) "shape_only" else "main_geometry",
+      n_tips = trait_n_tips,
+      .after = trait
+    )
 })
 write_clean_csv(asr_cont_results, file.path(output_dir, "08_ASR", "asr_continuous_fastAnc.csv"))
 

@@ -107,6 +107,15 @@ analyses use 14 matched proxy tips from the 63-specimen main dataset. Results
 are reported across alternative trees because the backbone is not sufficiently
 resolved to support topology-independent claims.
 
+Continuous ancestral-state reconstruction follows the same sampling rule:
+PC1-PC5 and centroid size use the 15-tip shape-only dataset, whereas absolute
+winding angle and endpoint-based axial span use the 14-tip main geometry
+dataset. Supplementary Table 24 exports raw-scale node estimates, variances and
+95% intervals for all eight traits. Extended Data Figure 5 uses standardized
+scores only for colour mapping and prunes each panel to its numerical
+trait-specific tip set; the missing geometry values for the Nemonychidae proxy
+tip are not used to force the five shape maps onto the 14-tip tree.
+
 The primary comparative tree is `data/phylogeny/P01_Trees/01_primary_tree_grafen.tre`.
 Its Grafen branch lengths encode relative node depth and are not geological
 ages. Fourteen additional topology and branch-length representations, including

@@ -330,15 +330,25 @@ save_canonical(ed4, "03_Extended_Data_Figures/Extended_Data_Figure_4_phylogeneti
 
 # Extended Data Figure 5 (base phytools rendering) -----------------------------
 asr_input <- read_mixed(file.path(source_dir, "asr_standardized_tip_data.csv"))
-asr_tree <- read.tree(tree_file)
-asr_input <- asr_input[complete.cases(asr_input[, c("PC1", "PC2", "PC3", "PC4", "PC5", "abs_winding_angle_deg", "axial_span")]), ]
-asr_tree <- drop.tip(asr_tree, setdiff(asr_tree$tip.label, asr_input$tree_label))
-asr_input <- asr_input[match(asr_tree$tip.label, asr_input$tree_label), ]
+asr_full_tree <- read.tree(tree_file)
 asr_traits <- c("PC1", "PC2", "PC3", "PC4", "PC5", "abs_winding_angle_deg", "axial_span")
 asr_titles <- c(PC1 = "PC1", PC2 = "PC2", PC3 = "PC3", PC4 = "PC4", PC5 = "PC5", abs_winding_angle_deg = "Winding angle", axial_span = "Axial span")
+missing_asr_columns <- setdiff(c("tree_label", asr_traits), names(asr_input))
+if (length(missing_asr_columns) > 0) {
+  stop("ASR source data are missing required columns: ", paste(missing_asr_columns, collapse = ", "))
+}
+
+shape_reference_rows <- complete.cases(asr_input[, paste0("PC", 1:5), drop = FALSE]) & !is.na(asr_input$tree_label)
+shape_reference_labels <- asr_input$tree_label[shape_reference_rows]
+asr_reference_tree <- drop.tip(asr_full_tree, setdiff(asr_full_tree$tip.label, shape_reference_labels))
+
 asr_maps <- lapply(asr_traits, function(v) {
-  x <- setNames(asr_input[[v]], asr_input$tree_label)
-  obj <- contMap(asr_tree, x, plot = FALSE, lims = c(-2.2, 2.2), res = 120)
+  trait_rows <- is.finite(asr_input[[v]]) & !is.na(asr_input$tree_label)
+  trait_data <- asr_input[trait_rows, c("tree_label", v), drop = FALSE]
+  trait_tree <- drop.tip(asr_full_tree, setdiff(asr_full_tree$tip.label, trait_data$tree_label))
+  x <- setNames(trait_data[[v]], trait_data$tree_label)
+  x <- x[trait_tree$tip.label]
+  obj <- contMap(trait_tree, x, plot = FALSE, lims = c(-2.2, 2.2), res = 120)
   obj$cols <- setNames(colorRampPalette(continuous_cols)(length(obj$cols)), names(obj$cols))
   obj
 })
@@ -362,12 +372,12 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
   layout(matrix(c(1,2,3,4,5,6,7,8,9), 3, 3, byrow = TRUE), widths = c(1,1,1), heights = c(1,1,1))
   par(mar = c(1.0, 0.4, 2.4, 0.4), oma = c(0.5, 0.2, 0.5, 0.2), family = "sans", fg = ink, col.axis = ink, col.lab = ink)
   par(mar = c(0.5, 0.2, 1.7, 0.2))
-  tip_depth <- max(node.depth.edgelength(asr_tree))
-  plot(asr_tree, show.tip.label = FALSE, edge.color = "#A7B8C2", no.margin = FALSE, x.lim = c(0, 1.92 * tip_depth))
+  tip_depth <- max(node.depth.edgelength(asr_reference_tree))
+  plot(asr_reference_tree, show.tip.label = FALSE, edge.color = "#A7B8C2", no.margin = FALSE, x.lim = c(0, 1.92 * tip_depth))
   tiplabels(pch = 16, col = "#000000", cex = 0.62)
-  tip_y <- seq.int(Ntip(asr_tree), 1)
-  tip_family <- sub("___.*$", "", asr_tree$tip.label)
-  tip_genus <- sub("^.*___", "", asr_tree$tip.label)
+  tip_y <- seq.int(Ntip(asr_reference_tree), 1)
+  tip_family <- sub("___.*$", "", asr_reference_tree$tip.label)
+  tip_genus <- sub("^.*___", "", asr_reference_tree$tip.label)
   text(1.05 * tip_depth, tip_y, labels = tip_family, pos = 4, offset = 0, cex = 0.52, col = ink)
   text(1.48 * tip_depth, tip_y, labels = tip_genus, pos = 4, offset = 0, cex = 0.52, col = ink, font = 3)
   title(main = "a   Reference phylogeny", adj = 0, line = 0.25, cex.main = 0.86, col.main = ink)
@@ -388,6 +398,15 @@ draw_ed5 <- function(device_path, kind = c("png", "jpeg", "pdf"), width = 12.8, 
 }
 
 draw_ed5(file.path(out_dir, "Extended_Data_Fig_5_robust_ASR.jpg"), "jpeg")
+docs_asset_dir <- file.path(repo_root, "docs", "google-docs-assets")
+dir.create(docs_asset_dir, recursive = TRUE, showWarnings = FALSE)
+draw_ed5(
+  file.path(docs_asset_dir, "Extended_Data_Fig_5_robust_ASR_docs.jpg"),
+  "jpeg",
+  width = 12,
+  height = 10.5,
+  dpi = 375
+)
 if (!is.na(manuscript_root)) {
   ed5base <- file.path(manuscript_root, "03_Extended_Data_Figures", "Extended_Data_Figure_5_ancestral_state_reconstructions_180mm")
   draw_ed5(paste0(ed5base, ".png"), "png", width = 7.09, height = 6.2, dpi = 500)
