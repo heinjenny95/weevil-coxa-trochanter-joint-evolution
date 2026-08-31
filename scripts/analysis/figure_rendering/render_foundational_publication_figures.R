@@ -252,13 +252,14 @@ save_plot_set(
 # Supplementary Figures 20-22 show shape-only ecological contrasts. The
 # dedicated 15-tip plotting matrix prevents the 14-tip geometry matrix from
 # being stacked with the shape-only matrix and plotting the same proxy tip
-# twice. Inferential annotations are likewise restricted to the shape-only
-# rows in Tables 35 and 36.
+# twice. Tables 35 and 36 retain the umbrella quality_set label
+# "main_dataset" for the current primary ecology run, so response and
+# predictor jointly identify each shape-only annotation row.
 ecology <- read_mixed(file.path(repo_root, "data", "foundational_figures", "ecology_shape_only_plot_data.csv"))
 pgls <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_pgls_factor_results.csv")) %>%
-  filter(quality_set == "shape_only")
+  filter(quality_set == "main_dataset")
 phyanova <- read_mixed(file.path(source_root, "S07_Ecology_Tests", "ecology_phylogenetic_anova_results.csv")) %>%
-  filter(quality_set == "shape_only")
+  filter(quality_set == "main_dataset")
 
 predictor_specs <- list(
   host_lineage_broad = list(title = "Host lineage", levels = c("angiosperm", "gymnosperm"), labels = c("Angiosperm", "Gymnosperm")),
@@ -269,14 +270,29 @@ predictor_specs <- list(
 
 ecology_panel <- function(response, predictor, ylab) {
   spec <- predictor_specs[[predictor]]
+  result_predictor <- if (identical(predictor, "wood_association_broad")) {
+    "woody_association_broad"
+  } else {
+    predictor
+  }
   dat <- ecology %>%
     filter(!is.na(.data[[response]]), !is.na(.data[[predictor]])) %>%
     mutate(group = factor(.data[[predictor]], levels = spec$levels, labels = spec$labels)) %>%
     filter(!is.na(group))
   counts <- dat %>% count(group) %>% mutate(axis_label = paste0(group, "\nn = ", n))
   axis_labels <- setNames(counts$axis_label, counts$group)
-  pgls_p <- pgls %>% filter(.data$response == .env$response, .data$predictor == .env$predictor) %>% summarise(value = min(p_value, na.rm = TRUE)) %>% pull(value)
-  anova_p <- phyanova %>% filter(.data$response == .env$response, .data$predictor == .env$predictor) %>% slice(1) %>% pull(p_value)
+  pgls_row <- pgls %>%
+    filter(.data$response == .env$response, .data$predictor == .env$result_predictor)
+  anova_row <- phyanova %>%
+    filter(.data$response == .env$response, .data$predictor == .env$result_predictor)
+  if (nrow(pgls_row) != 1L || nrow(anova_row) != 1L) {
+    stop(sprintf(
+      "Expected one current ecology result row for %s ~ %s; found PGLS=%d and phyANOVA=%d.",
+      response, result_predictor, nrow(pgls_row), nrow(anova_row)
+    ))
+  }
+  pgls_p <- pgls_row$p_value[[1]]
+  anova_p <- anova_row$p_value[[1]]
   pal <- ecology_palettes[[predictor]]
   names(pal) <- spec$labels
 
@@ -287,7 +303,7 @@ ecology_panel <- function(response, predictor, ylab) {
     scale_x_discrete(labels = axis_labels) +
     labs(
       title = spec$title,
-      subtitle = paste0("PGLS P ", fmt_p(pgls_p), "; phyANOVA P ", fmt_p(anova_p)),
+      subtitle = paste0("PGLS raw P ", fmt_p(pgls_p), "; phyANOVA raw P ", fmt_p(anova_p)),
       x = NULL,
       y = ylab
     ) +
