@@ -29,8 +29,8 @@ All analysis data other than the processed tomograms and coxa/trochanter meshes
 are included under `data/`. This includes the
 complete source-data payload for Supplementary Tables 1-40, derived analysis
 tables, analysis-ready tabular inputs, quality-control outputs and the detailed
-robust geometry audit files. The imaging data and joint-surface meshes will be
-made publicly accessible through RADAR4KIT upon publication
+robust geometry audit files. The imaging data and joint-surface meshes are
+publicly accessible through RADAR4KIT
 under https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
 replaced by explicit placeholder roots or command-line arguments so that no
 workstation-specific paths are published.

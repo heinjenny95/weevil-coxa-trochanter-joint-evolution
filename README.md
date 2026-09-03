@@ -164,7 +164,7 @@ maximum likelihood within [0, 1]; no fixed-lambda fallback is used.
 ## Data availability
 
 Processed tomographic datasets and coxa and trochanter joint-surface meshes
-will be made publicly accessible through RADAR4KIT upon publication under
+are publicly accessible through RADAR4KIT under
 https://doi.org/10.35097/9p77hjk7wa656d6k. All other data supporting the
 analyses, figures and statistical results are archived in this repository,
 including the complete Supplementary Tables 1-40 source-data package, derived

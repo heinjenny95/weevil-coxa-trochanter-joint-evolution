@@ -30,6 +30,12 @@ attribution to the upstream workflow.
 - maximum iterations: 1,000
 - final atlas sample: 68 aligned trochanter meshes
 
+The released optimization configuration records the optimizer, initial step
+size and maximum iteration limit. It does not encode a convergence tolerance,
+and no iteration-by-iteration log from the final atlas run is distributed;
+therefore neither a tolerance value nor a completed-iteration count should be
+cited as release-verifiable metadata.
+
 The exact ordered subject list is preserved in `study_data_set.xml`. Meshes
 are distributed separately with the study data and are not duplicated in
 this code repository.

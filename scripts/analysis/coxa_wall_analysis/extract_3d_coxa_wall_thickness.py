@@ -65,7 +65,7 @@ def parse_args() -> argparse.Namespace:
         help=(
             "Isotropic analysis scale applied to the complete cropped 3D mask. "
             "The default 0.75 was validated against full-resolution estimates "
-            "and preserves whole-volume median thickness within 0.5% in the "
+            "with specimen-level differences of 0.46-5.21% in the five-specimen "
             "validation subset."
         ),
     )
@@ -305,4 +305,3 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
-

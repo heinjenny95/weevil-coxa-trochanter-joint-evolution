@@ -75,7 +75,9 @@ with helix RMS divided by fitted radius no greater than 0.10. Other diagnostic
 warnings are reported descriptively and do not remove short helices.
 
 The joint-type PERMANOVA uses 999 permutations with the fixed seed `20260808`
-so its tabulated P value is exactly reproducible.
+for the point-estimate geometry in both the primary and conditional-bootstrap
+workflows, so the canonical point P value (`0.052`) is exactly reproducible.
+Measurement-bootstrap replicates retain their documented independent seeds.
 
 Rebuild the publication-style figure set from the repository root with:
 

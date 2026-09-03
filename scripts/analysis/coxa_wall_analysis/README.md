@@ -10,7 +10,8 @@ inside the coxa mask.
 
 For computational efficiency, the complete foreground-cropped mask is analysed
 at an isotropic scale of 0.75. Comparison with full-resolution estimates for a
-validation subset changed the median thickness by no more than 0.5%. Distances
+five-specimen validation subset changed the median thickness by 0.46-5.21%.
+Distances
 are converted back to original-voxel units and then to micrometres.
 
 Recommended order:

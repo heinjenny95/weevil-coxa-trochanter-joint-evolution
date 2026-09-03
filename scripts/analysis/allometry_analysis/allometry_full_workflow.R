@@ -29,7 +29,7 @@ resolve_analysis_path <- function(position, env_name, fallback) {
 lm_dir   <- resolve_analysis_path(1, "WEV_ALLOMETRY_LANDMARK_DIR", "<BEETLE_JOINTS_ROOT>/Processed/Curculionoidea/Landmarks")
 key_path <- resolve_analysis_path(2, "WEV_SPECIMEN_KEY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_key.csv")
 pca_path <- resolve_analysis_path(3, "WEV_PCA_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv")
-geom_path <- resolve_analysis_path(4, "WEV_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
+geom_path <- resolve_analysis_path(4, "WEV_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/robust_geometry_primary_adequate.csv")
 out_dir <- resolve_analysis_path(5, "WEV_ALLOMETRY_OUTPUT_DIR", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Allometry")
 tree_path <- resolve_analysis_path(6, "WEV_TREE_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/curc_fig1_grafen_withCaridae_correct.tre")
 if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)

@@ -319,7 +319,9 @@ for (set_name in names(analysis_sets)) {
       matrix_scaled <- scale(dat[, c("angle", "pitch", "axial_span")])
       distance <- dist(matrix_scaled)
       permutations <- ifelse(replicate == 0, 999, 199)
-      set.seed(20260810 + replicate)
+      # Use the same fixed seed as the canonical point-estimate workflow.
+      # Preserve the established bootstrap-draw seeds for replicates 1-200.
+      set.seed(ifelse(replicate == 0, 20260808, 20260810 + replicate))
       fit <- vegan::adonis2(distance ~ joint_type, data = dat, permutations = permutations)
       permanova_result$statistic <- fit$F[[1]]
       permanova_result$p_value <- fit$`Pr(>F)`[[1]]

@@ -35,7 +35,7 @@ Rscript scripts/analysis/atlas_pca_workflow/r/run_hopkins_clusterability.R `
 1. `gamma = 0.25`, retained from the adapted exploratory notebook.
 2. A data-adaptive kernel with `gamma = 1 / (2 * median squared pairwise distance)`.
 
-The script matches and sign-aligns the first five kernel axes to PC1-PC5 and compares global morphospace geometry, family and joint-type structure, allometry, and associations with screw joint geometry. When a robust fitted-pitch column is present, it is used in preference to the legacy endpoint quotient. Current shape-geometry analyses use the 63-fit main robust-helix table without an angular cutoff; historical endpoint-derived outputs are not used for current inference. The script writes tables, publication-ready figures and an input-file checksum manifest to the selected output directory.
+The script matches and sign-aligns the first five kernel axes to PC1-PC5 and compares global morphospace geometry, family and joint-type structure, allometry, and associations with screw joint geometry. Its family-dispersion calculation is a parallel exploratory diagnostic implemented in Python; it is not an exact rerun of the primary bias-adjusted, four-family PERMDISP workflow. When a robust fitted-pitch column is present, it is used in preference to the legacy endpoint quotient. Current shape-geometry analyses use the 63-fit main robust-helix table without an angular cutoff; historical endpoint-derived outputs are not used for current inference. The script writes tables, publication-ready figures and an input-file checksum manifest to the selected output directory.
 
 Run from the repository root with study-specific input paths:
 
@@ -52,8 +52,10 @@ Kernel eigenvalue fractions describe inertia in kernel feature space and should 
 
 ## Atlas kernel-width selection audit
 
-`python/analyze_kernel_width_stability.py` quantifies agreement among the five
-archived Deformetrica runs used during parameter selection (kernel widths
+Kernel width 0.1 was first selected by visual comparison of atlas outputs
+during workflow development. `python/analyze_kernel_width_stability.py`
+subsequently quantified agreement among the five archived Deformetrica runs
+used during that parameter-selection stage (kernel widths
 0.025, 0.075, 0.1, 0.15 and 0.2). These development-stage runs contain the 67
 specimens available at that time. They preceded the final 68-specimen atlas,
 which added *Rhynchites cupreus* while retaining kernel width 0.1 without

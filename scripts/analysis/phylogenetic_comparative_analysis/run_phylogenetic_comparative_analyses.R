@@ -79,7 +79,7 @@ tree_variant_dir <- Sys.getenv(
 )
 pc_file <- file.path(input_dir, "PCA_scores_with_specimen_id.csv")
 specimen_key_file <- file.path(input_dir, "specimen_key.csv")
-geometry_file <- file.path(input_dir, "winding_metrics_excel.csv")
+geometry_file <- file.path(input_dir, "robust_geometry_primary_adequate.csv")
 centroid_file <- file.path(input_dir, "PCA_scores_with_specimen_id_with_centroid_size.csv")
 output_dir <- Sys.getenv(
   "WEV_PCM_OUTPUT_DIR",
@@ -92,11 +92,6 @@ if (!nzchar(unified_allometry_dir)) {
     "run_unified_phylogenetic_allometry.R."
   )
 }
-require_geometry_matched_specimens <- tolower(Sys.getenv(
-  "WEV_REQUIRE_GEOMETRY_MATCHED_SPECIMENS",
-  unset = "false"
-)) %in% c("true", "1", "yes")
-
 tree_variant_files <- c(
   ml_unrooted = "curc_fig1.treefile",
   consensus_unrooted = "curc_fig1.contree",
@@ -696,6 +691,29 @@ names(specimen_key_df) <- clean_names_basic(names(specimen_key_df))
 names(geometry_df) <- clean_names_basic(names(geometry_df))
 names(centroid_df) <- clean_names_basic(names(centroid_df))
 
+# Enforce the manuscript's primary robust-geometry definition at import. The
+# standard input is the released 63-trajectory primary-adequate table. The
+# explicit check also keeps alternative all-fit inputs aligned with the same
+# fit_rms / fit_radius <= 0.10 definition.
+if (all(c("fit_rms", "fit_radius") %in% names(geometry_df))) {
+  geometry_df <- geometry_df %>%
+    dplyr::mutate(
+      fit_rms = as.numeric(fit_rms),
+      fit_radius = as.numeric(fit_radius),
+      robust_relative_rms = fit_rms / fit_radius
+    )
+} else if ("relative_rms" %in% names(geometry_df)) {
+  geometry_df <- geometry_df %>%
+    dplyr::mutate(robust_relative_rms = as.numeric(relative_rms))
+} else {
+  stop(
+    "Geometry input must contain fit_rms and fit_radius, or relative_rms, ",
+    "so the primary relative-RMS threshold can be enforced."
+  )
+}
+geometry_df <- geometry_df %>%
+  dplyr::filter(is.finite(robust_relative_rms), robust_relative_rms <= 0.10)
+
 pc_keep <- c("specimen_id", pc_vars_main)
 pc_df <- pc_df %>% dplyr::select(dplyr::any_of(pc_keep))
 
@@ -733,14 +751,6 @@ specimen_merged <- specimen_key_df %>%
   dplyr::left_join(pc_df, by = "specimen_id") %>%
   dplyr::left_join(geometry_df, by = "specimen_id") %>%
   dplyr::left_join(centroid_df, by = "specimen_id")
-
-if (isTRUE(require_geometry_matched_specimens)) {
-  specimen_merged <- specimen_merged %>%
-    dplyr::semi_join(
-      geometry_df %>% dplyr::select(specimen_id) %>% dplyr::distinct(),
-      by = "specimen_id"
-    )
-}
 
 specimen_merged <- specimen_merged %>%
   dplyr::mutate(
@@ -816,6 +826,31 @@ tip_level_df <- specimen_merged %>%
     dplyr::across(dplyr::all_of(continuous_vars), ~ ifelse(is.nan(.x), NA, .x))
   )
 
+# Geometry-dependent shape models must match specimens before aggregation.
+# Keep this table separate from the 15-tip shape-only table so that signal,
+# shape ASR and multivariate shape models retain all shape specimens.
+geometry_matched_specimen_merged <- specimen_merged %>%
+  dplyr::semi_join(
+    geometry_df %>% dplyr::select(specimen_id) %>% dplyr::distinct(),
+    by = "specimen_id"
+  )
+
+geometry_matched_tip_level_df <- geometry_matched_specimen_merged %>%
+  dplyr::filter(!is.na(tree_label)) %>%
+  dplyr::group_by(tree_label) %>%
+  dplyr::summarise(
+    dplyr::across(dplyr::all_of(continuous_vars), ~ mean(.x, na.rm = TRUE)),
+    tree_tip = mode_single_value(tree_tip),
+    Family = mode_single_value(Family),
+    `Coxal wall hole` = mode_single_value(`Coxal wall hole`),
+    `Coxal Socket` = mode_single_value(`Coxal Socket`),
+    n_specimens = dplyr::n(),
+    .groups = "drop"
+  ) %>%
+  dplyr::mutate(
+    dplyr::across(dplyr::all_of(continuous_vars), ~ ifelse(is.nan(.x), NA, .x))
+  )
+
 write_clean_csv(tip_counts, file.path(output_dir, "01_QC", "qc_specimens_per_tree_label.csv"))
 write_clean_csv(discrete_consistency, file.path(output_dir, "01_QC", "qc_tree_label_aggregation_summary.csv"))
 
@@ -842,6 +877,10 @@ tree_pruned <- ape::drop.tip(tree, tips_in_tree_not_data)
 
 tip_level_df <- tip_level_df %>%
   dplyr::filter(tree_label %in% shared_tips) %>%
+  dplyr::arrange(match(tree_label, tree_pruned$tip.label))
+
+geometry_matched_tip_level_df <- geometry_matched_tip_level_df %>%
+  dplyr::filter(tree_label %in% tree_pruned$tip.label) %>%
   dplyr::arrange(match(tree_label, tree_pruned$tip.label))
 
 tree_match_summary <- tibble::tibble(
@@ -1020,13 +1059,16 @@ skip_log <- tibble::tibble(
   reason = character()
 )
 
-geometry_vars_available <- intersect(geometry_vars_main, names(tip_level_df))
+geometry_vars_available <- intersect(geometry_vars_main, names(geometry_matched_tip_level_df))
 geometry_pairs <- combn(geometry_vars_available, 2, simplify = FALSE)
 geometry_models <- purrr::map(geometry_pairs, ~ tibble::tibble(response = .x[1], predictor = .x[2])) %>%
   dplyr::bind_rows()
 
 shape_geometry_models <- tidyr::expand_grid(response = pc_vars_main, predictor = geometry_vars_available) %>%
-  dplyr::filter(response %in% names(tip_level_df), predictor %in% names(tip_level_df))
+  dplyr::filter(
+    response %in% names(geometry_matched_tip_level_df),
+    predictor %in% names(geometry_matched_tip_level_df)
+  )
 
 all_cont_models <- dplyr::bind_rows(
   geometry_models,
@@ -1041,7 +1083,7 @@ for (i in seq_len(nrow(all_cont_models))) {
   resp <- all_cont_models$response[i]
   pred <- all_cont_models$predictor[i]
 
-  tmp <- safe_pgls(tree_pruned, tip_level_df, resp, pred, predictor_is_factor = FALSE)
+  tmp <- safe_pgls(tree_pruned, geometry_matched_tip_level_df, resp, pred, predictor_is_factor = FALSE)
 
   if (is.null(tmp$result)) {
     skip_log <- add_skip_log(skip_log, "PGLS_continuous", resp, pred, tmp$reason)
@@ -1052,7 +1094,7 @@ for (i in seq_len(nrow(all_cont_models))) {
         dplyr::mutate(response = resp, predictor = pred)
     }
 
-    plot_df <- tip_level_df %>%
+    plot_df <- geometry_matched_tip_level_df %>%
       dplyr::select(tree_label, dplyr::all_of(resp), dplyr::all_of(pred)) %>%
       dplyr::filter(!dplyr::if_any(c(dplyr::all_of(resp), dplyr::all_of(pred)), is.na))
 
@@ -1622,6 +1664,10 @@ if (all(c("PC1", "PC2") %in% names(tip_level_df))) {
 # ============================================================
 
 write_clean_csv(tip_level_df, file.path(output_dir, "10_Logs", "tip_level_dataset_used_for_PCM.csv"))
+write_clean_csv(
+  geometry_matched_tip_level_df,
+  file.path(output_dir, "10_Logs", "geometry_matched_tip_level_dataset_used_for_PGLS.csv")
+)
 write_clean_csv(skip_log, file.path(output_dir, "10_Logs", "skipped_analyses_log.csv"))
 
 # ============================================================
@@ -1873,7 +1919,7 @@ use_family_colors <- TRUE
 # 2) Minimal checks
 # ------------------------------------------------------------
 needed_vars <- unique(c(pgls_main_pairs$response, pgls_main_pairs$predictor, "tree_label"))
-missing_needed <- setdiff(needed_vars, names(tip_level_df))
+missing_needed <- setdiff(needed_vars, names(geometry_matched_tip_level_df))
 if (length(missing_needed) > 0) {
   stop("Missing required variables in tip_level_df: ", paste(missing_needed, collapse = ", "))
 }
@@ -1887,8 +1933,8 @@ if (!exists("pgls_results_df") || !is.data.frame(pgls_results_df) || nrow(pgls_r
 # 3) Family colors (only if available and desired)
 # ------------------------------------------------------------
 family_colors_local <- NULL
-if (use_family_colors && "Family" %in% names(tip_level_df)) {
-  fams_present <- tip_level_df %>%
+if (use_family_colors && "Family" %in% names(geometry_matched_tip_level_df)) {
+  fams_present <- geometry_matched_tip_level_df %>%
     dplyr::filter(!is.na(Family)) %>%
     dplyr::pull(Family) %>%
     unique() %>%
@@ -1963,7 +2009,7 @@ for (i in seq_len(nrow(pgls_main_pairs))) {
   pred <- pgls_main_pairs$predictor[i]
   panel_title <- pgls_main_pairs$panel_title[i]
   
-  plot_df <- tip_level_df %>%
+  plot_df <- geometry_matched_tip_level_df %>%
     dplyr::select(dplyr::any_of(c("tree_label", "Family", resp, pred))) %>%
     dplyr::filter(!is.na(.data[[resp]]), !is.na(.data[[pred]]))
   
@@ -2147,7 +2193,7 @@ robust_original <- purrr::map_dfr(seq_len(nrow(robust_pairs)), function(i) {
   resp <- robust_pairs$response[i]
   pred <- robust_pairs$predictor[i]
   
-  fit <- safe_pgls(tree_pruned, tip_level_df, resp, pred, predictor_is_factor = FALSE)
+  fit <- safe_pgls(tree_pruned, geometry_matched_tip_level_df, resp, pred, predictor_is_factor = FALSE)
   extract_compact_pgls(fit, resp, pred, dropped_taxon = NA_character_, model_type = "original")
 })
 
@@ -2163,14 +2209,14 @@ robust_loo <- purrr::map_dfr(seq_len(nrow(robust_pairs)), function(i) {
   resp <- robust_pairs$response[i]
   pred <- robust_pairs$predictor[i]
   
-  dat_base <- tip_level_df %>%
+  dat_base <- geometry_matched_tip_level_df %>%
     dplyr::select(tree_label, dplyr::all_of(resp), dplyr::all_of(pred)) %>%
     dplyr::filter(!is.na(.data[[resp]]), !is.na(.data[[pred]]))
   
   taxa <- dat_base$tree_label
   
   purrr::map_dfr(taxa, function(tx) {
-    dat_minus_one <- tip_level_df %>%
+    dat_minus_one <- geometry_matched_tip_level_df %>%
       dplyr::filter(tree_label != tx)
     
     fit <- safe_pgls(tree_pruned, dat_minus_one, resp, pred, predictor_is_factor = FALSE)
@@ -2448,7 +2494,7 @@ robust_pgls_trees <- purrr::map_dfr(names(tree_variant_list), function(tree_id) 
   purrr::map_dfr(seq_len(nrow(all_cont_models)), function(i) {
     resp <- all_cont_models$response[i]
     pred <- all_cont_models$predictor[i]
-    fit <- safe_pgls(tr, tip_level_df, resp, pred, predictor_is_factor = FALSE)
+    fit <- safe_pgls(tr, geometry_matched_tip_level_df, resp, pred, predictor_is_factor = FALSE)
     extract_compact_pgls(fit, resp, pred, dropped_taxon = NA_character_, model_type = "tree_variant") %>%
       dplyr::mutate(tree_id = tree_id, .before = 1)
   })

@@ -29,7 +29,7 @@ robustness tables without creating an additional Supplementary Table number.
 size and SHA-256 checksum of every added calibration tree, diagnostic and rerun
 table.
 
-Processed tomograms and coxa and trochanter joint-surface meshes will be made
-publicly accessible through RADAR4KIT upon publication under
+Processed tomograms and coxa and trochanter joint-surface meshes are publicly
+accessible through RADAR4KIT under
 https://doi.org/10.35097/9p77hjk7wa656d6k and are not duplicated here as bulk
 imaging or mesh files.

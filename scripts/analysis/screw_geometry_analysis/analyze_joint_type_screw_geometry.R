@@ -47,7 +47,7 @@ resolve_analysis_path <- function(position, env_name, fallback) {
 }
 
 # ------------------- PATHS -------------------
-geom_path <- resolve_analysis_path(1, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
+geom_path <- resolve_analysis_path(1, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/robust_geometry_primary_adequate.csv")
 type_path <- resolve_analysis_path(2, "WEEVIL_JOINT_TYPES_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/specimen_joint_types.csv")
 
 out_dir <- resolve_analysis_path(3, "WEEVIL_JOINT_GEOMETRY_OUT", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/JointType_Geometry")

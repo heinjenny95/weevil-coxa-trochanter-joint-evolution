@@ -35,7 +35,7 @@ resolve_analysis_path <- function(position, env_name, fallback) {
 
 # ------------------- INPUT -------------------
 pca_file  <- resolve_analysis_path(1, "WEEVIL_PCA_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/PCA_scores_with_specimen_id.csv")
-geom_file <- resolve_analysis_path(2, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/winding_metrics_excel.csv")
+geom_file <- resolve_analysis_path(2, "WEEVIL_GEOMETRY_FILE", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Input/robust_geometry_primary_adequate.csv")
 
 # ------------------- OUTPUT FOLDER -------------------
 out_dir <- resolve_analysis_path(3, "WEEVIL_SHAPE_GEOMETRY_OUT", "<MANUSCRIPT_PROJECT_ROOT>/analysis_data/Results/Shape_vs_ScrewGeometry")
@@ -580,6 +580,7 @@ size_values <- c(
 # -------------------
 model_angle_full <- lm(angle_abs ~ PC1 + PC2, data = df)
 model_pitch_full <- lm(axial_pitch ~ PC1 + PC2, data = df)
+model_span_full <- lm(axial_metric ~ PC1 + PC2, data = df)
 model_span_angle <- lm(axial_metric ~ angle_abs, data = df)
 model_pitch_angle <- lm(axial_pitch ~ angle_abs, data = df)
 model_pitch_span <- lm(axial_pitch ~ axial_metric, data = df)
@@ -605,6 +606,7 @@ if (nrow(df_right) >= 5) {
 reg_table <- bind_rows(
   lm_summary_row(model_angle_full, "angle_abs ~ PC1 + PC2", "full_dataset", nrow(df)),
   lm_summary_row(model_pitch_full, "axial_pitch ~ PC1 + PC2", "full_dataset", nrow(df)),
+  lm_summary_row(model_span_full, "axial_span ~ PC1 + PC2", "full_dataset", nrow(df)),
   lm_summary_row(model_angle_left, "angle_abs ~ PC1 + PC2", "main_region_PC1_lt_0.1", nrow(df_left)),
   if (!is.null(model_angle_right)) lm_summary_row(model_angle_right, "angle_abs ~ PC1 + PC2", "right_region_PC1_ge_0.1", nrow(df_right)),
   simple_lm_summary_row(model_span_angle, "axial_span ~ angle_abs", "angle_abs"),
@@ -1061,6 +1063,9 @@ print(summary(model_angle_full))
 
 cat("\n--- Full dataset: axial_pitch ~ PC1 + PC2 ---\n")
 print(summary(model_pitch_full))
+
+cat("\n--- Full dataset: axial_span ~ PC1 + PC2 ---\n")
+print(summary(model_span_full))
 
 cat("\n--- Main region only: angle_abs ~ PC1 + PC2 ---\n")
 print(summary(model_angle_left))

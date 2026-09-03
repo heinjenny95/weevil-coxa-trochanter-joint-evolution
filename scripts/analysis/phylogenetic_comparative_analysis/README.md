@@ -51,3 +51,12 @@ Run that workflow first and pass its output directory as
 broad script excludes centroid size from its internal continuous-trait matrix
 and imports the unified coefficient and ANOVA rows instead, so Supplementary
 Tables 27 and 28 cannot reintroduce the former raw-size implementation.
+
+The broad continuous matrix uses the robust main-geometry input and matches
+shape scores to the 63 specimens with `fit_rms / fit_radius <= 0.10` before
+proxy-tip aggregation; the threshold is enforced when the geometry input is
+read. Shape-only
+signal, shape ancestral-state and multivariate shape analyses remain on all 15
+shape tips. Supplementary Tables 27 and 28 therefore use 14 matched proxy tips
+for every geometry-dependent relationship while retaining the dedicated
+15-tip versus 14-tip allometry rows imported from the unified workflow.
