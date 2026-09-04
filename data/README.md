@@ -17,7 +17,10 @@ consistency corrections.
 
 - `specimen_key.csv`: analysis identifiers and coded analytical variables.
   Human-readable taxonomy uses
-  *Rhynchites cupreus* and the phylogeny display label uses *Nedyus*.
+  *Rhynchites cupreus* and the phylogeny display label uses *Nedyus*. The
+  `radar_filename` column preserves the exact deposited RADAR basename for
+  every specimen, including the 12 genus-only `_sp` names and the historical
+  `Rynchites_cupreus` filename.
 - `taxonomic_proxy_mapping.csv`: explicit mapping of 68 specimens to the 15
   taxonomic proxy tips used by the comparative analyses. Five specimens have an
   exact sampled-genus match; the other 63 use a broader taxonomic proxy. The
@@ -70,6 +73,13 @@ consistency corrections.
   the kPCA workflow, ordered atlas dataset and Deformetrica configuration.
   Reproducing the atlas momenta also requires the aligned VTK meshes and
   `initial_template.vtk`, which are not included in this repository.
+
+## `publication_figures`
+
+- Final PNG assets for all five main figures, six Extended Data figures and 27
+  Supplementary figures embedded in the regular manuscript.
+- `figure_manifest.csv`: stable relative paths, pixel dimensions, byte sizes
+  and SHA-256 checksums for those 38 assets.
 
 ## `phylogeny`
 

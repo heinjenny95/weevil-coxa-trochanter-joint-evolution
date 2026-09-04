@@ -11,7 +11,9 @@ measurements, ecological tests, and phylogenetic comparative analyses. It also
 includes the publication-figure renderers, shared visual style, panel assembly
 code and compact figure-source tables used for the final main, Extended Data
 and Supplementary figures. Image-only descriptive panels are retained as
-source assets alongside the corresponding scripted assembly workflows.
+source assets alongside the corresponding scripted assembly workflows. Stable
+copies of all 38 final embedded PNG figures and their checksum manifest are
+provided under `data/publication_figures`.
 
 The current standard-Python circular 3D helix fitter, conditional bootstrap and
 quality-set export are included in
@@ -38,7 +40,8 @@ workstation-specific paths are published.
 The source-data directory contains both a unique-payload checksum manifest and
 a normalized one-row-per-table-file map. The corresponding versioned GitHub
 release includes a human-readable XLSX workbook for Supplementary Tables 1-40,
-the two interactive supplementary PDFs and Supplementary Video 1.
+the two interactive supplementary PDFs, the primary Grafen tree, the 14-tree
+sensitivity package and Supplementary Video 1.
 
 The release does not contain every raw or intermediate input used in the
 raw-to-derived workflow. Not redistributed here are the study-specific Cinema

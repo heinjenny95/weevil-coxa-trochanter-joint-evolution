@@ -10,6 +10,12 @@ source files for Tables 10 and 11 as separate rows instead of a combined
 `10;11` value. A human-readable workbook containing Tables 1-40 is attached to
 the corresponding GitHub release.
 
+Table 1 includes `radar_filename`, the exact deposited basename used to bridge
+the 12 genus-only `_sp` files and the legacy `Rynchites_cupreus` filename to
+the normalized analytical identifiers. The captions for Tables 24 and 33 state
+explicitly that the continuous ancestral-state summaries are conditional on
+Brownian motion.
+
 Robust-geometry inference uses the 63-specimen main dataset without an angular
 cutoff. Other fit warnings remain descriptive diagnostics and do not define an
 exclusion subset because point count and angular coverage partly reflect the

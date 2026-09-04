@@ -62,7 +62,7 @@ supplementary_table,caption,source_order,relative_path
 22,Table 22: Phylogenetically informed allometry results.,10,S03_Allometry/phylogenetic_multivariate_allometry_tip_data.csv
 22,Table 22: Phylogenetically informed allometry results.,11,S03_Allometry/phylogenetic_multivariate_allometry_visualization_scores.csv
 23,Table 23: Phylogenetic signal in continuous traits.,1,S08_PCM_Signal_and_Models/phylogenetic_signal_continuous.csv
-24,Table 24: Continuous ancestral state reconstructions.,1,S10_PCM_ASR_and_Disparity/asr_continuous_fastAnc.csv
+24,Table 24: Brownian-motion-conditional continuous ancestral state reconstructions.,1,S10_PCM_ASR_and_Disparity/asr_continuous_fastAnc.csv
 25,Table 25: Univariate evolutionary model fits.,1,S08_PCM_Signal_and_Models/evolutionary_model_fits_univariate.csv
 26,Table 26: Multivariate evolutionary model fits.,1,S08_PCM_Signal_and_Models/evolutionary_model_fits_multivariate.csv
 27,Table 27: Full PGLS results for continuous trait–trait relationships.,1,S09_PCM_PGLS/pgls_continuous_vs_continuous.csv
@@ -73,8 +73,8 @@ supplementary_table,caption,source_order,relative_path
 31,Table 31: Summary of phylogenetic signal robustness across trees.,2,S11_Robustness/robustness_phylogenetic_signal_summary.csv
 32,Table 32: Best-fit evolutionary model frequencies across trees.,1,S11_Robustness/robustness_evolutionary_models_across_trees.csv
 32,Table 32: Best-fit evolutionary model frequencies across trees.,2,S11_Robustness/robustness_evolutionary_models_best_model_frequency.csv
-33,Table 33: Root-state robustness in continuous ancestral state reconstruction.,1,S11_Robustness/robustness_asr_root_estimates_across_trees.csv
-33,Table 33: Root-state robustness in continuous ancestral state reconstruction.,2,S11_Robustness/robustness_asr_root_estimates_summary.csv
+33,Table 33: Brownian-motion-conditional root-state robustness in continuous ancestral state reconstruction.,1,S11_Robustness/robustness_asr_root_estimates_across_trees.csv
+33,Table 33: Brownian-motion-conditional root-state robustness in continuous ancestral state reconstruction.,2,S11_Robustness/robustness_asr_root_estimates_summary.csv
 34,Table 34: Leave-one-out robustness of PGLS models.,1,S11_Robustness/robustness_leave_one_out_summary.csv
 35,Table 35: Phylogenetic ANOVA results for ecological predictors.,1,S07_Ecology_Tests/ecology_phylogenetic_anova_results.csv
 36,Table 36: PGLS results for ecological predictors.,1,S07_Ecology_Tests/ecology_pgls_factor_results.csv

@@ -1,8 +1,14 @@
 deformetrica==4.3.0
 jupyterlab
+localthickness
 matplotlib
 numpy
 pandas
+Pillow
+pypdf
+reportlab
+scikit-learn
 scipy
+seaborn
 tifffile
 trimesh
