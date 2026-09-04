@@ -96,6 +96,7 @@ def refresh_manifest(root: Path) -> None:
         if rel in known:
             continue
         is_calibration = rel.startswith("S11_Robustness/Calibration_Sensitivity/")
+        is_table_file_map = rel == "_table_file_map.csv"
         is_allometry_tip_data = rel in {
             "S03_Allometry/pgls_allometry_all_traits_anova.csv",
             "S03_Allometry/pgls_allometry_tip_data_geometry.csv",
@@ -107,9 +108,13 @@ def refresh_manifest(root: Path) -> None:
                 "Table 22: Phylogenetically informed allometry results."
                 if is_allometry_tip_data
                 else (
-                    "Calibration-sensitivity analysis provenance and outputs."
-                    if is_calibration
-                    else "Auxiliary analysis source data."
+                    "Normalized one-row-per-table-file mapping for Supplementary Tables 1-40."
+                    if is_table_file_map
+                    else (
+                        "Calibration-sensitivity analysis provenance and outputs."
+                        if is_calibration
+                        else "Auxiliary analysis source data."
+                    )
                 )
             ),
             "relative_path": rel,
@@ -117,9 +122,13 @@ def refresh_manifest(root: Path) -> None:
                 "numbered_table_payload"
                 if is_allometry_tip_data
                 else (
-                    "calibration_sensitivity_source_data"
-                    if is_calibration
-                    else "auxiliary_source_data"
+                    "table_file_map"
+                    if is_table_file_map
+                    else (
+                        "calibration_sensitivity_source_data"
+                        if is_calibration
+                        else "auxiliary_source_data"
+                    )
                 )
             ),
             "size_bytes": str(path.stat().st_size),

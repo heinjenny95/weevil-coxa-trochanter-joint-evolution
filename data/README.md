@@ -7,9 +7,11 @@ consistency corrections.
 ## `supplementary_source_data`
 
 - Complete source-data payload for Supplementary Tables 1-40. The
-  `_manifest.csv` file maps each numbered table to its CSV file(s), caption,
-  byte size and SHA-256 checksum. These tables complement the detailed robust
-  helix-fit outputs below.
+  `_manifest.csv` file inventories each unique payload and its checksum, while
+  `_table_file_map.csv` provides a normalized one-row-per-relationship mapping
+  from each numbered table to its CSV file(s). These files complement the
+  human-readable Tables 1-40 workbook attached to the GitHub release and the
+  detailed robust helix-fit outputs below.
 
 ## `metadata`
 

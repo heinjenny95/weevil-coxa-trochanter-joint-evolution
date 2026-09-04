@@ -35,6 +35,11 @@ under https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
 replaced by explicit placeholder roots or command-line arguments so that no
 workstation-specific paths are published.
 
+The source-data directory contains both a unique-payload checksum manifest and
+a normalized one-row-per-table-file map. The corresponding versioned GitHub
+release includes a human-readable XLSX workbook for Supplementary Tables 1-40,
+the two interactive supplementary PDFs and Supplementary Video 1.
+
 The release does not contain every raw or intermediate input used in the
 raw-to-derived workflow. Not redistributed here are the study-specific Cinema
 4D `Obj_Processing.py` batch-remeshing script, the original Checkpoint landmark

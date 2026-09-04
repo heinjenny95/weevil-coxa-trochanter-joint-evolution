@@ -190,18 +190,27 @@ def rebuild_manifest(source_root: Path, additions: dict[str, tuple[str, str]]) -
         if rel in retained_by_path:
             continue
         is_calibration = rel.startswith("S11_Robustness/Calibration_Sensitivity/")
+        is_table_file_map = rel == "_table_file_map.csv"
         row = {
             "supplementary_table": "",
             "caption": (
-                "Calibration-sensitivity analysis provenance and outputs."
-                if is_calibration
-                else "Auxiliary analysis source data."
+                "Normalized one-row-per-table-file mapping for Supplementary Tables 1-40."
+                if is_table_file_map
+                else (
+                    "Calibration-sensitivity analysis provenance and outputs."
+                    if is_calibration
+                    else "Auxiliary analysis source data."
+                )
             ),
             "relative_path": rel,
             "role": (
-                "calibration_sensitivity_source_data"
-                if is_calibration
-                else "auxiliary_source_data"
+                "table_file_map"
+                if is_table_file_map
+                else (
+                    "calibration_sensitivity_source_data"
+                    if is_calibration
+                    else "auxiliary_source_data"
+                )
             ),
             "size_bytes": "",
             "sha256": "",
@@ -214,7 +223,7 @@ def rebuild_manifest(source_root: Path, additions: dict[str, tuple[str, str]]) -
         row["sha256"] = sha256(path)
 
     def sort_key(row: dict[str, str]) -> tuple[int, str]:
-        number = row.get("supplementary_table", "").split(";", 1)[0]
+        number = row.get("supplementary_table", "")
         return (int(number) if number.isdigit() else 999, row["relative_path"])
 
     write_csv(manifest_path, fields, sorted(retained, key=sort_key))

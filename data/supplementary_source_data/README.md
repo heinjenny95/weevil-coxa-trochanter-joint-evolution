@@ -2,8 +2,13 @@
 
 This directory contains the complete CSV payload for Supplementary Tables 1-40
 of the associated manuscript. Files are grouped by analysis domain. The
-`_manifest.csv` file records the table number, caption, relative path, role,
-file size and SHA-256 checksum for every payload.
+`_manifest.csv` records each unique payload once, including its primary table
+group, caption, relative path, role, file size and SHA-256 checksum.
+`_table_file_map.csv` is the normalized authoritative table-to-file map, with
+one row per table-file relationship. It therefore records the three shared
+source files for Tables 10 and 11 as separate rows instead of a combined
+`10;11` value. A human-readable workbook containing Tables 1-40 is attached to
+the corresponding GitHub release.
 
 Robust-geometry inference uses the 63-specimen main dataset without an angular
 cutoff. Other fit warnings remain descriptive diagnostics and do not define an

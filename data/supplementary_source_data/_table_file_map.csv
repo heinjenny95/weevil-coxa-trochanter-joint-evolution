@@ -1,0 +1,84 @@
+supplementary_table,caption,source_order,relative_path
+1,Table 1: Specimen identifiers and phylogenetic tree-tip assignments.,1,S00_Specimen_Metadata/specimen_key.csv
+1,Table 1: Specimen identifiers and phylogenetic tree-tip assignments.,2,S00_Specimen_Metadata/taxonomic_proxy_mapping.csv
+2,Table 2: PCA scores for all specimens.,1,S01_PCA_and_Morphospace/PCA_scores_with_specimen_id.csv
+3,Table 3: Variance explained by principal components.,1,S01_PCA_and_Morphospace/PCA_variance.csv
+4,Table 4: Sensitivity of morphospace and downstream analyses to linear and nonlinear ordination.,1,S01_PCA_and_Morphospace/kPCA_sensitivity_summary.csv
+5,Table 5: Summary statistics for the Hopkins clusterability analysis.,1,S01_PCA_and_Morphospace/hopkins_m_sensitivity.csv
+5,Table 5: Summary statistics for the Hopkins clusterability analysis.,2,S01_PCA_and_Morphospace/hopkins_randomized_values.csv
+5,Table 5: Summary statistics for the Hopkins clusterability analysis.,3,S01_PCA_and_Morphospace/hopkins_summary.csv
+6,Table 6: Clustering assignments across alternative methods.,1,S01_PCA_and_Morphospace/clusters_all_methods.csv
+7,Table 7: Family-level disparity in morphospace.,1,S01_PCA_and_Morphospace/disparity_by_family_k5_nGT2.csv
+7,Table 7: Family-level disparity in morphospace.,2,S01_PCA_and_Morphospace/family_disparity_analysis_scope.csv
+7,Table 7: Family-level disparity in morphospace.,3,S01_PCA_and_Morphospace/family_disparity_global_test_pc1_pc5.csv
+7,Table 7: Family-level disparity in morphospace.,4,S01_PCA_and_Morphospace/family_disparity_pairwise_tests_pc1_pc5.csv
+7,Table 7: Family-level disparity in morphospace.,5,S01_PCA_and_Morphospace/family_disparity_rarefied_n4_pc1_pc5.csv
+7,Table 7: Family-level disparity in morphospace.,6,S01_PCA_and_Morphospace/family_disparity_sample_counts.csv
+7,Table 7: Family-level disparity in morphospace.,7,S01_PCA_and_Morphospace/family_disparity_summary_pc1_pc5.csv
+7,Table 7: Family-level disparity in morphospace.,8,S01_PCA_and_Morphospace/within_cluster_disparity_summary.csv
+8,Table 8: Observed and missing joint-character combinations among recurrent binary configurations.,1,S05_Joint_Typology/combos_overall_observed_vs_missing.csv
+9,Table 9: Whole-volume three-dimensional coxal wall-thickness metrics.,1,S04_Coxa_Thickness/coxa_3d_wall_thickness_analysis_dataset.csv
+9,Table 9: Whole-volume three-dimensional coxal wall-thickness metrics.,2,S04_Coxa_Thickness/coxa_3d_wall_thickness_group_descriptives.csv
+9,Table 9: Whole-volume three-dimensional coxal wall-thickness metrics.,3,S04_Coxa_Thickness/coxa_3d_wall_thickness_metrics.csv
+9,Table 9: Whole-volume three-dimensional coxal wall-thickness metrics.,4,S04_Coxa_Thickness/coxa_full_resolution_validation.csv
+10,Table 10: Scaling relationship between whole-volume wall thickness and coxa size.,1,S04_Coxa_Thickness/coxa_3d_wall_thickness_coefficients.csv
+10,Table 10: Scaling relationship between whole-volume wall thickness and coxa size.,2,S04_Coxa_Thickness/coxa_3d_wall_thickness_model_stats.csv
+10,Table 10: Scaling relationship between whole-volume wall thickness and coxa size.,3,S04_Coxa_Thickness/coxa_size_association_summary_stats.csv
+11,"Table 11: Coxal wall opening, whole-volume wall thickness and sensitivity analyses.",1,S04_Coxa_Thickness/coxa_3d_wall_thickness_coefficients.csv
+11,"Table 11: Coxal wall opening, whole-volume wall thickness and sensitivity analyses.",2,S04_Coxa_Thickness/coxa_3d_wall_thickness_model_stats.csv
+11,"Table 11: Coxal wall opening, whole-volume wall thickness and sensitivity analyses.",3,S04_Coxa_Thickness/coxa_3d_wall_thickness_sensitivity_tests.csv
+11,"Table 11: Coxal wall opening, whole-volume wall thickness and sensitivity analyses.",4,S04_Coxa_Thickness/coxa_size_association_summary_stats.csv
+12,Table 12: Family-level distribution of recurrent joint-character combinations.,1,S05_Joint_Typology/combos_by_family_counts_and_props.csv
+12,Table 12: Family-level distribution of recurrent joint-character combinations.,2,S05_Joint_Typology/joint_type_phylogeny_tip_summary.csv
+13,Table 13: Specimen-level screw joint geometry measurements.,1,S02_Shape_Geometry/geometry_sample_flow.csv
+13,Table 13: Specimen-level screw joint geometry measurements.,2,S02_Shape_Geometry/robust_geometry_all.csv
+13,Table 13: Specimen-level screw joint geometry measurements.,3,S02_Shape_Geometry/robust_helix_metrics.csv
+13,Table 13: Specimen-level screw joint geometry measurements.,4,S02_Shape_Geometry/specimen_level_screw_joint_geometry.csv
+14,Table 14: Main shape-geometry analysis results.,1,S02_Shape_Geometry/main_results.csv
+14,Table 14: Main shape-geometry analysis results.,2,S02_Shape_Geometry/shape_model_uncertainty_summary.csv
+15,Table 15: Regression summary for shape-geometry relationships.,1,S02_Shape_Geometry/regression_summary.csv
+16,Table 16: Core PGLS relationships between shape and screw joint geometry.,1,S09_PCM_PGLS/figure_pgls_core_pc1_pc2_vs_axial_span_table.csv
+16,Table 16: Core PGLS relationships between shape and screw joint geometry.,2,S09_PCM_PGLS/pgls_shape_geometry_rubin_summary.csv
+17,Table 17: Screw joint geometry statistics by joint type.,1,S05_Joint_Typology/joint_type_screw_geometry_stats.csv
+17,Table 17: Screw joint geometry statistics by joint type.,2,S05_Joint_Typology/joint_type_uncertainty_summary.csv
+18,Table 18: Univariate allometry across all atlas-derived principal components.,1,S03_Allometry/allometry_univariate_PC1_to_PC5_results.csv
+18,Table 18: Univariate allometry across all atlas-derived principal components.,2,S03_Allometry/allometry_univariate_all_PC_results.csv
+19,Table 19: Allometry of continuous geometry variables.,1,S03_Allometry/allometry_continuous_traits_results.csv
+20,Table 20: Full-shape and PC1–PC5 sensitivity RRPP allometry results.,1,S03_Allometry/allometry_PC_allometric_contributions.csv
+20,Table 20: Full-shape and PC1–PC5 sensitivity RRPP allometry results.,2,S03_Allometry/allometry_analysis_scope.csv
+20,Table 20: Full-shape and PC1–PC5 sensitivity RRPP allometry results.,3,S03_Allometry/allometry_full_shape_regression_scores.csv
+20,Table 20: Full-shape and PC1–PC5 sensitivity RRPP allometry results.,4,S03_Allometry/allometry_rrpp_PC1_to_PC5_sensitivity_results.csv
+20,Table 20: Full-shape and PC1–PC5 sensitivity RRPP allometry results.,5,S03_Allometry/allometry_rrpp_multivariate_results.csv
+21,Table 21: Procrustes ANOVA results for multivariate allometry.,1,S03_Allometry/allometry_procD_lm_results.csv
+22,Table 22: Phylogenetically informed allometry results.,1,S03_Allometry/pgls_allometry_all_traits.csv
+22,Table 22: Phylogenetically informed allometry results.,2,S03_Allometry/pgls_allometry_all_traits_anova.csv
+22,Table 22: Phylogenetically informed allometry results.,3,S03_Allometry/pgls_allometry_tip_data_geometry.csv
+22,Table 22: Phylogenetically informed allometry results.,4,S03_Allometry/pgls_allometry_tip_data_shape.csv
+22,Table 22: Phylogenetically informed allometry results.,5,S03_Allometry/pgls_geometry_main_traits_main_dataset.csv
+22,Table 22: Phylogenetically informed allometry results.,6,S03_Allometry/pgls_results_main_traits.csv
+22,Table 22: Phylogenetically informed allometry results.,7,S03_Allometry/phylogenetic_multivariate_allometry_matching.csv
+22,Table 22: Phylogenetically informed allometry results.,8,S03_Allometry/phylogenetic_multivariate_allometry_projection.csv
+22,Table 22: Phylogenetically informed allometry results.,9,S03_Allometry/phylogenetic_multivariate_allometry_results.csv
+22,Table 22: Phylogenetically informed allometry results.,10,S03_Allometry/phylogenetic_multivariate_allometry_tip_data.csv
+22,Table 22: Phylogenetically informed allometry results.,11,S03_Allometry/phylogenetic_multivariate_allometry_visualization_scores.csv
+23,Table 23: Phylogenetic signal in continuous traits.,1,S08_PCM_Signal_and_Models/phylogenetic_signal_continuous.csv
+24,Table 24: Continuous ancestral state reconstructions.,1,S10_PCM_ASR_and_Disparity/asr_continuous_fastAnc.csv
+25,Table 25: Univariate evolutionary model fits.,1,S08_PCM_Signal_and_Models/evolutionary_model_fits_univariate.csv
+26,Table 26: Multivariate evolutionary model fits.,1,S08_PCM_Signal_and_Models/evolutionary_model_fits_multivariate.csv
+27,Table 27: Full PGLS results for continuous trait–trait relationships.,1,S09_PCM_PGLS/pgls_continuous_vs_continuous.csv
+28,Table 28: ANOVA summaries for continuous PGLS models.,1,S09_PCM_PGLS/pgls_continuous_vs_continuous_anova.csv
+29,Table 29: Summary of PGLS robustness across alternative trees.,1,S11_Robustness/robustness_pgls_summary.csv
+30,Table 30: Full PGLS robustness results across alternative trees.,1,S11_Robustness/robustness_pgls_across_trees.csv
+31,Table 31: Summary of phylogenetic signal robustness across trees.,1,S11_Robustness/robustness_phylogenetic_signal_across_trees.csv
+31,Table 31: Summary of phylogenetic signal robustness across trees.,2,S11_Robustness/robustness_phylogenetic_signal_summary.csv
+32,Table 32: Best-fit evolutionary model frequencies across trees.,1,S11_Robustness/robustness_evolutionary_models_across_trees.csv
+32,Table 32: Best-fit evolutionary model frequencies across trees.,2,S11_Robustness/robustness_evolutionary_models_best_model_frequency.csv
+33,Table 33: Root-state robustness in continuous ancestral state reconstruction.,1,S11_Robustness/robustness_asr_root_estimates_across_trees.csv
+33,Table 33: Root-state robustness in continuous ancestral state reconstruction.,2,S11_Robustness/robustness_asr_root_estimates_summary.csv
+34,Table 34: Leave-one-out robustness of PGLS models.,1,S11_Robustness/robustness_leave_one_out_summary.csv
+35,Table 35: Phylogenetic ANOVA results for ecological predictors.,1,S07_Ecology_Tests/ecology_phylogenetic_anova_results.csv
+36,Table 36: PGLS results for ecological predictors.,1,S07_Ecology_Tests/ecology_pgls_factor_results.csv
+37,Table 37: Descriptive ecological summaries by trait and factor.,1,S07_Ecology_Tests/ecology_trait_group_summary.csv
+38,Table 38: Non-phylogenetic ecological group tests.,1,S07_Ecology_Tests/ecology_nonphylo_group_tests.csv
+39,Table 39: Geometry-matched ecology matrix used for comparative analyses.,1,S06_Ecology_Matrix/ecology_analysis_input_merged.csv
+40,Table 40: Discrete stochastic character mapping summary.,1,S10_PCM_ASR_and_Disparity/asr_discrete_simmap_summary.csv
