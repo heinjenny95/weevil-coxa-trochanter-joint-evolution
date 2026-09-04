@@ -35,5 +35,9 @@ The older central-section scripts are retained only to document the exploratory
 analysis that preceded the whole-volume workflow. They are not used for the
 reported results.
 
-The scripts assume the input tables distributed with the study and use
-placeholder project roots rather than workstation-specific paths.
+The extraction script requires the original paired binary coxa masks and OBJ
+meshes. The binary segmentation masks are not distributed in this repository;
+the repository contains the derived wall-thickness tables used by the
+downstream analyses. Exact re-extraction therefore requires the non-repository
+masks in addition to the meshes deposited on RADAR4KIT. Scripts use placeholder
+project roots rather than workstation-specific paths.

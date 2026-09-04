@@ -5,6 +5,11 @@ screw-related geometry from the coxa-trochanteral joint.
 
 The current workflow fits manually placed, ordered three-dimensional
 semilandmarks with `fit_helical_paths.py`, a robust circular 3D helix model.
+The original per-specimen semilandmark CSV inputs are not included in the
+repository. Their observed point names and XYZ coordinates are retained in
+`data/screw_geometry/robust_helix_point_residuals.csv`, from which trajectories
+can be reconstructed, although this does not reproduce the original input-file
+packaging.
 The original Cinema 4D/Python implementation,
 `helical_path_metrics_cinema4d.py`, is retained as an auditable legacy method
 and is reproduced internally by the new script. The legacy method estimates an

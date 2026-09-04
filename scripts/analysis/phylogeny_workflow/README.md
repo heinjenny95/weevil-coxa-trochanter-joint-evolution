@@ -55,5 +55,8 @@ branch-length representations. Findings that change with calibration or tree
 choice are reported as sensitivity-dependent.
 
 The original source alignment, partition files and source-study inference
-outputs are not redistributed in this code repository. They should be obtained
-from the McKenna et al. source dataset cited in the manuscript.
+records (including the exact IQ-TREE command, log and report) are not
+redistributed in this code repository. They should be obtained from the McKenna
+et al. source dataset cited in the manuscript or recreated from that source.
+The resulting tree used by this study and its downstream working and
+sensitivity variants are included under `data/phylogeny/P01_Trees`.

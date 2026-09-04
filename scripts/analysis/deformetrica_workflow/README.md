@@ -36,9 +36,11 @@ and no iteration-by-iteration log from the final atlas run is distributed;
 therefore neither a tolerance value nor a completed-iteration count should be
 cited as release-verifiable metadata.
 
-The exact ordered subject list is preserved in `study_data_set.xml`. Meshes
-are distributed separately with the study data and are not duplicated in
-this code repository.
+The exact ordered subject list is preserved in `study_data_set.xml`. The
+aligned VTK meshes referenced by that file, the Checkpoint landmarks used for
+alignment and `initial_template.vtk` are not distributed in this code
+repository. Surface meshes are deposited separately on RADAR4KIT, but the
+repository is not a turnkey archive of the exact atlas inputs.
 
 ## Files
 
@@ -58,8 +60,8 @@ performs the unscaled, centred PCA of subject momenta used in the manuscript.
 
 ## Command-line use
 
-Place the aligned VTK meshes and `initial_template.vtk` in one working
-directory, then run:
+After obtaining or reconstructing the aligned VTK meshes and
+`initial_template.vtk`, place them in one working directory, then run:
 
 ```bash
 python build_dataset_xml.py /path/to/atlasing --output data_set.xml

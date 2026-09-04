@@ -4,8 +4,8 @@ This repository contains the analysis code used for the manuscript
 **Evolutionary diversification of the biological screw joint in weevils**.
 The current workflows are located in `scripts/analysis`.
 
-The release includes mesh alignment, the exact Deformetrica atlas
-configuration and ordered study dataset, morphometric and allometric analyses,
+The release includes the three-landmark mesh-alignment script, the Deformetrica
+atlas configuration and ordered study dataset, morphometric and allometric analyses,
 robust 3D helix fitting and downstream joint-geometry analysis, coxal-wall
 measurements, ecological tests, and phylogenetic comparative analyses. It also
 includes the publication-figure renderers, shared visual style, panel assembly
@@ -25,8 +25,8 @@ axial-span, radius and fit-error measurements used for numerical legacy
 validation. Running that historical script requires a compatible Cinema 4D
 Python environment; the current robust fitter does not.
 
-All analysis data other than the processed tomograms and coxa/trochanter meshes
-are included under `data/`. This includes the
+The analysis-ready tabular inputs and derived outputs needed for the downstream
+statistical analyses are included under `data/`. This includes the
 complete source-data payload for Supplementary Tables 1-40, derived analysis
 tables, analysis-ready tabular inputs, quality-control outputs and the detailed
 robust geometry audit files. The imaging data and joint-surface meshes are
@@ -34,3 +34,16 @@ publicly accessible through RADAR4KIT
 under https://doi.org/10.35097/9p77hjk7wa656d6k. Local absolute paths have been
 replaced by explicit placeholder roots or command-line arguments so that no
 workstation-specific paths are published.
+
+The release does not contain every raw or intermediate input used in the
+raw-to-derived workflow. Not redistributed here are the study-specific Cinema
+4D `Obj_Processing.py` batch-remeshing script, the original Checkpoint landmark
+files, aligned VTK meshes, `initial_template.vtk`, binary coxa segmentation
+masks, the original ordered per-specimen semilandmark CSV files, or the source
+alignment, partition files and IQ-TREE command log/report. The point-residual
+table retains the observed semilandmark XYZ coordinates, but not the original
+input-file packaging. Consequently, the public release supports exact
+regeneration of downstream statistics, tables and scripted quantitative
+figures from the released derived inputs; exact reruns of mesh preprocessing,
+atlas estimation, wall-thickness extraction and source-tree inference require
+the corresponding non-repository inputs.

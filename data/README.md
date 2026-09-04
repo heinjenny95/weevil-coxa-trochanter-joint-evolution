@@ -65,9 +65,9 @@ consistency corrections.
   `kPCA_shape_geometry_regressions.csv`: ordination-sensitivity outputs for
   ordinary PCA and kernel PCA. Geometry-related historical outputs are kept
   separate from the current robust helix-fit evidence. The repository includes
-  the kPCA workflow, ordered atlas dataset and exact Deformetrica configuration;
-  regenerated momenta can be produced by rerunning that atlas workflow on the
-  deposited meshes.
+  the kPCA workflow, ordered atlas dataset and Deformetrica configuration.
+  Reproducing the atlas momenta also requires the aligned VTK meshes and
+  `initial_template.vtk`, which are not included in this repository.
 
 ## `phylogeny`
 
@@ -79,6 +79,6 @@ consistency corrections.
   as labelled sensitivity trees.
 
 The identifiers for *Lissorhoptrus oryzophilus*, *Ormiscus saltator* and
-*Tropiphorus pseudonasutus* are normalized to the atlas/PCA spellings. Current
+*Trigonopterus pseudonasutus* are normalized to the atlas/PCA spellings. Current
 pitch is the fitted axial rise per complete turn using all trajectory points;
 the algebraic endpoint quotient is retained only in the legacy tables.

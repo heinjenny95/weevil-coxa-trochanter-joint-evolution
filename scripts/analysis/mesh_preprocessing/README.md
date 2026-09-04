@@ -13,3 +13,12 @@ homologous order.
 
 Cinema 4D's Python environment provides the `c4d` module; this dependency is
 therefore not installable through the repository's Python requirements file.
+
+This folder documents and releases the GPA alignment step only. The
+study-specific `Obj_Processing.py` script used earlier for batch remeshing,
+smoothing and mesh cleanup is not included in the public repository. The
+original Checkpoint/Morphologika landmark files and the processed or aligned
+mesh inputs are likewise not included here; surface meshes are deposited
+separately on RADAR4KIT. Reproducing the raw mesh-preprocessing sequence
+therefore requires those non-repository inputs in addition to this alignment
+script.
