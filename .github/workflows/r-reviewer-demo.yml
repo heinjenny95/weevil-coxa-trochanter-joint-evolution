@@ -1,0 +1,44 @@
+name: R reviewer example
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reviewer-example:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    env:
+      RGL_USE_NULL: 'true'
+      LC_ALL: C
+      LANG: C
+    steps:
+      - uses: actions/checkout@v4
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          r-version: '4.5.2'
+          use-public-rspm: false
+      - name: Install the documented study environment
+        shell: pwsh
+        run: Rscript --vanilla scripts/install_R_dependencies.R
+      - name: Run seven workflows and verify 25 reference tables
+        shell: pwsh
+        run: Rscript --vanilla scripts/run_reviewer_demo.R
+      - name: Retain verification, timing and workflow logs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: R-reviewer-example
+          path: |
+            reviewer-demo-output/verification.csv
+            reviewer-demo-output/timings.csv
+            reviewer-demo-output/sessionInfo.txt
+            reviewer-demo-output/logs/
+            .reviewer-library/installed_versions.csv
+          if-no-files-found: warn
+          include-hidden-files: true

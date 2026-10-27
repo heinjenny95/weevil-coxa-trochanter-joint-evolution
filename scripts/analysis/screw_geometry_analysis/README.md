@@ -9,7 +9,10 @@ The original per-specimen semilandmark CSV inputs are not included in the
 repository. Their observed point names and XYZ coordinates are retained in
 `data/screw_geometry/robust_helix_point_residuals.csv`, from which trajectories
 can be reconstructed, although this does not reproduce the original input-file
-packaging.
+packaging. Release v1.4.0 supplies reconstructed inputs under
+`data/reviewer_support/helix_traces`, with units copied from the released
+metrics and original point order preserved. Normal vectors are not recreated.
+`reconstruct_helix_traces.py` rebuilds those files from the released tables.
 The original Cinema 4D/Python implementation,
 `helical_path_metrics_cinema4d.py`, is retained as an auditable legacy method
 and is reproduced internally by the new script. The legacy method estimates an

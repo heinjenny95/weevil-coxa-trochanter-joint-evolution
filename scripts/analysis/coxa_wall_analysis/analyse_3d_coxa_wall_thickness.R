@@ -87,6 +87,19 @@ extract_lm_summary <- function(model, model_name, metric, subset_name) {
 metrics <- read_table_robust(metrics_file)
 key <- read_table_robust(key_file)
 
+if (!"touches_original_stack_boundary" %in% names(metrics) && "boundary-qc" %in% names(args)) {
+  boundary_qc <- read_table_robust(args[["boundary-qc"]])
+  required_qc <- c("specimen", "touches_original_stack_boundary")
+  if (!all(required_qc %in% names(boundary_qc)) || anyDuplicated(boundary_qc$specimen)) {
+    stop("Boundary QC must contain one unique specimen row and a boundary flag.")
+  }
+  qc_index <- match(metrics$specimen, boundary_qc$specimen)
+  if (anyNA(qc_index)) stop("Boundary QC does not cover every metrics specimen.")
+  recovered <- as_bool(boundary_qc$touches_original_stack_boundary[qc_index])
+  if (anyNA(recovered)) stop("Boundary QC contains missing or invalid flags.")
+  metrics$touches_original_stack_boundary <- recovered
+}
+
 required_metrics <- c(
   "specimen", "bbox_diag_um", "median_3d_thickness_um", "p10_3d_thickness_um",
   "touches_original_stack_boundary", "analysis_scale"

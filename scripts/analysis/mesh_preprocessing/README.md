@@ -14,11 +14,15 @@ homologous order.
 Cinema 4D's Python environment provides the `c4d` module; this dependency is
 therefore not installable through the repository's Python requirements file.
 
-This folder documents and releases the GPA alignment step only. The
-study-specific `Obj_Processing.py` script used earlier for batch remeshing,
-smoothing and mesh cleanup is not included in the public repository. The
-original Checkpoint/Morphologika landmark files and the processed or aligned
-mesh inputs are likewise not included here; surface meshes are deposited
-separately on RADAR4KIT. Reproducing the raw mesh-preprocessing sequence
+Release v1.4.0 restores `Obj_Processing.py` from an
+archived pre-submission copy. It matches the documented target of 10,000
+polygons, three smoothing iterations at alpha 0.40 and disabled hole closing.
+Set `WEEVIL_RAW_MESH_DIR` before starting Cinema 4D, or edit `BASE_PATH` in
+the script, then use the Script Manager. It writes cleaned OBJ/PLY files to
+named subdirectories and a processing log. This audit parsed its syntax but
+did not execute or validate the Cinema 4D API calls. The historical execution
+log and exact original software environment were not recovered. Original Checkpoint/Morphologika landmark files are not bundled.
+Aligned VTK inputs are in the [atlas release asset](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Atlas_inputs_and_outputs_68_specimens.zip);
+processed surface meshes are on RADAR4KIT. Reproducing the raw mesh-preprocessing sequence
 therefore requires those non-repository inputs in addition to this alignment
 script.

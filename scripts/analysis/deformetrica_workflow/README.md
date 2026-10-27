@@ -23,24 +23,36 @@ attribution to the upstream workflow.
 - attachment: current
 - template noise standard deviation: 0.05
 - template and deformation kernel: KeOps, width 0.1
-- kernel device used for the archived run: CPU
+- saved XML kernel device: CPU (runtime log reports `GpuMode.KERNEL`; historical
+  hardware use is not established by the XML alone)
 - deformation trajectory: 30 time points
 - optimizer: gradient ascent
 - initial step size: 0.01
 - maximum iterations: 1,000
 - final atlas sample: 68 aligned trochanter meshes
 
-The released optimization configuration records the optimizer, initial step
-size and maximum iteration limit. It does not encode a convergence tolerance,
-and no iteration-by-iteration log from the final atlas run is distributed;
-therefore neither a tolerance value nor a completed-iteration count should be
-cited as release-verifiable metadata.
+The v1.3.2 optimization configuration records the optimizer, initial step
+size and maximum iteration limit, without a convergence tolerance or a
+distributed execution log. The reviewer supplement subsequently located the
+matching archive under `Testcode/data/atlasing`. Its log records convergence
+tolerance 0.0001, final reported iteration 51, stopping after the tolerance
+threshold was met, and estimation time 32 minutes 44 seconds. These recovered logs and inputs accompany v1.4.0 as a release asset;
+the v1.3.2 tag remains unchanged.
 
 The exact ordered subject list is preserved in `study_data_set.xml`. The
 aligned VTK meshes referenced by that file, the Checkpoint landmarks used for
 alignment and `initial_template.vtk` are not distributed in this code
-repository. Surface meshes are deposited separately on RADAR4KIT, but the
-repository is not a turnkey archive of the exact atlas inputs.
+source tree. The aligned meshes and template are provided in the
+versioned atlas release asset below; surface meshes are also on RADAR4KIT.
+
+The [v1.4.0 atlas asset](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Atlas_inputs_and_outputs_68_specimens.zip) packages
+the 68 referenced aligned meshes, initial/estimated templates, momenta,
+control points, XML files and recovered logs. PCA reconstructed from those
+momenta matches all released numerical scores and variance values exactly.
+The extractor explicitly records the historical `t_pseudonastus` to
+`t_pseudonasutus` identifier correction. No atlas optimization was rerun in
+this audit. The runtime log reports `GpuMode.KERNEL` despite `kernel-device`
+being `cpu` in the XML; actual historical hardware use remains to be resolved.
 
 ## Files
 

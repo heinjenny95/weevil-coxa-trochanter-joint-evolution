@@ -54,9 +54,9 @@ Results are evaluated across the topology-based primary tree and alternative
 branch-length representations. Findings that change with calibration or tree
 choice are reported as sensitivity-dependent.
 
-The original source alignment, partition files and source-study inference
-records (including the exact IQ-TREE command, log and report) are not
-redistributed in this code repository. They should be obtained from the McKenna
-et al. source dataset cited in the manuscript or recreated from that source.
-The resulting tree used by this study and its downstream working and
-sensitivity variants are included under `data/phylogeny/P01_Trees`.
+The study inference alignment, partitions and original IQ-TREE command/log/report
+are supplied in the [v1.4.0 phylogeny input asset](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Phylogeny_inference_inputs_and_logs.zip).
+The upstream phylogenomic source is McKenna et al. (2019;
+doi:10.1073/pnas.1909655116), Dataset S4. Preserve that attribution when reusing
+the alignment. The resulting study tree and sensitivity variants are checked
+in under `data/phylogeny/P01_Trees`. Inference was not rerun in this validation.
