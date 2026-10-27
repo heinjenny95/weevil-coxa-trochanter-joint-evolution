@@ -36,8 +36,34 @@ analysis that preceded the whole-volume workflow. They are not used for the
 reported results.
 
 The extraction script requires the original paired binary coxa masks and OBJ
-meshes. The binary segmentation masks are not distributed in this repository;
-the repository contains the derived wall-thickness tables used by the
-downstream analyses. Exact re-extraction therefore requires the non-repository
-masks in addition to the meshes deposited on RADAR4KIT. Scripts use placeholder
+meshes. The [68 original masks](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Coxa_original_masks_68_specimens.zip) are attached to
+release v1.4.0; derived thickness tables remain in the source tree.
+Re-extraction uses those masks and the corresponding meshes on RADAR4KIT. Scripts use placeholder
 project roots rather than workstation-specific paths.
+
+## Recovered boundary QC in the reviewer supplement
+
+The v1.3.2 metrics table omitted `touches_original_stack_boundary`, although
+the downstream R script required it for boundary-exclusion sensitivity. The
+supplement supplies `data/reviewer_support/coxa_mask_boundary_qc.csv`, recovered
+from the six faces of each of the 68 original TIFF masks. Stack dimensions
+were checked against the released metrics and SHA-256 checksums identify the
+source masks. Three masks touch a stack boundary.
+
+Pass `--boundary-qc data/reviewer_support/coxa_mask_boundary_qc.csv` to
+`analyse_3d_coxa_wall_thickness.R` with its other required arguments. The script
+matches unique specimen IDs and rejects missing or invalid flags. It retains
+an existing boundary column when one is already supplied. Main and lower-tail
+statistics on all masks reproduce the released values; additional
+boundary-exclusion output uses 65 masks and is not present in the v1.3.2
+reference tables. No published numerical result was overwritten.
+
+To independently recover the flags from the original masks, use:
+
+```text
+python recover_mask_boundary_qc.py metrics.csv ORIGINAL_MASK_DIRECTORY recovered_qc.csv
+```
+
+This optional recovery requires numpy, tifffile and an appropriate TIFF codec
+(imagecodecs was used in the validation). It is not needed to run the bundled
+R reviewer example.

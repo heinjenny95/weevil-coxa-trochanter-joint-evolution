@@ -1,0 +1,67 @@
+{
+  "date": "2026-10-27",
+  "base_release": "v1.3.2",
+  "base_commit": "99f3079f5d8d1bebbda6c33adaf9c3d45b5b2747",
+  "status": "Validation record accompanying public release v1.4.0",
+  "os": "Windows 11 Enterprise 10.0.26200",
+  "cpu": "AMD Ryzen 9 7950X, 16 physical cores / 32 logical processors",
+  "ram_bytes": 136522924032,
+  "R": "4.5.2",
+  "Python": "3.12.14",
+  "R_clean_install_seconds": 122.982,
+  "R_demo_seconds": 25.345,
+  "R_demo_workflows": 7,
+  "R_reference_tables_passed": 25,
+  "Python_clean_dependency_install_seconds": 20.262,
+  "Python_venv_creation_seconds": 7.416,
+  "Python_unit_tests_seconds": 6.852,
+  "Python_unit_tests_passed": 3,
+  "all_64_helix_refit_seconds": 73.901,
+  "helix_refit_bootstrap_replicates": 0,
+  "helix_numeric_comparison": {
+    "abs_winding_angle_deg": {
+      "max_absolute_difference": 0.0,
+      "specimen_at_max": "xylosandrus_germanus_trochanter_aligned"
+    },
+    "fitted_pitch_360": {
+      "max_absolute_difference": 0.0,
+      "specimen_at_max": "xylosandrus_germanus_trochanter_aligned"
+    },
+    "fit_radius": {
+      "max_absolute_difference": 0.0,
+      "specimen_at_max": "xylosandrus_germanus_trochanter_aligned"
+    },
+    "helix_rms": {
+      "max_absolute_difference": 0.0,
+      "specimen_at_max": "xylosandrus_germanus_trochanter_aligned"
+    },
+    "endpoint_axial_span_new_axis": {
+      "max_absolute_difference": 0.0,
+      "specimen_at_max": "xylosandrus_germanus_trochanter_aligned"
+    }
+  },
+  "recovered_boundary_qc": {
+    "masks": 68,
+    "touching_boundary": 3,
+    "source": "Original uncropped TIFF masks; six faces examined; source checksums in coexisting CSV"
+  },
+  "limitations": [
+    "Not a complete scan-to-results reproduction.",
+    "The 12800 conditional bootstrap draws were not regenerated.",
+    "Cinema 4D source was syntax checked, not executed.",
+    "No full atlas estimation, IQ-TREE inference or complete broad PCM/ecology rerun.",
+    "External raw and intermediate inputs are separate from the code repository.",
+    "No independent colleague installation test; automated validation only."
+  ],
+  "recovered_68_specimen_atlas": {
+    "source": "Testcode/data/atlasing",
+    "aligned_meshes": 68,
+    "initial_template_present": true,
+    "estimated_template_present": true,
+    "PCA_values_matching_exactly": 4624,
+    "PCA_variance_values_match": true,
+    "historical_identifier_correction": "t_pseudonastus -> t_pseudonasutus",
+    "new_atlas_optimization_performed": false
+  },
+  "release": "v1.4.0"
+}

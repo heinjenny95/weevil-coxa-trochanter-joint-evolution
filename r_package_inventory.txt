@@ -16,6 +16,7 @@ grDevices
 grid
 gridExtra
 hopkins
+jpeg
 mclust
 mvMORPH
 nlme
@@ -27,6 +28,7 @@ purrr
 RColorBrewer
 readr
 readxl
+rgl
 RRPP
 scales
 stats

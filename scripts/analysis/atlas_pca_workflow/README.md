@@ -6,6 +6,12 @@ This directory contains the scripts used to summarize the subject-specific Defor
 
 The `r/` scripts reproduce the ordinary-PCA workflow used for the main analyses, including PCA variance, specimen scores, morphospace clustering, disparity and allometry.
 
+The reviewer supplement corrects the standalone `test_full_shape_allometry.R`
+PC1-PC5 export to apply Holm correction within those five interpretation tests,
+matching `allometry_full_workflow.R` and the released table. The separate
+all-nonzero-PC export retains its own 67-test Holm family. The primary
+multivariate analysis and the original reference tables are unchanged.
+
 ### Hopkins clusterability diagnostic
 
 `r/run_hopkins_clusterability.R` reproduces the descriptive Hopkins diagnostic

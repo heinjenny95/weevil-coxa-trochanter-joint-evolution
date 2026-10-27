@@ -74,6 +74,23 @@ if (any(is.na(subj_ids)) || any(subj_ids == "")) {
 
 specimen_ids <- strip_vtk(subj_ids)
 
+# The archived atlas XML retains this historical spelling. The released
+# analysis tables use the corrected identifier; preserve the original in an
+# explicit audit table instead of dropping its specimen during later joins.
+source_specimen_ids <- specimen_ids
+specimen_ids[specimen_ids == "t_pseudonastus_trochanter_aligned"] <-
+  "t_pseudonasutus_trochanter_aligned"
+identifier_corrections <- data.frame(
+  source_specimen_id = source_specimen_ids,
+  analysis_specimen_id = specimen_ids,
+  stringsAsFactors = FALSE
+)
+identifier_corrections <- identifier_corrections[
+  identifier_corrections$source_specimen_id != identifier_corrections$analysis_specimen_id,
+  , drop = FALSE
+]
+write.csv(identifier_corrections, file.path(out_dir, "specimen_identifier_corrections.csv"), row.names = FALSE)
+
 # unique check
 dups <- specimen_ids[duplicated(specimen_ids)]
 if (length(dups) > 0) {

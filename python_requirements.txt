@@ -1,5 +1,6 @@
 deformetrica==4.3.0
 jupyterlab
+imagecodecs
 localthickness
 matplotlib
 numpy

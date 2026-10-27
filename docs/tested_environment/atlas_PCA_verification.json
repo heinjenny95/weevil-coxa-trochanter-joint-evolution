@@ -1,0 +1,49 @@
+{
+  "subjects": 68,
+  "all_meshes_present": true,
+  "template_present": true,
+  "pca_comparison": {
+    "match": false,
+    "rows": 68,
+    "common_columns": 69,
+    "columns_only_in_actual": [],
+    "columns_only_in_expected": [],
+    "difference_count": 1,
+    "differences": [
+      {
+        "row": 65,
+        "column": "specimen_id",
+        "actual": "t_pseudonastus_trochanter_aligned",
+        "expected": "t_pseudonasutus_trochanter_aligned"
+      }
+    ],
+    "max_relative_difference": 0
+  },
+  "pca_elapsed_seconds": 1.214,
+  "numeric_PCA_match": "All 68 axes for all 68 specimens match exactly at stored precision.",
+  "identifier_alias": {
+    "t_pseudonastus_trochanter_aligned": "t_pseudonasutus_trochanter_aligned"
+  },
+  "variance_max_absolute_difference": 0,
+  "new_atlas_optimization_performed": false,
+  "historical_log": {
+    "last_reported_iteration": 51,
+    "stop_reason": "Tolerance threshold met",
+    "reported_estimation_time": "32 minutes and 44 seconds",
+    "python_path_version": "3.8",
+    "caution": "The saved model XML says kernel-device cpu, but the runtime log reports GpuMode.KERNEL; actual historical GPU use was not resolved.",
+    "convergence_tolerance": 0.0001,
+    "source_log_date": "2026-03-24"
+  },
+  "pca_comparison_after_documented_identifier_normalization": {
+    "match": true,
+    "rows": 68,
+    "common_columns": 69,
+    "columns_only_in_actual": [],
+    "columns_only_in_expected": [],
+    "difference_count": 0,
+    "differences": [],
+    "max_relative_difference": 0
+  },
+  "estimated_template_present": true
+}

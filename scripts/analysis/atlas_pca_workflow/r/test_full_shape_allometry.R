@@ -210,6 +210,12 @@ pc5_univariate <- univariate[
   ,
   drop = FALSE
 ]
+# Match the manuscript workflow: the interpretation table is a separate
+# five-PC Holm family. The all-PC table retains adjustment over all axes.
+pc5_univariate$p_value_adjusted <- stats::p.adjust(
+  pc5_univariate$p_value, method = p_adjust_method
+)
+pc5_univariate$analysis_scope <- "PC1_to_PC5_interpretation"
 
 regression_fit <- stats::lm(full_shape ~ analysis_data$logCS)
 regression_vector_raw <- stats::coef(regression_fit)[2, ]

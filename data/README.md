@@ -71,8 +71,8 @@ consistency corrections.
   ordinary PCA and kernel PCA. Geometry-related historical outputs are kept
   separate from the current robust helix-fit evidence. The repository includes
   the kPCA workflow, ordered atlas dataset and Deformetrica configuration.
-  Reproducing the atlas momenta also requires the aligned VTK meshes and
-  `initial_template.vtk`, which are not included in this repository.
+  The aligned VTK meshes, initial template and archived momenta are
+  available in the versioned atlas asset linked below.
 
 ## `publication_figures`
 
@@ -94,3 +94,16 @@ The identifiers for *Lissorhoptrus oryzophilus*, *Ormiscus saltator* and
 *Trigonopterus pseudonasutus* are normalized to the atlas/PCA spellings. Current
 pitch is the fitted axial rise per complete turn using all trajectory points;
 the algebraic endpoint quotient is retained only in the legacy tables.
+
+## Additional reproducibility inputs in v1.4.0
+
+- [Atlas inputs and outputs](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Atlas_inputs_and_outputs_68_specimens.zip): 68 aligned meshes, templates, momenta, control points, configurations and logs.
+- [Original coxa masks](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Coxa_original_masks_68_specimens.zip): 68 masks and checksum-linked boundary QC.
+- [Phylogenetic inference archive](https://github.com/heinjenny95/weevil-coxa-trochanter-joint-evolution/releases/download/v1.4.0/Phylogeny_inference_inputs_and_logs.zip): alignment, partitions, original IQ-TREE log/report and inferred tree.
+- `reviewer_support/coxa_mask_boundary_qc.csv`: boundary flags recovered directly from those original masks.
+- `reviewer_support/helix_traces/`: 64 ordered CSV inputs repackaged from the released observed XYZ values, with units from the released metrics. These are not the original exports and contain no reconstructed normal vectors.
+
+The archives contain per-file checksums and provenance notes. Numerical source
+tables from v1.3.2 are unchanged. Original Checkpoint landmark files are not
+bundled; downstream and atlas-stage reproduction use the supplied derived or
+aligned inputs. See the root README for commands and tested scope.
